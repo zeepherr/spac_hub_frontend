@@ -1,20 +1,20 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-
-import { zodResolver } from "@/hookform/resolvers/zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router";
 import { useForm } from "react-hook-form";
-import { loginSchema } from "@/validations/auth.schema";
+import { loginSchema } from "../../validations/auth.schema";
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
-  const { formState, register, handleSubmit } = useForm({
+  const { formState:{errors}, register, handleSubmit } = useForm({
     resolver: zodResolver(loginSchema),
     mode: "onSubmit",
     defaultValues: { email: "", password: "" },
   });
 
+   
   const onSubmit = (data) => {
     console.log(data);
   };
@@ -98,7 +98,7 @@ function LoginPage() {
             {/* Forgot password */}
             <div className="flex justify-end mt-3">
               <Link
-                to="/forgot-password"
+                // to="/forgot-password"
                 className="text-sm text-orange-500 hover:text-orange-600 font-medium"
               >
                 ลืมรหัสผ่าน?
