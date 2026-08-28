@@ -4,9 +4,7 @@ export function AttemptsExceededDialog({ message, onConfirm }) {
   return (
     <dialog open className="modal">
       <div className="modal-box">
-        <h3 className="text-lg font-bold text-error">
-          Verification attempts exceeded
-        </h3>
+        <h3 className="font-bold text-lg text-error">Too many attempts</h3>
 
         <p className="py-4 text-sm text-base-content/70">{message}</p>
 
@@ -16,10 +14,6 @@ export function AttemptsExceededDialog({ message, onConfirm }) {
           </button>
         </div>
       </div>
-
-      <form method="dialog" className="modal-backdrop">
-        <button type="button" aria-label="Close" onClick={onConfirm} />
-      </form>
     </dialog>
   );
 }
