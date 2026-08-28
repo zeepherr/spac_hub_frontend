@@ -1,49 +1,24 @@
 import { useState } from "react";
-import {
-  Link,
-  useNavigate,
-} from "react-router";
+import {Link,useNavigate,} from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "react-toastify";
-
-import {
-  Eye,
-  EyeOff,
-  LockKeyhole,
-  Mail,
-  UserRound,
-} from "lucide-react";
-
+import {Eye,EyeOff,LockKeyhole,Mail,UserRound,} from "lucide-react";
 import { registerSchema } from "../../validations/auth.schema.js";
-import mainApi from "../../apis/mainApi.js";
 
 function RegisterPage() {
   const navigate = useNavigate();
 
   // ใช้เฉพาะเปิด–ปิดการแสดงรหัสผ่าน
   const [showPassword, setShowPassword] =
-    useState(false);
+  useState(false);
 
-  const [
-    showConfirmPassword,
-    setShowConfirmPassword,
-  ] = useState(false);
+  const [showConfirmPassword,setShowConfirmPassword,] = useState(false);
 
   // React Hook Form
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: {
-      errors,
-      isSubmitting,
-    },
+  const {register,handleSubmit,reset,formState: {errors,isSubmitting,},
   } = useForm({
     resolver: zodResolver(registerSchema),
-
     mode: "onSubmit",
-
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -54,27 +29,9 @@ function RegisterPage() {
   });
 
   // ทำงานเมื่อข้อมูลผ่าน Zod
-  const onSubmit = async (data) => {
-    try {
-      await mainApi.post("/auth/register", {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        password: data.password,
-      });
-
-      toast.success("สมัครสมาชิกสำเร็จ");
-
-      reset();
-      navigate("/login");
-    } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        "ไม่สามารถสมัครสมาชิกได้";
-
-      toast.error(message);
-    }
+  const onSubmit =  (data) => {
+    console.log(data)
+    
   };
 
   const inputStyle =
@@ -88,38 +45,27 @@ function RegisterPage() {
           <Link
             to="/"
             className="mb-4 inline-block text-2xl font-black tracking-tight text-neutral-900"
-          >
-            SPEC
-            <span className="text-orange-500">
-              HUB
-            </span>
+          > SPEC
+            <span className="text-orange-500">HUB</span>
           </Link>
 
-          <h1 className="text-3xl font-bold text-neutral-900">
-            สมัครสมาชิก
-          </h1>
+          <h1 className="text-3xl font-bold text-neutral-900">สมัครสมาชิก</h1>
 
-          <p className="mt-2 text-sm text-neutral-500">
-            สร้างบัญชีเพื่อเริ่มซื้อขายอุปกรณ์ไอทีมือสอง
-          </p>
+          <p className="mt-2 text-sm text-neutral-500">สร้างบัญชีเพื่อเริ่มซื้อขายอุปกรณ์ไอทีมือสอง</p>
         </header>
-
-        {/* Form */}
+        
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-5"
           noValidate
         >
-          {/* ชื่อและนามสกุล */}
+         
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/* ชื่อ */}
             <div>
               <label
                 htmlFor="firstName"
                 className="mb-2 block text-sm font-semibold text-neutral-800"
-              >
-                ชื่อ
-              </label>
+              >ชื่อ</label>
 
               <div className="relative">
                 <UserRound
@@ -152,14 +98,12 @@ function RegisterPage() {
               )}
             </div>
 
-            {/* นามสกุล */}
+           
             <div>
               <label
                 htmlFor="lastName"
                 className="mb-2 block text-sm font-semibold text-neutral-800"
-              >
-                นามสกุล
-              </label>
+              >นามสกุล</label>
 
               <div className="relative">
                 <UserRound
@@ -193,14 +137,11 @@ function RegisterPage() {
             </div>
           </div>
 
-          {/* อีเมล */}
           <div>
             <label
               htmlFor="email"
               className="mb-2 block text-sm font-semibold text-neutral-800"
-            >
-              อีเมล
-            </label>
+            >อีเมล</label>
 
             <div className="relative">
               <Mail
@@ -233,14 +174,12 @@ function RegisterPage() {
             )}
           </div>
 
-          {/* รหัสผ่าน */}
+         
           <div>
             <label
               htmlFor="password"
               className="mb-2 block text-sm font-semibold text-neutral-800"
-            >
-              รหัสผ่าน
-            </label>
+            >รหัสผ่าน</label>
 
             <div className="relative">
               <LockKeyhole
@@ -298,14 +237,11 @@ function RegisterPage() {
             )}
           </div>
 
-          {/* ยืนยันรหัสผ่าน */}
           <div>
             <label
               htmlFor="confirmPassword"
               className="mb-2 block text-sm font-semibold text-neutral-800"
-            >
-              ยืนยันรหัสผ่าน
-            </label>
+            >ยืนยันรหัสผ่าน</label>
 
             <div className="relative">
               <LockKeyhole
@@ -363,72 +299,26 @@ function RegisterPage() {
             )}
           </div>
 
-          {/* ข้อตกลง */}
-          <label className="flex cursor-pointer items-start gap-3 text-sm text-neutral-600">
-            <input
-              type="checkbox"
-              required
-              className="mt-0.5 size-4 rounded border-neutral-300 accent-orange-500"
-            />
-
-            <span>
-              ฉันยอมรับ{" "}
-              <Link
-                to="/terms"
-                className="font-medium text-orange-500 hover:underline"
-              >
-                ข้อกำหนดการใช้งาน
-              </Link>{" "}
-              และ{" "}
-              <Link
-                to="/privacy"
-                className="font-medium text-orange-500 hover:underline"
-              >
-                นโยบายความเป็นส่วนตัว
-              </Link>
-            </span>
-          </label>
-
-          {/* ปุ่มสมัคร */}
           <button
             type="submit"
-            disabled={isSubmitting}
+            // disabled={isSubmitting}
             className="w-full rounded-lg bg-orange-500 py-3 font-semibold text-white transition hover:bg-orange-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isSubmitting
-              ? "กำลังสมัครสมาชิก..."
-              : "สร้างบัญชี"}
+            {isSubmitting? "กำลังสมัครสมาชิก...": "สร้างบัญชี"}
           </button>
         </form>
 
         <div className="mt-6 flex items-center gap-4">
           <div className="h-px flex-1 bg-neutral-200" />
-
-          <span className="text-xs text-neutral-400">
-            หรือ
-          </span>
-
+          <span className="text-xs text-neutral-400">หรือ</span>
           <div className="h-px flex-1 bg-neutral-200" />
         </div>
 
-        <button
-          type="button"
-          className="mt-5 flex w-full items-center justify-center gap-3 rounded-lg border border-neutral-300 bg-white py-3 font-medium text-neutral-700 transition hover:bg-neutral-50"
-        >
-          <span className="text-lg font-bold text-blue-500">
-            G
-          </span>
-
-          สมัครด้วย Google
-        </button>
-
-        <p className="mt-6 text-center text-sm text-neutral-500">
-          มีบัญชีอยู่แล้ว?{" "}
+        <p className="mt-6 text-center text-sm text-neutral-500"> มีบัญชีอยู่แล้ว?{" "}
           <Link
             to="/login"
             className="font-semibold text-orange-500 hover:underline"
-          >
-            เข้าสู่ระบบ
+          >เข้าสู่ระบบ
           </Link>
         </p>
       </section>

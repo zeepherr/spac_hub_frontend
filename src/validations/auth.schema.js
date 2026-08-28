@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { z } from "zod";
 
 export const registerSchema = z
@@ -30,11 +29,6 @@ export const registerSchema = z
       .string()
       .min(1, "กรุณายืนยันรหัสผ่าน"),
 
-    acceptTerms: z
-      .boolean()
-      .refine((value) => value === true, {
-        message: "กรุณายอมรับข้อกำหนดการใช้งาน",
-      }),
   })
   .refine(
     (values) =>
@@ -44,8 +38,7 @@ export const registerSchema = z
       path: ["confirmPassword"],
     }
   );
-=======
-import z from "zod"
+
 export const loginSchema = z.object({
   email: z
     .string()
@@ -54,4 +47,3 @@ export const loginSchema = z.object({
     .email("Enter a valid email address"),
   password: z.string().min(4, "Password requires at least 4 characters"),
 });
->>>>>>> dev
