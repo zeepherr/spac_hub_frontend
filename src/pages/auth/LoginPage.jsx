@@ -1,26 +1,56 @@
-import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { login } from "@/api/auth/auth.api";
+import { establishSession } from "@/api/auth/auth.session";
+import useAuthStore from "@/stores/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Link, Navigate, useNavigate } from "react-router";
+import { toast } from "sonner";
 import { loginSchema } from "../../validations/auth.schema";
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-
-  const { formState:{errors}, register, handleSubmit } = useForm({
+  const navigate = useNavigate();
+  const user = useAuthStore((store) => store.user);
+  const {
+    formState: { errors, isSubmitting },
+    register,
+    handleSubmit,
+    setFocus,
+    reset,
+  } = useForm({
     resolver: zodResolver(loginSchema),
     mode: "onSubmit",
     defaultValues: { email: "", password: "" },
   });
+  const focusNextOnEnter = (event, nextField) => {
+    if (event.key !== "Enter") return;
 
-   
-  const onSubmit = (data) => {
-    console.log(data);
+    event.preventDefault();
+    setFocus(nextField);
   };
 
+  const onSubmit = async (data) => {
+    try {
+      const res = await login(data);
+      await establishSession(res);
+      toast.success(res.message, { position: "top-center" });
+      navigate("/");
+
+      reset();
+    } catch (err) {
+      toast.error(err.response?.data.message ?? "Login error.", {
+        position: "top-center",
+      });
+    }
+  };
+  if (user) {
+    return <Navigate to={"/"} replace />;
+  }
+
   return (
-    <main className="min-h-screen bg-base-100 flex items-center justify-center px-4 py-10">
+    <main className="min-h-full  flex items-center justify-center w-full">
       <div className="hardware-surface w-full max-w-md bg-white p-8 md:p-10">
         <div className="text-center mb-6">
           <Link
@@ -52,6 +82,7 @@ function LoginPage() {
               placeholder="กรอกอีเมลของคุณ"
               className="input input-bordered w-full h-12"
               {...register("email")}
+              onKeyDown={(e) => focusNextOnEnter(e, "password")}
             />
 
             {errors.email && (
@@ -111,7 +142,7 @@ function LoginPage() {
             type="submit"
             className="btn btn-accent w-full h-12 text-base"
           >
-            เข้าสู่ระบบ
+            {isSubmitting ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
           </button>
 
           {/* Divider */}
