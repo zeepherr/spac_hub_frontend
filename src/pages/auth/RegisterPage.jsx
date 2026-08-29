@@ -1,4 +1,5 @@
 import { registerUser } from "@/api/auth/auth.api.js";
+import { getRoleHome } from "@/routes/Role.route.jsx";
 import useAuthStore from "@/stores/auth.store.js";
 import { savePendingRegistration } from "@/utils/auth/pending-registration.js";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -56,7 +57,7 @@ function RegisterPage() {
 
   const inputStyle =
     "w-full rounded-lg border bg-white py-3 pl-11 pr-4 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:ring-2";
-  if (user) return <Navigate to={"/"} replace />;
+  if (user) return <Navigate to={getRoleHome(user.role)} replace />;
   return (
     <main className="flex min-h-full items-center justify-center bg-neutral-100 px-4 py-10">
       <section className="w-full max-w-xl rounded-2xl border border-neutral-200 bg-white px-6 py-8 shadow-xl sm:px-10">
