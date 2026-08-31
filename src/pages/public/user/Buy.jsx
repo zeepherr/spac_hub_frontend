@@ -1,5 +1,5 @@
 function Buy() {
-  return <div>Buy</div>;
+  return <div>User Dashboard</div>;
 }
 
 export default Buy;
