@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { useCategories } from "@/hook/category/useCategory";
 import { useCreateCategory } from "@/hook/category/useCreateCategory";
-import { useUpdateCategory } from "@/hook/category/useUpdateCategory";
+import EditCategoryModal from "./EditCategoryModal";
 
 function Categories() {
   const [search, setSearch] = useState("");
@@ -274,6 +274,16 @@ function Categories() {
           </div>
         </div>
       )}
+
+      {/* EDIT CATEGORY MODAL */}
+      <EditCategoryModal
+        isOpen={isEditOpen}
+        category={selectedCategory}
+        onClose={() => {
+          setIsEditOpen(false);
+          setSelectedCategory(null);
+        }}
+      />
     </div>
   );
 }

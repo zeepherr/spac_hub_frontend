@@ -4,11 +4,7 @@ import GlobalLoading from "@/components/loading/GlobalLoading";
 import { getRoleHome } from "@/routes/Role.route";
 import useAuthStore from "@/stores/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
-<<<<<<< HEAD
-import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
-=======
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
->>>>>>> dev
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, Navigate, useNavigate } from "react-router";
@@ -63,11 +59,8 @@ function LoginPage() {
     );
   }
 
-<<<<<<< HEAD
-=======
   if (isSubmitting) return <GlobalLoading label="กำลังเข้าสู่ระบบ..." />;
 
->>>>>>> dev
   const inputStyle =
     "w-full rounded-lg border bg-white py-2.5 pl-11 pr-4 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:ring-2";
 
@@ -102,29 +95,6 @@ function LoginPage() {
                 size={18}
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
               />
-<<<<<<< HEAD
-
-              <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="กรอกอีเมลของคุณ"
-                className={`${inputStyle} ${
-                  errors.email
-                    ? "border-red-500 focus:border-red-500 focus:ring-red-100"
-                    : "border-neutral-300 focus:border-orange-500 focus:ring-orange-100"
-                }`}
-                {...register("email")}
-                onKeyDown={(e) => focusNextOnEnter(e, "password")}
-              />
-
-              {errors.email && (
-                <p className="text-[#f97316] text-sm mt-1">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-=======
 
               <input
                 id="email"
@@ -146,7 +116,6 @@ function LoginPage() {
                 {errors.email.message}
               </p>
             )}
->>>>>>> dev
           </div>
 
           {/* Password */}
@@ -175,14 +144,6 @@ function LoginPage() {
                 }`}
                 {...register("password")}
               />
-<<<<<<< HEAD
-              {errors.password && (
-                <p className="text-[#f97316] text-sm mt-1">
-                  {errors.password.message}
-                </p>
-              )}
-=======
->>>>>>> dev
 
               <button
                 type="button"

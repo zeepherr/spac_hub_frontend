@@ -9,13 +9,8 @@ function Logo() {
         {/* <span className="text-lg font-black text-accent">S</span> */}
       </div>
       <div>
-<<<<<<< HEAD
-        <span className="text-lg font-black tracking-tight">SPEC</span>
-        <span className="text-lg font-black text-[#f97361] tracking-tight">
-=======
         <span className="text-5xl font-black tracking-tight">SPEC</span>
         <span className="text-5xl font-black text-[#f97316] tracking-tight">
->>>>>>> dev
           HUB
         </span>
       </div>

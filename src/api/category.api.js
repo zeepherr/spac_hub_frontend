@@ -12,9 +12,9 @@ export const createCategory = async (payload) => {
   return response.data;
 };
 
-export const updateCategory = async ({id,payload}) => {
-  const response = await authApi.patch(`/categories/:${id}`,payload)
+export const updateCategory = async (id,payload) => {
+  const response = await authApi.patch(`/categories/${id}`,payload)
 
-  return response.data.data
+  return response.data
 };
 

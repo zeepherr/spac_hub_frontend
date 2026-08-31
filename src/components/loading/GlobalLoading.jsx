@@ -11,11 +11,7 @@ import { Cpu } from "lucide-react";
  */
 export default function GlobalLoading({ label = "กำลังโหลดข้อมูล..." }) {
   return (
-<<<<<<< HEAD
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 overflow-hidden bg-base-100">
-=======
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 overflow-hidden bg-base-100/75">
->>>>>>> dev
       {/* พื้นหลังลาย circuit board บางๆ */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.06]"

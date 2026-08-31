@@ -7,6 +7,7 @@ function EditCategoryModal({
   category,
 }) {
   const [categoryName, setCategoryName] = useState("");
+  console.log(category)
 
   const {
     mutate: updateCategory,
@@ -42,7 +43,7 @@ function EditCategoryModal({
     updateCategory(
       {
         id: category.id,
-        data: {
+        payload: {
           name,
         },
       },

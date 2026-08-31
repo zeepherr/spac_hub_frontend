@@ -6,7 +6,9 @@ import {toast} from "sonner"
 export const useUpdateCategory = ()=>{
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: updateCategory,
+        mutationFn: ({id,payload})=>{
+            return updateCategory(id,payload)
+        },
         onSuccess: (data)=>{
             toast.success(data.message, {position:"top-right"})
             queryClient.invalidateQueries({
