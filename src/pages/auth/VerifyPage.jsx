@@ -70,13 +70,13 @@ export default function VerifyPage() {
           </svg>
         </div>
 
-        <h1 className="text-2xl md:text-3xl font-black tracking-tight mb-2">
+        <h1 className="text-2xl md:text-3xl text-[#171717] font-black tracking-tight mb-2">
           Verification Code
         </h1>
 
-        <p className="text-xs md:text-sm text-secondary max-w-xs mb-6 leading-relaxed">
+        <p className="text-xs md:text-sm text-[#171717] max-w-xs mb-6 leading-relaxed">
           กรุณากรอกรหัสยืนยัน 6 หลักที่เราได้ส่งไปยังอีเมล:{" "}
-          <span className="font-bold text-base-content">{pending.email}</span>
+          <span className="font-bold text-[#f97316]">{pending.email}</span>
         </p>
 
         <VerifyEmailForm

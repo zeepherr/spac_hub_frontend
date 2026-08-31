@@ -4,11 +4,11 @@ import Header from "../components/auth/AuthHeader";
 
 function AuthLayout() {
   return (
-    <div className="flex flex-col h-screen scroll-smooth scrollbar-none overflow-hidden">
+    <div className="flex h-screen flex-col overflow-hidden">
       <Header />
-      <div className="grid flex-1 lg:grid-cols-2 ">
+      <div className="grid min-h-0 flex-1 lg:grid-cols-2">
         <AuthAside />
-        <div className="flex items-center justify-center p-6 ">
+        <div className="flex items-center justify-center overflow-y-auto p-4">
           <Outlet />
         </div>
       </div>

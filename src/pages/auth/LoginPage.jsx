@@ -2,7 +2,7 @@ import { login } from "@/api/auth/auth.api";
 import { establishSession } from "@/api/auth/auth.session";
 import useAuthStore from "@/stores/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, Navigate, useNavigate } from "react-router";
@@ -49,15 +49,18 @@ function LoginPage() {
     return <Navigate to={"/"} replace />;
   }
 
+  const inputStyle =
+    "w-full rounded-lg border bg-white py-2.5 pl-11 pr-4 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:ring-2";
+
   return (
-    <main className="min-h-full  flex items-center justify-center w-full">
-      <div className="hardware-surface w-full max-w-md bg-white p-8 md:p-10">
+    <main className="max-h-full flex items-center justify-center w-full">
+      <div className="hardware-surface w-full max-w-md bg-white p-8 md:p-10 ">
         <div className="text-center mb-6">
           <Link
             to="/"
             className="inline-block text-2xl font-black tracking-tight text-neutral-900"
           >
-            SPEC<span className="text-orange-500">HUB</span>
+            SPEC<span className="text-[#f97316]">HUB</span>
           </Link>
         </div>
         {/* Title */}
@@ -75,21 +78,32 @@ function LoginPage() {
               อีเมล
             </label>
 
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="กรอกอีเมลของคุณ"
-              className="input input-bordered w-full h-12"
-              {...register("email")}
-              onKeyDown={(e) => focusNextOnEnter(e, "password")}
-            />
+            <div className="relative">
+              <Mail
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
+              />
 
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
-              </p>
-            )}
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="กรอกอีเมลของคุณ"
+                className={`${inputStyle} ${
+                  errors.email
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-100"
+                    : "border-neutral-300 focus:border-orange-500 focus:ring-orange-100"
+                }`}
+                {...register("email")}
+                onKeyDown={(e) => focusNextOnEnter(e, "password")}
+              />
+
+              {errors.email && (
+                <p className="text-[#f97316] text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Password */}
@@ -102,16 +116,24 @@ function LoginPage() {
             </label>
 
             <div className="relative">
+              <LockKeyhole
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
+              />
               <input
                 id="password"
                 name="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="กรอกรหัสผ่านของคุณ"
-                className="input input-bordered w-full h-12 pr-12"
+                className={`${inputStyle}  pr-12 ${
+                  errors.password
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-100"
+                    : "border-neutral-300 focus:border-orange-500 focus:ring-orange-100"
+                }`}
                 {...register("password")}
               />
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-[#f97316] text-sm mt-1">
                   {errors.password.message}
                 </p>
               )}
@@ -130,7 +152,7 @@ function LoginPage() {
             <div className="flex justify-end mt-3">
               <Link
                 // to="/forgot-password"
-                className="text-sm text-orange-500 hover:text-orange-600 font-medium"
+                className="text-[#f97316] hover:underline hover:text-orange-600 text-sm font-medium"
               >
                 ลืมรหัสผ่าน?
               </Link>
@@ -140,7 +162,7 @@ function LoginPage() {
           {/* Login */}
           <button
             type="submit"
-            className="btn btn-accent w-full h-12 text-base"
+            className="w-full cursor-pointer rounded-lg bg-[#f97316] py-2.5 font-semibold text-white transition hover:bg-orange-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
           </button>
@@ -157,7 +179,7 @@ function LoginPage() {
           {/* Google */}
           <button
             type="button"
-            className="btn btn-outline w-full h-12 gap-3 bg-white"
+            className="btn btn-outline w-full h-12 gap-3 rounded-lg bg-white"
           >
             <svg
               width="20"
@@ -194,7 +216,7 @@ function LoginPage() {
           ยังไม่มีบัญชี?{" "}
           <Link
             to="/register"
-            className="text-orange-500 hover:text-orange-600 font-medium"
+            className="text-[#f97316] hover:underline hover:text-orange-600 font-semibold"
           >
             สมัครสมาชิก
           </Link>
