@@ -26,7 +26,7 @@ const router = createBrowserRouter([
             element: <RoleRoute allowRoles={[ROLES.USER]} />,
             children: [
               {
-                path: "/",
+                path: "/user",
                 Component: PublicLayout,
                 children: [
                   {
@@ -34,6 +34,26 @@ const router = createBrowserRouter([
                     Component: HomePage,
                   },
                 ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    Component: ProtectedRoute,
+    children: [
+      {
+        element: <RoleRoute allowRoles={[ROLES.ADMIN]} />,
+        children: [
+          {
+            path: "/admin",
+            Component: AdminLayout,
+            children: [
+              {
+                index: true,
+                Component: Dashboard,
               },
             ],
           },
@@ -60,26 +80,7 @@ const router = createBrowserRouter([
     ],
   },
   //admin routes
-  {
-    Component: ProtectedRoute,
-    children: [
-      {
-        element: <RoleRoute allowRoles={[ROLES.ADMIN]} />,
-        children: [
-          {
-            path: "/admin",
-            Component: AdminLayout,
-            children: [
-              {
-                index: true,
-                Component: Dashboard,
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
+
   {
     path: "*",
     element: <p>This page is not found</p>,

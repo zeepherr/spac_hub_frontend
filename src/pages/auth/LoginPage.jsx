@@ -1,5 +1,6 @@
 import { login } from "@/api/auth/auth.api";
 import { establishSession } from "@/api/auth/auth.session";
+import { getRoleHome } from "@/routes/Role.route";
 import useAuthStore from "@/stores/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
@@ -34,9 +35,9 @@ function LoginPage() {
   const onSubmit = async (data) => {
     try {
       const res = await login(data);
-      await establishSession(res);
+      const user = await establishSession(res);
+      navigate(getRoleHome(user.role), { replace: true });
       toast.success(res.message, { position: "top-center" });
-      navigate("/");
 
       reset();
     } catch (err) {
@@ -46,7 +47,7 @@ function LoginPage() {
     }
   };
   if (user) {
-    return <Navigate to={"/"} replace />;
+    return <Navigate to={getRoleHome(user.role)} replace />;
   }
 
   const inputStyle =
