@@ -33,16 +33,8 @@ const router = createBrowserRouter([
                 path: "user",
                 Component: ProfileLayout,
                 children: [
-                  {
-                    index: true,
-                    Component: Buy,
-                  },
-                  {
-                    path: "/user",
-                    Component: ProfileLayout,
-                    children: [
                       {
-                        index: true,
+                         index: true,
                         Component: Buy,
                       },
                       {
@@ -65,8 +57,8 @@ const router = createBrowserRouter([
           },
         ],
       },
-    ],
-  },
+
+
   {
     Component: ProtectedRoute,
     children: [

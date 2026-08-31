@@ -3,10 +3,12 @@ import Header from "../components/auth/AuthHeader";
 
 function PublicLayout() {
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-[#ffffff]">
-      <Header />
-      <div className="flex items-center justify-center overflow-y-auto p-4">
-        PuclicLayput
+    <div className="flex h-screen flex-col overflow-hidden bg-white">
+      <div className="shrink-0">
+        <Header />
+      </div>
+
+      <div className="min-h-0 w-full flex-1 overflow-y-auto">
         <Outlet />
       </div>
     </div>
