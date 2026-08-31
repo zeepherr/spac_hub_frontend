@@ -31,7 +31,6 @@ const router = createBrowserRouter([
             children: [
               {
                 path: "/",
-                Component: PublicLayout,
                 children: [
                   {
                     index: true,
