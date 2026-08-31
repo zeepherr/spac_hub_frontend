@@ -10,7 +10,7 @@ const useAuthStore = create((set) => ({
     set({ user });
   },
   // checking | authenticated | guest
-  status: "authenticated", // later will be set checking
+  status: "checking", // later will be set checking
 
   setSession: ({ accessToken, user }) => {
     set({
