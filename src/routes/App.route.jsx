@@ -52,6 +52,10 @@ const router = createBrowserRouter([
                         path: "details",
                         Component: Profile,
                       },
+                      {
+                        path: "favorites",
+                        element: null,
+                      },                   
                     ],
                   },
                 ],

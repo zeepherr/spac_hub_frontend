@@ -1,5 +1,5 @@
 function Sell() {
-  return <div>Sell</div>;
+  return <div>Seller Dashboard</div>;
 }
 
 export default Sell;
