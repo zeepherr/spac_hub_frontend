@@ -1,5 +1,14 @@
+import { LogoutButton } from "@/components/auth/LogoutButton";
+import useAuthStore from "@/stores/auth.store";
+
 function Dashboard() {
-  return <div>Dashboard</div>;
+  const user = useAuthStore((state) => state.user);
+  return (
+    <div>
+      Dashboard
+      {user && <LogoutButton />}
+    </div>
+  );
 }
 
 export default Dashboard;

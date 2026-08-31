@@ -1,9 +1,14 @@
 import { login } from "@/api/auth/auth.api";
 import { establishSession } from "@/api/auth/auth.session";
+import GlobalLoading from "@/components/loading/GlobalLoading";
 import { getRoleHome } from "@/routes/Role.route";
 import useAuthStore from "@/stores/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
+<<<<<<< HEAD
 import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
+=======
+import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+>>>>>>> dev
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, Navigate, useNavigate } from "react-router";
@@ -36,7 +41,9 @@ function LoginPage() {
     try {
       const res = await login(data);
       const user = await establishSession(res);
-      navigate(getRoleHome(user.role), { replace: true });
+      navigate(user.role === "USER" ? "/" : getRoleHome(user.role), {
+        replace: true,
+      });
       toast.success(res.message, { position: "top-center" });
 
       reset();
@@ -47,9 +54,20 @@ function LoginPage() {
     }
   };
   if (user) {
-    return <Navigate to={getRoleHome(user.role)} replace />;
+    console.log(user.role);
+    return (
+      <Navigate
+        to={user.role === "USER" ? "/" : getRoleHome(user.role)}
+        replace
+      />
+    );
   }
 
+<<<<<<< HEAD
+=======
+  if (isSubmitting) return <GlobalLoading label="กำลังเข้าสู่ระบบ..." />;
+
+>>>>>>> dev
   const inputStyle =
     "w-full rounded-lg border bg-white py-2.5 pl-11 pr-4 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:ring-2";
 
@@ -84,6 +102,7 @@ function LoginPage() {
                 size={18}
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
               />
+<<<<<<< HEAD
 
               <input
                 id="email"
@@ -105,6 +124,29 @@ function LoginPage() {
                 </p>
               )}
             </div>
+=======
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="กรอกอีเมลของคุณ"
+                className={`${inputStyle} ${
+                  errors.email
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-100"
+                    : "border-neutral-300 focus:border-orange-500 focus:ring-orange-100"
+                }`}
+                {...register("email")}
+                onKeyDown={(e) => focusNextOnEnter(e, "password")}
+              />
+            </div>
+
+            {errors.email && (
+              <p className="text-[#f97316] text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
+>>>>>>> dev
           </div>
 
           {/* Password */}
@@ -133,11 +175,14 @@ function LoginPage() {
                 }`}
                 {...register("password")}
               />
+<<<<<<< HEAD
               {errors.password && (
                 <p className="text-[#f97316] text-sm mt-1">
                   {errors.password.message}
                 </p>
               )}
+=======
+>>>>>>> dev
 
               <button
                 type="button"
@@ -148,6 +193,12 @@ function LoginPage() {
                 {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
               </button>
             </div>
+
+            {errors.password && (
+              <p className="text-[#f97316] text-sm mt-1">
+                {errors.password.message}
+              </p>
+            )}
 
             {/* Forgot password */}
             <div className="flex justify-end mt-3">

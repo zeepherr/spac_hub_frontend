@@ -3,9 +3,10 @@ import useAuthStore from "../stores/auth.store";
 
 const RoleRoute = ({ allowRoles = [] }) => {
   const user = useAuthStore((state) => state.user);
-  const status = useAuthStore((state) => state.status);
-  if (status !== "authenticated" || !user)
-    return <Navigate to="/login" replace />;
+  // const status = useAuthStore((state) => state.status);
+  // if (status !== "authenticated" || !user)
+  //   return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/login" replace />;
   if (!allowRoles.includes(user.role)) {
     return <Navigate to={getRoleHome(user?.role)} replace />;
   }
