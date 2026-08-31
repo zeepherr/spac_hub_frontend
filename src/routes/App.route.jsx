@@ -13,6 +13,7 @@ import VerifyPage from "../pages/auth/VerifyPage";
 import HomePage from "../pages/public/HomePage";
 import ProtectedRoute from "./Protected.route";
 import RoleRoute, { ROLES } from "./Role.route";
+import CreateProductPage from "@/pages/public/user/CreateProductPage";
 import Categories from "@/components/admin/Categories";
 
 const router = createBrowserRouter([
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
                       {
                         path: "sell",
                         Component: Sell,
+                      },
+                      {
+                        path: "sell/create",
+                        Component: CreateProductPage,
                       },
                       {
                         path: "details",
