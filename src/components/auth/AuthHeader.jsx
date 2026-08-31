@@ -12,7 +12,12 @@ function Logo() {
       <div className="matte flex h-9 w-9 items-center justify-center rounded-lg">
         {/* <span className="text-lg font-black text-accent">S</span> */}
       </div>
-      <span className="text-lg font-black tracking-tight">SPECHUB</span>
+      <div>
+        <span className="text-lg font-black tracking-tight">SPEC</span>
+        <span className="text-lg font-black text-[#f97361] tracking-tight">
+          HUB
+        </span>
+      </div>
     </Link>
   );
 }
