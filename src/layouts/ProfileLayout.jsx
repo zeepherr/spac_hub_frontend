@@ -39,7 +39,7 @@ function ProfileLayout() {
 
 
   return (
-    <div className="flex min-h-screen flex-col bg-white md:flex-row">
+    <div className="flex min-h-full flex-col bg-white md:flex-row">
       {/* Sidebar */}
       <aside className="flex w-full cursor-pointer shrink-0 flex-col border-b border-neutral-200 bg-neutral-100 md:w-72 md:border-b-0 md:border-r">
         {/* โปรไฟล์ */}
