@@ -1,5 +1,5 @@
 function Profile() {
-  return <div>Profile</div>;
+  return <div>/MyOrder</div>;
 }
 
 export default Profile;

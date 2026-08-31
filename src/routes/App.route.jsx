@@ -38,12 +38,26 @@ const router = createBrowserRouter([
                     Component: Buy,
                   },
                   {
-                    path: "sell",
-                    Component: Sell,
-                  },
-                  {
-                    path: "details",
-                    Component: Profile,
+                    path: "/user",
+                    Component: ProfileLayout,
+                    children: [
+                      {
+                        index: true,
+                        Component: Buy,
+                      },
+                      {
+                        path: "sell",
+                        Component: Sell,
+                      },
+                      {
+                        path: "details",
+                        Component: Profile,
+                      },
+                      {
+                        path: "favorites",
+                        element: null,
+                      },                   
+                    ],
                   },
                 ],
               },
