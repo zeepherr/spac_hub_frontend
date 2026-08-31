@@ -1,5 +1,6 @@
 import { login } from "@/api/auth/auth.api";
 import { establishSession } from "@/api/auth/auth.session";
+import GlobalLoading from "@/components/loading/GlobalLoading";
 import { getRoleHome } from "@/routes/Role.route";
 import useAuthStore from "@/stores/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,13 +48,16 @@ function LoginPage() {
     }
   };
   if (user) {
+    console.log(user.role);
     return (
       <Navigate
-        to={user.role === "ADMIN" ? getRoleHome(user.role) : "/"}
+        to={user.role === "USER" ? "/" : getRoleHome(user.role)}
         replace
       />
     );
   }
+
+  if (isSubmitting) return <GlobalLoading label="กำลังเข้าสู่ระบบ..." />;
 
   const inputStyle =
     "w-full rounded-lg border bg-white py-2.5 pl-11 pr-4 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:ring-2";

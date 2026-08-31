@@ -1,45 +1,73 @@
-import React, { useState } from 'react';
-import { Upload, Image as ImageIcon } from 'lucide-react';
+import React from 'react';
+import { Upload, Camera, X } from 'lucide-react';
 
-export default function ImageUploadPreview({ images, setImages }) {
-  const [previewUrl, setPreviewUrl] = useState(null);
-
+export default function ImageUploadPreview({ images = [], setImages }) {
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
-      setImages(files);
-      setPreviewUrl(URL.createObjectURL(files[0]));
+      const newPreviews = files.map((file) => URL.createObjectURL(file));
+      setImages((prev) => [...prev, ...newPreviews].slice(0, 5));
     }
   };
 
+  const handleRemove = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
-    <div className="hardware-surface p-5 rounded-2xl bg-white border border-[#d4d4d4] space-y-4">
-      <div className="flex items-center gap-2 border-b border-[#d4d4d4] pb-2">
-        <div className="hardware-indicator" />
-        <h4 className="hardware-label text-xs">ตัวอย่างการแสดงผล</h4>
+    <div className="hardware-surface p-6 bg-base-100 border border-base-300 rounded-box space-y-4 shadow-sm">
+      <div className="border-b border-base-300 pb-3 flex items-center justify-between">
+        <h3 className="font-bold text-lg text-base-content">
+          รูปภาพสินค้า <span className="text-sm font-bold text-neutral/80">(สูงสุด 5 รูป)</span>
+        </h3>
+        <span className="text-xs text-neutral/80 font-bold">อัปโหลดอย่างน้อย 1 รูป</span>
       </div>
 
-      {/* Box Preview */}
-      <div className="border border-dashed border-[#a3a3a3] rounded-xl p-4 flex flex-col items-center justify-center min-h-[160px] bg-[#f5f5f5] relative overflow-hidden">
-        {previewUrl ? (
-          <img
-            src={previewUrl}
-            alt="Product Preview"
-            className="w-full h-36 object-contain rounded-lg"
-          />
-        ) : (
-          <div className="text-center space-y-2 text-[#737373]">
-            <ImageIcon className="w-8 h-8 mx-auto stroke-1" />
-            <span className="text-xs block">ระบุรูปภาพสินค้า</span>
+      {/* Grid รูปภาพ */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        {images.map((imgUrl, idx) => (
+          <div
+            key={idx}
+            className="relative aspect-square rounded-field overflow-hidden border border-base-300 group bg-base-200"
+          >
+            <img
+              src={imgUrl}
+              alt={`Product preview ${idx + 1}`}
+              className="w-full h-full object-cover"
+            />
+            <button
+              type="button"
+              onClick={() => handleRemove(idx)}
+              className="absolute top-1 right-1 bg-neutral/80 text-white hover:bg-error rounded-full p-1 transition-colors"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
           </div>
+        ))}
+
+        {/* ปุ่มช่อง + เพิ่มรูป */}
+        {images.length < 5 && (
+          <label className="aspect-square border-2 border-dashed border-base-300 hover:border-[#f97316] bg-base-200/80 hover:bg-base-200 rounded-field flex flex-col items-center justify-center cursor-pointer transition-all p-2 text-center group">
+            <div className="w-10 h-10 rounded-full bg-base-300 group-hover:bg-[#f97316]/20 flex items-center justify-center mb-1 transition-colors">
+              <Camera className="w-5 h-5 text-base-content group-hover:text-[#f97316]" />
+            </div>
+            <span className="text-xs font-bold text-base-content group-hover:text-[#f97316]">+ เพิ่มรูป</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </label>
         )}
       </div>
 
-      {/* Upload Button Input */}
-      <div>
-        <label className="btn btn-outline w-full cursor-pointer flex items-center justify-center gap-2 border-[#d4d4d4] hover:bg-[#ebebeb]">
+      {/* ปุ่มกดเลือกไฟล์จากเครื่อง */}
+      {images.length < 5 && (
+        <label className="btn btn-outline border-base-300 hover:bg-base-200 w-full flex items-center justify-center gap-2 text-xs font-bold text-base-content cursor-pointer mt-2">
           <Upload className="w-4 h-4 text-[#f97316]" />
-          <span className="text-xs font-bold text-[#171717]">อัปโหลดรูปภาพ</span>
+          <span>เลือกรูปภาพจากเครื่องของคุณ</span>
           <input
             type="file"
             accept="image/*"
@@ -48,7 +76,7 @@ export default function ImageUploadPreview({ images, setImages }) {
             className="hidden"
           />
         </label>
-      </div>
+      )}
     </div>
   );
 }

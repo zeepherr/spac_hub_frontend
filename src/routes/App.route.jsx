@@ -31,35 +31,24 @@ const router = createBrowserRouter([
             element: <RoleRoute allowRoles={[ROLES.USER]} />,
             children: [
               {
-                path: "/",
+                path: "user",
+                Component: ProfileLayout,
                 children: [
                   {
                     index: true,
-                    Component: HomePage,
+                    Component: Buy,
                   },
                   {
-                    path: "/user",
-                    Component: ProfileLayout,
-                    children: [
-                      {
-                        index: true,
-                        Component: Buy,
-                      },
-                      {
-                        path: "sell",
-                        Component: Sell,
-                      },
-
-                      {
-                        path: "sell/create",
-                        Component: CreateProductPage, 
-                      },
-
-                      {
-                        path: "details",
-                        Component: Profile,
-                      },
-                    ],
+                    path: "sell",
+                    Component: Sell,
+                  },
+                  {
+                    path:"sell/create",
+                    Component: CreateProductPage
+                  },
+                  {
+                    path: "details",
+                    Component: Profile,
                   },
                 ],
               },
