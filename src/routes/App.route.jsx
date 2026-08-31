@@ -9,6 +9,7 @@ import VerifyPage from "../pages/auth/VerifyPage";
 import HomePage from "../pages/public/HomePage";
 import ProtectedRoute from "./Protected.route";
 import RoleRoute, { ROLES } from "./Role.route";
+import Categories from "@/components/admin/Categories";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
               {
                 index: true,
                 Component: Dashboard,
+              },
+              {
+                path: "categories",
+                Component: Categories,
               },
             ],
           },

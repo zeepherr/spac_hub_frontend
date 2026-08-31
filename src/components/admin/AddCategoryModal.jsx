@@ -1,45 +1,23 @@
 import { useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
+
 import { useCategories } from "@/hook/category/useCategory";
-import { useCreateCategory } from "@/hook/category/useCreateCategory";
-import { useUpdateCategory } from "@/hook/category/useUpdateCategory";
+import AddCategoryModal from "./AddCategoryModal";
+import EditCategoryModal from "./EditCategoryModal";
 
 function Categories() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
-
-  // Modal
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [categoryName, setCategoryName] = useState("");
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // GET categories
+  // GET Categories ด้วย TanStack Query
   const { data: categoriesResponse, isPending: isLoading } = useCategories();
-
-  // CREATE category
-  const { mutate: createCategory, isPending: isCreating } = useCreateCategory();
 
   const categories = categoriesResponse || [];
 
-  // CREATE CATEGORY
-  const handleAddCategory = (event) => {
-    event.preventDefault();
-
-    createCategory(
-      {
-        name: categoryName,
-      },
-      {
-        onSuccess: () => {
-          setCategoryName("");
-          setIsAddOpen(false);
-        },
-      },
-    );
-  };
-
-  // STATS
+  // Stats
   const stats = useMemo(() => {
     const total = categories.length;
 
@@ -54,7 +32,7 @@ function Categories() {
     };
   }, [categories]);
 
-  // SEARCH + STATUS FILTER
+  // Search + Filter
   const filteredCategories = useMemo(() => {
     return categories.filter((category) => {
       const matchSearch = category.name
@@ -72,7 +50,7 @@ function Categories() {
 
   return (
     <div className="mx-auto max-w-[1200px] px-4 py-6">
-      {/* HEADER */}
+      {/* Header */}
       <div className="mb-5 flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[#111827]">Categories</h1>
@@ -83,7 +61,6 @@ function Categories() {
           </p>
         </div>
 
-        {/* OPEN MODAL */}
         <button
           onClick={() => setIsAddOpen(true)}
           className="flex cursor-pointer items-center gap-2 rounded-lg bg-[#FF6B1A] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#E85D0F]"
@@ -92,7 +69,7 @@ function Categories() {
         </button>
       </div>
 
-      {/* STATS */}
+      {/* Stats */}
       <div className="mb-5 grid max-w-[650px] grid-cols-3 gap-4">
         <StatCard number={stats.total} title="Total categories" />
 
@@ -101,7 +78,7 @@ function Categories() {
         <StatCard number={stats.disabled} title="Disabled" />
       </div>
 
-      {/* SEARCH + FILTER */}
+      {/* Search + Filter */}
       <div className="mb-3 flex justify-between">
         <input
           type="text"
@@ -117,12 +94,14 @@ function Categories() {
           className="cursor-pointer rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-[#FF6B1A]"
         >
           <option value="all">All statuses</option>
+
           <option value="active">Active</option>
+
           <option value="disabled">Disabled</option>
         </select>
       </div>
 
-      {/* TABLE */}
+      {/* Table */}
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <table className="w-full text-left text-sm">
           <thead className="border-b bg-gray-50">
@@ -154,22 +133,22 @@ function Categories() {
                   key={category.id}
                   className="border-b border-gray-100 last:border-none"
                 >
-                  {/* NAME */}
+                  {/* Name */}
                   <td className="px-4 py-4 font-medium text-gray-900">
                     {category.name}
                   </td>
 
-                  {/* STATUS */}
+                  {/* Status */}
                   <td className="px-4 py-4">
                     <StatusBadge isActive={category.isActive} />
                   </td>
 
-                  {/* QUESTIONS */}
+                  {/* Questions */}
                   <td className="px-4 py-4 text-gray-500">
                     {category._count.conditionQuestions} questions
                   </td>
 
-                  {/* CREATED */}
+                  {/* Created */}
                   <td className="px-4 py-4 text-gray-500">
                     {new Date(category.createdAt).toLocaleDateString("en-US", {
                       month: "short",
@@ -178,7 +157,7 @@ function Categories() {
                     })}
                   </td>
 
-                  {/* ACTIONS */}
+                  {/* Actions */}
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3 text-xs font-medium">
                       <button
@@ -212,68 +191,20 @@ function Categories() {
         </table>
       </div>
 
-      {/* ================= ADD CATEGORY MODAL ================= */}
-
-      {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-            {/* Modal Header */}
-            <div className="mb-5">
-              <h2 className="text-xl font-bold text-gray-900">Add Category</h2>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Create a new product category.
-              </p>
-            </div>
-
-            {/* FORM */}
-            <form onSubmit={handleAddCategory}>
-              <div className="mb-5">
-                <label className="mb-2 block text-sm font-medium text-gray-700">
-                  Category Name
-                </label>
-
-                <input
-                  type="text"
-                  value={categoryName}
-                  onChange={(event) => setCategoryName(event.target.value)}
-                  placeholder="e.g. Monitor"
-                  maxLength={50}
-                  autoFocus
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:border-[#FF6B1A]"
-                />
-
-                {/* <p className="mt-1 text-xs text-gray-400">
-                  2–50 characters
-                </p> */}
-              </div>
-
-              {/* BUTTONS */}
-              <div className="flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsAddOpen(false);
-                    setCategoryName("");
-                  }}
-                  disabled={isCreating}
-                  className="cursor-pointer rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={isCreating}
-                  className="cursor-pointer rounded-lg bg-[#FF6B1A] px-4 py-2 text-sm font-medium text-white hover:bg-[#E85D0F] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isCreating ? "Creating..." : "Create Category"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Add Category Modal */}
+      <AddCategoryModal
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
+      />
+      
+      <EditCategoryModal
+        isOpen={isEditOpen}
+        category={selectedCategory}
+        onClose={() => {
+          setIsEditOpen(false);
+          setSelectedCategory(null);
+        }}
+      />
     </div>
   );
 }

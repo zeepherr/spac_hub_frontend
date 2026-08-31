@@ -1,10 +1,5 @@
 import { NavLink } from "react-router";
-import {
-  LayoutGrid,
-  ShoppingCart,
-  Users,
-  ClipboardCheck,
-} from "lucide-react";
+import { LayoutGrid, ShoppingCart, Users, ClipboardCheck } from "lucide-react";
 
 const menuItems = [
   {
@@ -12,34 +7,18 @@ const menuItems = [
     path: "/admin/categories",
     icon: LayoutGrid,
   },
-  {
-    name: "Orders",
-    path: "/admin/orders",
-    icon: ShoppingCart,
-  },
-  {
-    name: "Inspections",
-    path: "/admin/inspections",
-    icon: ClipboardCheck,
-  },
-  {
-    name: "Users",
-    path: "/admin/users",
-    icon: Users,
-  },
+  
 ];
 
 function AdminSidebar() {
   return (
     <aside className="min-h-screen w-60 bg-[#1F1F1F] px-4 py-6">
-      <div className="mb-10 px-2">
+      <div className="mb-10">
         <h1 className="text-xl font-bold text-white">
-          SPECHUB
+          SPEC<span className="text-orange-500">HUB</span>
         </h1>
 
-        <p className="text-xs text-zinc-500">
-          ADMIN PANEL
-        </p>
+        <p className="text-xs text-gray-500">ADMIN PANEL</p>
       </div>
 
       <nav className="space-y-2">
