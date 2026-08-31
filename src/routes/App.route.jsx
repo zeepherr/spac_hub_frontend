@@ -1,3 +1,7 @@
+import ProfileLayout from "@/layouts/ProfileLayout";
+import Buy from "@/pages/public/user/Buy";
+import Profile from "@/pages/public/user/Profile";
+import Sell from "@/pages/public/user/Sell";
 import { createBrowserRouter } from "react-router";
 import AdminLayout from "../layouts/AdminLayout";
 import AuthLayout from "../layouts/AuthLayout";
@@ -26,12 +30,30 @@ const router = createBrowserRouter([
             element: <RoleRoute allowRoles={[ROLES.USER]} />,
             children: [
               {
-                path: "/user",
+                path: "/",
                 Component: PublicLayout,
                 children: [
                   {
                     index: true,
                     Component: HomePage,
+                  },
+                  {
+                    path: "/user",
+                    Component: ProfileLayout,
+                    children: [
+                      {
+                        index: true,
+                        Component: Buy,
+                      },
+                      {
+                        path: "sell",
+                        Component: Sell,
+                      },
+                      {
+                        path: "details",
+                        Component: Profile,
+                      },
+                    ],
                   },
                 ],
               },
