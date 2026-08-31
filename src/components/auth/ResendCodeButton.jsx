@@ -91,7 +91,7 @@ export function ResendCodeButton({ email, resendAvailableAt, onResent }) {
   }
 
   return (
-    <div className="text-xs text-secondary pt-1">
+    <div className="text-xs text-[#171717] pt-1">
       <span>หากไม่ได้รับรหัส? </span>
 
       <button
@@ -100,8 +100,8 @@ export function ResendCodeButton({ email, resendAvailableAt, onResent }) {
         disabled={seconds > 0 || isSending}
         className={`font-bold px-2 py-1 rounded-md transition-all ${
           seconds > 0 || isSending
-            ? "text-base-300 cursor-not-allowed opacity-60"
-            : "text-accent hover:bg-orange-50 hover:underline cursor-pointer"
+            ? "text-[#525252] cursor-not-allowed opacity-60"
+            : "text-[#f97316] hover:bg-orange-50 hover:underline cursor-pointer"
         }`}
       >
         {isSending
