@@ -37,7 +37,9 @@ function LoginPage() {
     try {
       const res = await login(data);
       const user = await establishSession(res);
-      navigate(getRoleHome(user.role), { replace: true });
+      navigate(user.role === "USER" ? "/" : getRoleHome(user.role), {
+        replace: true,
+      });
       toast.success(res.message, { position: "top-center" });
 
       reset();
