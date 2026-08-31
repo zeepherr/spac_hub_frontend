@@ -34,21 +34,27 @@ const router = createBrowserRouter([
                 path: "user",
                 Component: ProfileLayout,
                 children: [
-                  {
-                    index: true,
-                    Component: Buy,
-                  },
-                  {
-                    path: "sell",
-                    Component: Sell,
-                  },
-                  {
-                    path:"sell/create",
-                    Component: CreateProductPage
-                  },
-                  {
-                    path: "details",
-                    Component: Profile,
+                      {
+                         index: true,
+                        Component: Buy,
+                      },
+                      {
+                        path: "sell",
+                        Component: Sell,
+                      },
+                      {
+                        path: "sell/create",
+                        Component: CreateProductPage,
+                      },
+                      {
+                        path: "details",
+                        Component: Profile,
+                      },
+                      {
+                        path: "favorites",
+                        element: null,
+                      },                   
+                    ],
                   },
                 ],
               },
@@ -56,8 +62,8 @@ const router = createBrowserRouter([
           },
         ],
       },
-    ],
-  },
+
+
   {
     Component: ProtectedRoute,
     children: [
