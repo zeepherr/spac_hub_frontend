@@ -1,5 +1,6 @@
 import { login } from "@/api/auth/auth.api";
 import { establishSession } from "@/api/auth/auth.session";
+import GlobalLoading from "@/components/loading/GlobalLoading";
 import { getRoleHome } from "@/routes/Role.route";
 import useAuthStore from "@/stores/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -47,13 +48,16 @@ function LoginPage() {
     }
   };
   if (user) {
+    console.log(user.role);
     return (
       <Navigate
-        to={user.role === "ADMIN" ? getRoleHome(user.role) : "/"}
+        to={user.role === "USER" ? "/" : getRoleHome(user.role)}
         replace
       />
     );
   }
+
+  if (isSubmitting) return <GlobalLoading label="กำลังเข้าสู่ระบบ..." />;
 
   const inputStyle =
     "w-full rounded-lg border bg-white py-2.5 pl-11 pr-4 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:ring-2";
@@ -103,13 +107,13 @@ function LoginPage() {
                 {...register("email")}
                 onKeyDown={(e) => focusNextOnEnter(e, "password")}
               />
-
-              {errors.email && (
-                <p className="text-[#f97316] text-sm mt-1">
-                  {errors.email.message}
-                </p>
-              )}
             </div>
+
+            {errors.email && (
+              <p className="text-[#f97316] text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           {/* Password */}
@@ -138,11 +142,6 @@ function LoginPage() {
                 }`}
                 {...register("password")}
               />
-              {errors.password && (
-                <p className="text-[#f97316] text-sm mt-1">
-                  {errors.password.message}
-                </p>
-              )}
 
               <button
                 type="button"
@@ -153,6 +152,12 @@ function LoginPage() {
                 {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
               </button>
             </div>
+
+            {errors.password && (
+              <p className="text-[#f97316] text-sm mt-1">
+                {errors.password.message}
+              </p>
+            )}
 
             {/* Forgot password */}
             <div className="flex justify-end mt-3">
