@@ -9,7 +9,7 @@ function HomePage() {
   return (
     <div>
       HomePage
-      <LogoutButton />
+      {user && <LogoutButton />}
     </div>
   );
 }

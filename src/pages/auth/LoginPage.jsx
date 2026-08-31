@@ -107,13 +107,13 @@ function LoginPage() {
                 {...register("email")}
                 onKeyDown={(e) => focusNextOnEnter(e, "password")}
               />
-
-              {errors.email && (
-                <p className="text-[#f97316] text-sm mt-1">
-                  {errors.email.message}
-                </p>
-              )}
             </div>
+
+            {errors.email && (
+              <p className="text-[#f97316] text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           {/* Password */}
@@ -142,11 +142,6 @@ function LoginPage() {
                 }`}
                 {...register("password")}
               />
-              {errors.password && (
-                <p className="text-[#f97316] text-sm mt-1">
-                  {errors.password.message}
-                </p>
-              )}
 
               <button
                 type="button"
@@ -157,6 +152,12 @@ function LoginPage() {
                 {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
               </button>
             </div>
+
+            {errors.password && (
+              <p className="text-[#f97316] text-sm mt-1">
+                {errors.password.message}
+              </p>
+            )}
 
             {/* Forgot password */}
             <div className="flex justify-end mt-3">
