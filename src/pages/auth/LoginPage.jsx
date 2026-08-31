@@ -3,7 +3,7 @@ import { establishSession } from "@/api/auth/auth.session";
 import { getRoleHome } from "@/routes/Role.route";
 import useAuthStore from "@/stores/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
+import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, Navigate, useNavigate } from "react-router";
@@ -47,7 +47,12 @@ function LoginPage() {
     }
   };
   if (user) {
-    return <Navigate to={getRoleHome(user.role)} replace />;
+    return (
+      <Navigate
+        to={user.role === "ADMIN" ? getRoleHome(user.role) : "/"}
+        replace
+      />
+    );
   }
 
   const inputStyle =

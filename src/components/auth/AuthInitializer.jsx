@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 import { restoreSession } from "@/api/auth/auth.session";
 import useAuthStore from "../../stores/auth.store";
+import GlobalLoading from "../loading/GlobalLoading";
 const AuthInitializer = ({ children }) => {
   const status = useAuthStore((state) => state.status);
 
@@ -10,7 +11,7 @@ const AuthInitializer = ({ children }) => {
   }, []);
 
   if (status === "checking") {
-    return <div className="min-h-screen bg-background">Loading....</div>;
+    return <GlobalLoading />;
   }
 
   return children;
