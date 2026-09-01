@@ -15,6 +15,7 @@ import ProtectedRoute from "./Protected.route";
 import RoleRoute, { ROLES } from "./Role.route";
 import CreateProductPage from "@/pages/public/user/CreateProductPage";
 import Categories from "@/components/admin/Categories";
+import CatagoryPage from "@/pages/public/CatagoryPage";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
         Component: HomePage,
       },
       {
+        path: "/categories",
+        Component: CatagoryPage,
+      },
+      {
         Component: ProtectedRoute,
         children: [
           {
@@ -35,27 +40,25 @@ const router = createBrowserRouter([
                 path: "user",
                 Component: ProfileLayout,
                 children: [
-                      {
-                         index: true,
-                        Component: Buy,
-                      },
-                      {
-                        path: "sell",
-                        Component: Sell,
-                      },
-                      {
-                        path: "sell/create",
-                        Component: CreateProductPage,
-                      },
-                      {
-                        path: "details",
-                        Component: Profile,
-                      },
-                      {
-                        path: "favorites",
-                        element: null,
-                      },                   
-                    ],
+                  {
+                    index: true,
+                    Component: Buy,
+                  },
+                  {
+                    path: "sell",
+                    Component: Sell,
+                  },
+                  {
+                    path: "sell/create",
+                    Component: CreateProductPage,
+                  },
+                  {
+                    path: "details",
+                    Component: Profile,
+                  },
+                  {
+                    path: "favorites",
+                    element: null,
                   },
                 ],
               },
@@ -63,7 +66,8 @@ const router = createBrowserRouter([
           },
         ],
       },
-
+    ],
+  },
 
   {
     Component: ProtectedRoute,
