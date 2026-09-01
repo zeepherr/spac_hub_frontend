@@ -1,5 +1,4 @@
-import { getAllCategoriesForUser } from "@/api/category.api";
-import { useQuery } from "@tanstack/react-query";
+import { useCategories } from "@/hook/category/useCategory";
 import {
   Boxes,
   Cable,
@@ -10,9 +9,9 @@ import {
   Gamepad2,
   HardDrive,
   Layers,
+  MemoryStick,
   Menu,
   Monitor,
-  MemoryStick,
   Network,
   Plug,
   RefreshCw,
@@ -46,10 +45,7 @@ export default function CategorySidebar() {
     data: categories = [],
     isLoading,
     isError,
-  } = useQuery({
-    queryKey: ["categories"],
-    queryFn: getAllCategoriesForUser,
-  });
+  } = useCategories({ includeInactive: false });
 
   return (
     <aside className="hardware-surface flex h-fit flex-col">
