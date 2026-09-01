@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
-import { ArrowRight } from "lucide-react";
 import { useCategories } from "@/hook/category/useCategory";
 import { useCreateCategory } from "@/hook/category/useCreateCategory";
+import { ArrowRight } from "lucide-react";
+import { useMemo, useState } from "react";
 import EditCategoryModal from "./EditCategoryModal";
 
 function Categories() {
@@ -15,7 +15,9 @@ function Categories() {
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   // GET categories
-  const { data: categoriesResponse, isPending: isLoading } = useCategories();
+  const { data: categoriesResponse, isPending: isLoading } = useCategories({
+    includeInactive: true,
+  });
 
   // CREATE category
   const { mutate: createCategory, isPending: isCreating } = useCreateCategory();
