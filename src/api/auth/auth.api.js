@@ -43,3 +43,20 @@ export const resendRegistrationOtp = async (payload) => {
 
   return response.data;
 };
+
+
+
+export const getMe = async () => {
+  const response = await authApi.get("/user/me");
+
+  return response.data;
+};
+
+export const updateMe = async (formData) => {
+  const response = await authApi.patch(
+    "/user/me",
+    formData,
+  );
+
+  return response.data;
+};
