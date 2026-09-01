@@ -24,7 +24,7 @@ const menus = [
   },
   {
     id: "my-orders",
-    label: "MyOrder",
+    label: "My Order",
     to: "/user/details",
     icon: Tag,
   },
@@ -35,83 +35,76 @@ const menus = [
     icon: Heart,
   },
 ];
+
 function ProfileLayout() {
-
-
   return (
-    <div className="flex min-h-full flex-col bg-white md:flex-row">
-      {/* Sidebar */}
-      <aside className="flex w-full cursor-pointer shrink-0 flex-col border-b border-neutral-200 bg-neutral-100 md:w-72 md:border-b-0 md:border-r">
-        {/* โปรไฟล์ */}
-        <div className="border-b border-neutral-200 px-6 py-8">
-          <div className="mb-4 flex size-24 items-center justify-center rounded-full border border-neutral-200 bg-white shadow-sm">
+    <div className="flex min-h-screen flex-col bg-base-100 text-base-content md:flex-row">
+      {/* Sidebar - ปรับเป็น md:w-80 เพื่อให้สมส่วนและเต็มกรอบ */}
+      <aside className="flex w-full shrink-0 flex-col border-b border-base-300 bg-base-200/50 md:w-80 md:border-b-0 md:border-r">
+        
+        {/* ส่วนโปรไฟล์ - จัดกึ่งกลาง (flex flex-col items-center text-center) */}
+        <div className="flex flex-col items-center justify-center border-b border-base-300 px-6 py-8 text-center">
+          <div className="relative mb-4 flex size-24 items-center justify-center rounded-full border border-base-300 bg-base-100 shadow-sm">
             <UserRound
-              size={42}
+              size={44}
               strokeWidth={1.5}
-              className="text-neutral-600"
+              className="text-neutral"
               aria-hidden="true"
             />
+            {/* ไฟ LED สัญลักษณ์ธีม Hardware */}
+            <span className="hardware-indicator absolute bottom-1 right-1" />
           </div>
 
-          <h2 className="text-xl font-semibold text-neutral-900">
+          <h2 className="text-xl font-bold tracking-tight text-base-content">
             ชื่อผู้ใช้งาน
           </h2>
 
-          <p className="mt-1 text-sm text-neutral-600">
+          <p className="mt-1 text-xs font-bold uppercase tracking-wider text-neutral/70">
             บัญชี SPECHUB
           </p>
         </div>
 
-        {/* เมนูทั้ง 4 */}
-        <nav
-          aria-label="เมนูบัญชี"
-          className="px-4 py-6"
-        >
-          <ul className="space-y-3">
-            <ul className="space-y-3">
-              {menus.map((menu) => {
-                const Icon = menu.icon;
+        {/* เมนูการใช้งาน */}
+        <nav aria-label="เมนูบัญชี" className="p-4">
+          <ul className="space-y-2">
+            {menus.map((menu) => {
+              const Icon = menu.icon;
 
-                return (
-                  <li key={menu.id}>
-                    <NavLink
-                      to={menu.to}
-                      end={menu.end}
-                      className={({ isActive }) =>
-                        `flex min-h-14 w-full cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-left text-base font-semibold transition-colors ${isActive
-                          ? "border-orange-500 bg-orange-500 text-white shadow-sm hover:bg-orange-600"
-                          : "border-neutral-200 bg-white text-neutral-800 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-700"
-                        }`
-                      }
-                    >
-                      <Icon
-                        size={22}
-                        strokeWidth={1.8}
-                        className="shrink-0"
-                        aria-hidden="true"
-                      />
-
-                      <span>{menu.label}</span>
-                    </NavLink>
-                  </li>
-                );
-              })}
-            </ul>
+              return (
+                <li key={menu.id}>
+                  <NavLink
+                    to={menu.to}
+                    end={menu.end}
+                    className={({ isActive }) =>
+                      `flex min-h-12 w-full items-center gap-3 rounded-field px-4 py-3 text-left text-sm font-bold transition-all ${
+                        isActive
+                          ? "bg-[#f97316] text-white shadow-md border border-[#ea580c]"
+                          : "border border-transparent text-base-content hover:bg-base-300/60 hover:text-base-content"
+                      }`
+                    }
+                  >
+                    <Icon
+                      size={20}
+                      strokeWidth={2}
+                      className="shrink-0"
+                      aria-hidden="true"
+                    />
+                    <span>{menu.label}</span>
+                  </NavLink>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
-         {/* ปุ่ม Logout ด้านล่าง Sidebar */}
-        <div className="mt-auto border-t border-neutral-200 p-4 ">
+        {/* ปุ่ม Logout ด้านล่าง Sidebar */}
+        <div className="mt-auto border-t border-base-300 p-4">
           <LogoutButton />
         </div>
-
       </aside>
 
       {/* เนื้อหาด้านขวา */}
-      <main
-        aria-label="เนื้อหาบัญชี"
-        className="min-w-0 flex-1 bg-white"
-      >
+      <main aria-label="เนื้อหาบัญชี" className="min-w-0 flex-1 bg-base-100 p-4 md:p-8">
         <Outlet />
       </main>
     </div>
