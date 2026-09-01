@@ -6,7 +6,6 @@ const TOP_NAV = [
   { label: "คอมประกอบ", to: "/build", hasDropdown: true },
   { label: "โปรโมชั่น", to: "/promotions" },
   { label: "สินค้า", to: "/products" },
-  { label: "สินค้ามือสอง", to: "/used" },
   { label: "รีวิว", to: "/reviews" },
   { label: "บริการ", to: "/services" },
   { label: "ติดต่อเรา", to: "/contact" },
@@ -14,7 +13,7 @@ const TOP_NAV = [
 
 function MainNav() {
   return (
-    <nav className="border-t border-neutral-100 bg-white">
+    <nav className="border-t border-neutral-100 bg-white shadow-lg">
       <div className="mx-auto flex max-w-8xl items-center gap-1 px-4">
         {TOP_NAV.map(({ label, to, hasDropdown }) => (
           <NavLink
