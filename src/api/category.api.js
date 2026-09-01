@@ -1,9 +1,7 @@
 import { authApi } from "./axios";
 
-export const getCategories = async () => {
-  const response = await authApi.get("/categories", {
-    globalLoading: false,
-  });
+export const getAllCategoriesForUser = async () => {
+  const response = await authApi.get("/categories");
 
   return response.data.data;
 };
