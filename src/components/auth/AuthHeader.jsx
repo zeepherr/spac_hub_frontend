@@ -1,3 +1,4 @@
+import useAuthStore from "@/stores/auth.store";
 import {
   Cpu,
   Heart,
@@ -51,7 +52,46 @@ const iconLinkClass = ({ isActive }) =>
     isActive ? "text-[#f97316]" : "text-neutral-700"
   }`;
 
+function AuthLinks() {
+  return (
+    <div className="flex items-center gap-1.5 text-neutral-700">
+      <User size={18} />
+      <NavLink to="/login" className={navLinkClass}>
+        เข้าสู่ระบบ
+      </NavLink>
+      <span> / </span>
+      <NavLink to="/register" className={navLinkClass}>
+        สมัตรสมาชิก
+      </NavLink>
+    </div>
+  );
+}
+
+function ProfileLink({ user }) {
+  return (
+    <NavLink
+      to="/user" // TODO: แก้ path ให้ตรงกับ route หน้าโปรไฟล์จริงของคุณ เช่น `/users/${user.id}`
+      className="flex items-center gap-2 text-neutral-700 hover:text-[#f97316]"
+    >
+      {user.profileImageUrl ? (
+        <img
+          src={user.profileImageUrl}
+          alt={user.firstName ?? "โปรไฟล์"}
+          className="h-8 w-8 rounded-full object-cover ring-2 ring-transparent hover:ring-[#f97316]"
+        />
+      ) : (
+        <span className="matte flex h-8 w-8 items-center justify-center rounded-full">
+          <User size={16} className="text-[#f97316]" />
+        </span>
+      )}
+      <span className="max-w-[100px] truncate">{user.firstName}</span>
+    </NavLink>
+  );
+}
+
 function MainNav() {
+  const user = useAuthStore((store) => store.user);
+
   return (
     <nav className="flex shrink-0 items-center gap-6 whitespace-nowrap text-sm font-semibold">
       <NavLink to="/" end className={iconLinkClass}>
@@ -74,16 +114,7 @@ function MainNav() {
         ตะกร้าสินค้า
       </NavLink>
 
-      <div className="flex items-center gap-1.5 text-neutral-700">
-        <User size={18} />
-        <NavLink to="/login" className={navLinkClass}>
-          เข้าสู่ระบบ
-        </NavLink>
-        <span> / </span>
-        <NavLink to="/register" className={navLinkClass}>
-          สมัตรสมาชิก
-        </NavLink>
-      </div>
+      {user ? <ProfileLink user={user} /> : <AuthLinks />}
     </nav>
   );
 }
