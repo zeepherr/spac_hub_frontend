@@ -1,4 +1,7 @@
-import { getAllCategoriesAdmin, getCategories } from "@/api/category.api";
+import {
+  getAllCategoriesAdmin,
+  getAllCategoriesForUser,
+} from "@/api/category.api";
 import { useQuery } from "@tanstack/react-query";
 import { categoryKeys } from "./categoryKeys";
 
@@ -8,7 +11,7 @@ export const useCategories = ({ includeInactive = false } = {}) => {
       ? categoryKeys.includeInactive()
       : categoryKeys.active(),
 
-    queryFn: includeInactive ? getAllCategoriesAdmin : getCategories,
+    queryFn: includeInactive ? getAllCategoriesAdmin : getAllCategoriesForUser,
 
     staleTime: 5 * 60 * 1000,
     retry: false,
