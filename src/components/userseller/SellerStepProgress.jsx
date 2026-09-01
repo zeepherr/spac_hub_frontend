@@ -30,7 +30,7 @@ export default function SellerStepProgress({ currentStep, onSaveDraft, savingDra
                       isCompleted
                         ? "bg-[#f97316]/10 text-[#f97316] border border-[#f97316]/30"
                         : isCurrent
-                        ? "bg-gradient-to-r from-[#f97316] to-[#ea580c] text-white shadow-md shadow-[#f97316]/25 scale-105"
+                        ? "bg-linear-to-r from-[#f97316] to-[#ea580c] text-white shadow-md shadow-[#f97316]/25 scale-105"
                         : "bg-base-200/80 text-base-content/40 border border-base-300"
                     }`}
                   >
@@ -62,9 +62,9 @@ export default function SellerStepProgress({ currentStep, onSaveDraft, savingDra
 
                 {/* Connecting Line (เส้นเชื่อมระหว่างขั้น) */}
                 {index < steps.length - 1 && (
-                  <div className="flex-1 mx-3 hidden sm:block min-w-[20px] max-w-[80px]">
+                  <div className="flex-1 mx-3 hidden sm:block min-w-5 max-w-20">
                     <div
-                      className={`h-[2px] w-full rounded-full transition-all duration-300 ${
+                      className={`h-0.5 w-full rounded-full transition-all duration-300 ${
                         currentStep > step.id
                           ? "bg-[#f97316]"
                           : "bg-base-300"
