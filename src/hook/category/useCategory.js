@@ -1,9 +1,16 @@
-import { getAllCategoriesAdmin } from "@/api/category.api"
-import { useQuery } from "@tanstack/react-query"
+import { getAllCategoriesAdmin, getCategories } from "@/api/category.api";
+import { useQuery } from "@tanstack/react-query";
+import { categoryKeys } from "./categoryKeys";
 
-export const useCategories = ()=>{
-    return useQuery({
-        queryKey :["categories"],
-        queryFn : getAllCategoriesAdmin
-    })
-}
+export const useCategories = ({ includeInactive = false } = {}) => {
+  return useQuery({
+    queryKey: includeInactive
+      ? categoryKeys.includeInactive()
+      : categoryKeys.active(),
+
+    queryFn: includeInactive ? getAllCategoriesAdmin : getCategories,
+
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+};

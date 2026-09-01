@@ -7,7 +7,9 @@ export const getAllCategoriesForUser = async () => {
 };
 
 export const getAllCategoriesAdmin = async () => {
-  const response = await authApi.get("/categories/admin");
+  const response = await authApi.get("/categories/admin", {
+    globalLoading: false,
+  });
 
   return response.data.data;
 };
