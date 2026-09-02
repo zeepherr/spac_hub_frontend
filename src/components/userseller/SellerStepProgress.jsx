@@ -92,7 +92,7 @@ export default function SellerStepProgress({ currentStep, onSaveDraft, savingDra
             {savingDraft ? (
               <span className="loading loading-spinner loading-xs" />
             ) : (
-              <Save className="size-4 stroke-[2]" />
+              <Save className="size-4 stroke-2" />
             )}
             <span>{savingDraft ? "กำลังบันทึก..." : "บันทึกแบบร่าง (Save Draft)"}</span>
           </button>

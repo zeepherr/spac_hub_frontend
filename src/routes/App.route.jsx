@@ -16,8 +16,23 @@ import RoleRoute, { ROLES } from "./Role.route";
 import CreateProductPage from "@/pages/public/user/CreateProductPage";
 import Categories from "@/pages/admin/Categories";
 import CatagoryPage from "@/pages/public/CatagoryPage";
+<<<<<<< HEAD
 import EditProfile from "@/pages/public/user/EditProfile";
 import NotFound from "@/components/์NotFound";
+=======
+import ListingPage from "@/pages/public/ListingPage";
+import { Component } from "lucide-react";
+import ListingDetailPage from "@/pages/listing/ListingDeatailPage";
+import CategoryListingPage from "@/components/category/ListByCategory";
+import AllProduct from "@/components/auth/AllProduct";
+import CartPage from "@/pages/cart/CartPage";
+
+import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
+import Inspection from "@/pages/admin/Inspection";
+import ReadyToShip from "@/pages/admin/ReadyToShip";
+import ActionRequired from "@/pages/admin/ActionRequired";
+import AdminChats from "@/pages/admin/AdminChats";
+>>>>>>> a7bd9936c42f74c3763ed2a1b27e66040975803a
 
 const router = createBrowserRouter([
   {
@@ -29,8 +44,32 @@ const router = createBrowserRouter([
         Component: HomePage,
       },
       {
-        path: "categories",
-        Component: CatagoryPage,
+        path: "products",
+        Component: ListingPage,
+        children: [
+          {
+            index: true, // 👈 เพิ่มใหม่ - ตรงกับ path "/products" เป๊ะๆ
+            Component: AllProduct,
+          },
+          {
+            path: "categories",
+            Component: CatagoryPage,
+            children: [
+              {
+                path: ":categoryId",
+                Component: CategoryListingPage,
+              },
+            ],
+          },
+          {
+            path: ":id",
+            Component: ListingDetailPage,
+          },
+        ],
+      },
+      {
+        path: "/store",
+        Component: CartPage,
       },
       {
         Component: ProtectedRoute,
@@ -90,6 +129,7 @@ const router = createBrowserRouter([
             Component: AdminLayout,
             children: [
               {
+<<<<<<< HEAD
                 index: true,
                 Component: Dashboard,
               },
@@ -101,6 +141,35 @@ const router = createBrowserRouter([
                 path: "*",
                 Component: NotFound
               },
+=======
+              index: true,
+              Component: Dashboard,
+            },
+            {
+              path: "orders/awaiting-receipt",
+              Component: AwaitingReceipt,
+            },
+            {
+              path: "orders/inspection",
+              Component: Inspection,
+            },
+            {
+              path: "orders/ready-to-ship",
+              Component: ReadyToShip,
+            },
+            {
+              path: "orders/action-required",
+              Component: ActionRequired,
+            },
+            {
+              path: "chats",
+              Component: AdminChats,
+            },
+            {
+              path: "categories",
+              Component: Categories,
+            },
+>>>>>>> a7bd9936c42f74c3763ed2a1b27e66040975803a
             ],
           },
         ],

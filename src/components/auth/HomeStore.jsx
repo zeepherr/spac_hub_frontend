@@ -1,15 +1,8 @@
 import { useListings } from "@/hook/listing/useListingForHomePage";
-import {
-  Cpu,
-  Headset,
-  Percent,
-  ShieldCheck,
-  ShoppingCart,
-  Star,
-  Truck,
-  Wrench,
-} from "lucide-react";
+import { Headset, Percent, ShieldCheck, Truck, Wrench } from "lucide-react";
+import { useMemo } from "react";
 import { Link } from "react-router";
+import ProductCard from "./ProductCard";
 
 const TRUST_ITEMS = [
   {
@@ -23,13 +16,10 @@ const TRUST_ITEMS = [
   { icon: Headset, title: "บริการหลังการขาย", subtitle: "ดูแลตลอดการใช้งาน" },
 ];
 
-// หารูปปกจาก listing.images (isCover ก่อน ถ้าไม่มีเอารูปแรก)
-// backend คืน imageUrl เต็มมาให้อยู่แล้ว (แปลง imageKey เป็น URL ฝั่ง server แล้ว)
-function getCoverImageUrl(listing) {
-  const images = listing.images ?? [];
-  const cover = images.find((img) => img.isCover) ?? images[0];
-  console.log(cover.imageUrl);
-  return cover?.imageUrl;
+// สุ่มหยิบสินค้ามา n ชิ้นจากที่มีทั้งหมด (ไม่แก้ array เดิม)
+function pickRandomProducts(list, count) {
+  const shuffled = [...list].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
 }
 
 function HeroBanner() {
@@ -91,63 +81,6 @@ function TrustBar() {
         </div>
       ))}
     </div>
-  );
-}
-
-function ProductCard({ product }) {
-  console.log(product);
-  const imageUrl = getCoverImageUrl(product);
-  const price = Number(product.price);
-
-  return (
-    <Link
-      to={`/listings/${product.id}`}
-      className="hardware-surface flex flex-col p-4"
-    >
-      <span className="hardware-label mb-2 w-fit rounded-field bg-neutral-100 px-2 py-1 normal-case text-secondary">
-        {product.brand}
-      </span>
-
-      <div className="mb-3 flex aspect-square items-center justify-center overflow-hidden rounded-box bg-neutral-50">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={product.title}
-            className="h-full w-full object-contain"
-          />
-        ) : (
-          <Cpu className="h-12 w-12 text-neutral-300" strokeWidth={1} />
-        )}
-      </div>
-
-      <p className="mb-1 line-clamp-2 text-sm font-semibold text-neutral-900">
-        {product.title}
-      </p>
-      <p className="mb-2 text-lg font-bold text-[#f97316]">
-        {price.toLocaleString()}.-
-      </p>
-
-      <div className="mt-auto flex items-center justify-between">
-        {/* schema ตอนนี้ยังไม่มี rating ผูกกับ Listing โดยตรง (Review อยู่บน Order)
-            เว้นที่ไว้เผื่อทำสรุป rating ทีหลัง ถ้ายังไม่มีข้อมูลจะไม่โชว์แถวนี้ */}
-        {product.rating ? (
-          <span className="flex items-center gap-1 text-xs text-neutral-500">
-            <Star size={14} className="fill-[#f97316] text-[#f97316]" />
-            {product.rating} ({product.reviewCount})
-          </span>
-        ) : (
-          <span />
-        )}
-        <button
-          type="button"
-          aria-label="เพิ่มลงตะกร้า"
-          onClick={(e) => e.preventDefault()}
-          className="flex h-8 w-8 items-center justify-center rounded-field bg-[#f97316] text-white hover:bg-orange-600"
-        >
-          <ShoppingCart size={16} />
-        </button>
-      </div>
-    </Link>
   );
 }
 
@@ -231,10 +164,13 @@ function ArticleSection() {
 export default function HomeStore() {
   const { data: listings = [], isLoading, isError } = useListings();
 
-  // ยังไม่มี endpoint แยก "แนะนำ" กับ "ใหม่ล่าสุด" ตอนนี้ backend ส่งมาชุดเดียว
-  // (orderBy createdAt desc) เลยตัดโชว์คนละช่วงไปก่อน พอมี endpoint แยกจริงค่อยเปลี่ยน
-  const featured = listings.slice(0, 5);
-  const newest = listings.slice(5, 10);
+  // ล่าสุด - backend เรียง createdAt desc มาให้อยู่แล้ว เอา 5 ตัวแรกตรงๆ
+  const newest = listings.slice(0, 5);
+
+  // แนะนำ - สุ่มจากสินค้าทั้งหมดที่มี (ไม่ผูกกับ index ตายตัวแบบเดิม)
+  // ใช้ useMemo ผูกกับ listings เพื่อไม่ให้สุ่มใหม่ทุกครั้งที่ re-render
+  // (สุ่มใหม่เฉพาะตอนข้อมูล listings เปลี่ยนจริงๆ เช่น fetch เสร็จ/refetch)
+  const featured = useMemo(() => pickRandomProducts(listings, 5), [listings]);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
