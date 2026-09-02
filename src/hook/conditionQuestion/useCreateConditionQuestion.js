@@ -2,6 +2,7 @@ import { createConditionQuestion } from "@/api/conditionQuestion.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { conditionQuestionKeys } from "./conditionQuestionKeys";
+import { categoryKeys } from "@/hook/category/categoryKeys";
 
 export const useCreateConditionQuestion = () => {
   const queryClient = useQueryClient();
@@ -17,6 +18,10 @@ export const useCreateConditionQuestion = () => {
 
       queryClient.invalidateQueries({
         queryKey: conditionQuestionKeys.byCategory(variables.categoryId),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: categoryKeys.includeInactive(),
       });
     },
   });

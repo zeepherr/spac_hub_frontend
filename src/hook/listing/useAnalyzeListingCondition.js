@@ -24,3 +24,6 @@ export const useAnalyzeListingCondition = () => {
     },
   });
 };
+
+// AI analyzes the listing details, condition answers, and images
+// to estimate the product's condition score and grade.

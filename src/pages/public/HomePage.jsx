@@ -1,12 +1,14 @@
 import CategorySidebar from "@/components/auth/CatagorySidebar";
 import HomeStore from "@/components/auth/HomeStore";
-import { LogoutButton } from "@/components/auth/LogoutButton";
+import { useListings } from "@/hook/listing/useListingForHomePage";
 import useAuthStore from "@/stores/auth.store";
 
 function HomePage() {
   const user = useAuthStore((store) => store.user);
   console.log(user);
+  const { data } = useListings();
   // let isOpne = true;
+  console.log(data);
   // if (isOpne) return <GlobalLoading />;
 
   return (

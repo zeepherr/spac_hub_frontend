@@ -24,3 +24,6 @@ export const useUpdateListing = () => {
     },
   });
 };
+
+// Updates the basic information of the seller's draft listing,
+// such as title, description, brand, model, price, or category.

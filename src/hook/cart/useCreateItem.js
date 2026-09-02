@@ -1,13 +1,15 @@
-import { createListing } from "@/api/listing.api";
+import { addCartItem } from "@/api/cart.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { listingKeys } from "./listingKeys";
+import { cartKeys } from "./cartKeys";
 
-export const useCreateListing = () => {
+// Adds an ACTIVE listing to the authenticated user's cart.
+// Refreshes the cart after the listing has been added.
+export const useAddCartItem = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createListing,
+    mutationFn: addCartItem,
 
     onSuccess: (data) => {
       toast.success(data.message, {
@@ -15,11 +17,8 @@ export const useCreateListing = () => {
       });
 
       queryClient.invalidateQueries({
-        queryKey: listingKeys.mine(),
+        queryKey: cartKeys.mine(),
       });
     },
   });
 };
-
-// Creates a new draft listing for the authenticated seller.
-// The listing must be completed before it can be published.

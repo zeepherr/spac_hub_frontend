@@ -44,6 +44,7 @@ export const resendRegistrationOtp = async (payload) => {
   return response.data;
 };
 
+<<<<<<< HEAD
 
 
 export const getMe = async () => {
@@ -54,6 +55,13 @@ export const getMe = async () => {
 
 export const updateMe = async (payload) => {
   const response = await authApi.patch("/user/me", payload);
+=======
+//google login
+export const googleLogin = async (credential) => {
+  const response = await publicApi.post("/auth/google", {
+    credential,
+  });
+>>>>>>> dev
 
   return response.data;
 };

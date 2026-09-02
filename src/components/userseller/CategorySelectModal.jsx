@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Search, X, Check, Layers } from "lucide-react";
 import { authApi } from "@/api/axios";
+import { useCategories } from "@/hook/category/useCategory";
 
 export default function CategorySelectModal({
   isOpen,
@@ -9,38 +10,39 @@ export default function CategorySelectModal({
   selectedCategoryId,
   onSelectCategory,
 }) {
-  const [categories, setCategories] = useState([]);
+//   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const {data:categories,isPending} = useCategories({includeInactive:false})
 
-  useEffect(() => {
-    if (!isOpen) return;
+// //   useEffect(() => {
+// //     if (!isOpen) return;
 
-    const fetchCategories = async () => {
-      try {
-        setLoading(true);
-        // เรียก Endpoint API getAllCategoriesForUser
-        const response = await authApi.get("/categories");
-        console.log(response.data)
-        if (response.data && response.data.data) {
-          setCategories(response.data.data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch categories:", err);
-        setError("ไม่สามารถโหลดรายการหมวดหมู่ได้");
-      } finally {
-        setLoading(false);
-      }
-    };
+// //     const fetchCategories = async () => {
+// //       try {
+// //         setLoading(true);
+// //         // เรียก Endpoint API getAllCategoriesForUser
+// //         const response = await authApi.get("/categories");
+// //         console.log(response.data)
+// //         if (response.data && response.data.data) {
+// //           setCategories(response.data.data);
+// //         }
+// //       } catch (err) {
+// //         console.error("Failed to fetch categories:", err);
+// //         setError("ไม่สามารถโหลดรายการหมวดหมู่ได้");
+// //       } finally {
+// //         setLoading(false);
+// //       }
+// //     };
 
-    fetchCategories();
-  }, [isOpen]);
+//     fetchCategories();
+//   }, [isOpen]);
 
   if (!isOpen) return null;
 
   // กรองหมวดหมู่ตามช่องค้นหา
-  const filteredCategories = categories.filter((cat) =>
+  const filteredCategories = categories?.filter((cat) =>
     cat.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -82,7 +84,7 @@ export default function CategorySelectModal({
 
         {/* List หมวดหมู่ */}
         <div className="p-3 overflow-y-auto flex-1 space-y-1">
-          {loading ? (
+          {isPending ? (
             <div className="py-12 flex flex-col items-center justify-center gap-2 text-neutral">
               <span className="loading loading-spinner loading-md text-[#f97316]" />
               <span className="text-sm font-medium">กำลังโหลดหมวดหมู่...</span>
