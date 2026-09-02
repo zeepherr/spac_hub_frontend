@@ -53,3 +53,11 @@ export const updateConditionQuestionStatus = async (
 
   return response.data;
 };
+
+export const deleteConditionQuestion = async (categoryId, questionId) => {
+  const response = await authApi.delete(
+    `/categories/${categoryId}/questions/${questionId}`,
+  );
+
+  return response.data;
+};

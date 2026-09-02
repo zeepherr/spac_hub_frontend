@@ -26,10 +26,8 @@ export const updateCategory = async (id, payload) => {
   return response.data;
 };
 
-// export const updateCategoryStatus = async (id, isActive) => {
-//   const response = await mainApi.patch(`/categories/${id}/status`, {
-//     isActive,
-//   });
+export const deleteCategory = async (id) => {
+  const response = await authApi.delete(`/categories/${id}`);
 
-//   return response.data;
-// };
+  return response.data;
+};
