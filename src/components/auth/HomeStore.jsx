@@ -1,3 +1,4 @@
+import { useListings } from "@/hook/listing/useListingForHomePage";
 import {
   Cpu,
   Headset,
@@ -21,6 +22,15 @@ const TRUST_ITEMS = [
   { icon: Percent, title: "ผ่อนชำระ 0%", subtitle: "สูงสุด 10 เดือน" },
   { icon: Headset, title: "บริการหลังการขาย", subtitle: "ดูแลตลอดการใช้งาน" },
 ];
+
+// หารูปปกจาก listing.images (isCover ก่อน ถ้าไม่มีเอารูปแรก)
+// backend คืน imageUrl เต็มมาให้อยู่แล้ว (แปลง imageKey เป็น URL ฝั่ง server แล้ว)
+function getCoverImageUrl(listing) {
+  const images = listing.images ?? [];
+  const cover = images.find((img) => img.isCover) ?? images[0];
+  console.log(cover.imageUrl);
+  return cover?.imageUrl;
+}
 
 function HeroBanner() {
   // TODO: fetch แบนเนอร์จาก backend แล้ว .map() แทน placeholder นี้
@@ -85,16 +95,23 @@ function TrustBar() {
 }
 
 function ProductCard({ product }) {
+  console.log(product);
+  const imageUrl = getCoverImageUrl(product);
+  const price = Number(product.price);
+
   return (
-    <div className="hardware-surface flex flex-col p-4">
+    <Link
+      to={`/listings/${product.id}`}
+      className="hardware-surface flex flex-col p-4"
+    >
       <span className="hardware-label mb-2 w-fit rounded-field bg-neutral-100 px-2 py-1 normal-case text-secondary">
         {product.brand}
       </span>
 
       <div className="mb-3 flex aspect-square items-center justify-center overflow-hidden rounded-box bg-neutral-50">
-        {product.imageUrl ? (
+        {imageUrl ? (
           <img
-            src={product.imageUrl}
+            src={imageUrl}
             alt={product.title}
             className="h-full w-full object-contain"
           />
@@ -107,29 +124,34 @@ function ProductCard({ product }) {
         {product.title}
       </p>
       <p className="mb-2 text-lg font-bold text-[#f97316]">
-        {product.price?.toLocaleString()}.-
+        {price.toLocaleString()}.-
       </p>
 
       <div className="mt-auto flex items-center justify-between">
-        <span className="flex items-center gap-1 text-xs text-neutral-500">
-          <Star size={14} className="fill-[#f97316] text-[#f97316]" />
-          {product.rating} ({product.reviewCount})
-        </span>
+        {/* schema ตอนนี้ยังไม่มี rating ผูกกับ Listing โดยตรง (Review อยู่บน Order)
+            เว้นที่ไว้เผื่อทำสรุป rating ทีหลัง ถ้ายังไม่มีข้อมูลจะไม่โชว์แถวนี้ */}
+        {product.rating ? (
+          <span className="flex items-center gap-1 text-xs text-neutral-500">
+            <Star size={14} className="fill-[#f97316] text-[#f97316]" />
+            {product.rating} ({product.reviewCount})
+          </span>
+        ) : (
+          <span />
+        )}
         <button
+          type="button"
           aria-label="เพิ่มลงตะกร้า"
+          onClick={(e) => e.preventDefault()}
           className="flex h-8 w-8 items-center justify-center rounded-field bg-[#f97316] text-white hover:bg-orange-600"
         >
           <ShoppingCart size={16} />
         </button>
       </div>
-    </div>
+    </Link>
   );
 }
 
-function ProductSection({ title }) {
-  // TODO: fetch สินค้าจริงจาก backend (เช่น useQuery(["listings", ...])) แล้วแทนที่ [] นี้
-  const products = [];
-
+function ProductSection({ title, products = [], isLoading, isError }) {
   return (
     <section>
       <div className="mb-3 flex items-center justify-between">
@@ -145,7 +167,20 @@ function ProductSection({ title }) {
         </Link>
       </div>
 
-      {products.length === 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="hardware-surface aspect-[3/4] animate-pulse bg-neutral-100"
+            />
+          ))}
+        </div>
+      ) : isError ? (
+        <div className="hardware-surface flex h-40 items-center justify-center">
+          <p className="text-sm text-[#dc2626]">โหลดสินค้าไม่สำเร็จ</p>
+        </div>
+      ) : products.length === 0 ? (
         <div className="hardware-surface flex h-40 items-center justify-center">
           <p className="text-sm text-neutral-400">ยังไม่มีข้อมูลสินค้า</p>
         </div>
@@ -194,13 +229,30 @@ function ArticleSection() {
 }
 
 export default function HomeStore() {
+  const { data: listings = [], isLoading, isError } = useListings();
+
+  // ยังไม่มี endpoint แยก "แนะนำ" กับ "ใหม่ล่าสุด" ตอนนี้ backend ส่งมาชุดเดียว
+  // (orderBy createdAt desc) เลยตัดโชว์คนละช่วงไปก่อน พอมี endpoint แยกจริงค่อยเปลี่ยน
+  const featured = listings.slice(0, 5);
+  const newest = listings.slice(5, 10);
+
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
       <div className="flex flex-col gap-6">
         <HeroBanner />
         <TrustBar />
-        <ProductSection title="สินค้าแนะนำ" />
-        <ProductSection title="สินค้าใหม่ล่าสุด" />
+        <ProductSection
+          title="สินค้าแนะนำ"
+          products={featured}
+          isLoading={isLoading}
+          isError={isError}
+        />
+        <ProductSection
+          title="สินค้าใหม่ล่าสุด"
+          products={newest}
+          isLoading={isLoading}
+          isError={isError}
+        />
       </div>
 
       <div className="flex flex-col gap-6">
