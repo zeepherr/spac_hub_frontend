@@ -1,5 +1,13 @@
+import { replace, useNavigate, useNavigation } from "react-router";
+
 function Sell() {
-  return <div>Seller Dashboard</div>;
+  const navigate = useNavigate()
+  return <div>
+    Seller Dashboard
+    <button onClick={()=> navigate("/user/sell/create",replace)}>
+      Sell
+    </button>
+    </div>;
 }
 
 export default Sell;

@@ -11,3 +11,7 @@ export const useListingDetail = (listingId) => {
     retry: false,
   });
 };
+
+// Fetches one listing owned by the authenticated seller.
+// Used for seller-side listing management or editing.
+// Do not use this hook for the public buyer listing detail page.

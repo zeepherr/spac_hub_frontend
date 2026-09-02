@@ -110,3 +110,11 @@ export const getListingsByCategory = async (categoryId) => {
 
   return response.data.data;
 };
+
+export const getPublicListingById = async (listingId) => {
+  const response = await publicApi.get(`/listings/public/${listingId}`, {
+    globalLoading: false,
+  });
+
+  return response.data.data;
+};

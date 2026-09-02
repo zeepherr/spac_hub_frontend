@@ -13,3 +13,5 @@ export const useIdentifyProduct = () => {
     },
   });
 };
+// Sends a product image to AI to identify product information
+// such as title, brand, model, category, and description.

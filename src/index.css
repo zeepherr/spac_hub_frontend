@@ -103,19 +103,15 @@
 
   /* Shadow */
   --hardware-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.06),
-    0 1px 3px rgba(0, 0, 0, 0.08);
+    0 4px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.08);
 
   --hardware-shadow-hover:
-    0 12px 28px rgba(0, 0, 0, 0.10),
-    0 3px 8px rgba(0, 0, 0, 0.08);
+    0 12px 28px rgba(0, 0, 0, 0.1), 0 3px 8px rgba(0, 0, 0, 0.08);
 
   /* Motion */
-  --hardware-ease:
-    cubic-bezier(0.22, 1, 0.36, 1);
+  --hardware-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
-  --hardware-fast:
-    cubic-bezier(0.4, 0, 0.2, 1);
+  --hardware-fast: cubic-bezier(0.4, 0, 0.2, 1);
 
   --background: oklch(1 0 0);
 
@@ -193,11 +189,9 @@ html {
 body {
   min-height: 100vh;
 
-  background:
-    var(--hardware-bg);
+  background: var(--hardware-bg);
 
-  color:
-    var(--hardware-black);
+  color: var(--hardware-black);
 
   -webkit-font-smoothing: antialiased;
 }
@@ -207,17 +201,13 @@ body {
    ========================================================= */
 
 .hardware-surface {
-  background:
-    var(--hardware-surface);
+  background: var(--hardware-surface);
 
-  border:
-    1px solid var(--hardware-border);
+  border: 1px solid var(--hardware-border);
 
-  border-radius:
-    var(--radius-box);
+  border-radius: var(--radius-box);
 
-  box-shadow:
-    var(--hardware-shadow);
+  box-shadow: var(--hardware-shadow);
 
   transition:
     transform 350ms var(--hardware-ease),
@@ -226,14 +216,11 @@ body {
 }
 
 .hardware-surface:hover {
-  border-color:
-    var(--hardware-border-dark);
+  border-color: var(--hardware-border-dark);
 
-  box-shadow:
-    var(--hardware-shadow-hover);
+  box-shadow: var(--hardware-shadow-hover);
 
-  transform:
-    translateY(-2px);
+  transform: translateY(-2px);
 }
 
 /* =========================================================
@@ -241,19 +228,15 @@ body {
    ========================================================= */
 
 .card {
-  border:
-    1px solid var(--hardware-border);
+  border: 1px solid var(--hardware-border);
 
-  background:
-    var(--hardware-surface);
+  background: var(--hardware-surface);
 
-  box-shadow:
-    var(--hardware-shadow);
+  box-shadow: var(--hardware-shadow);
 }
 
 .card:hover {
-  box-shadow:
-    var(--hardware-shadow-hover);
+  box-shadow: var(--hardware-shadow-hover);
 }
 
 /* =========================================================
@@ -261,16 +244,9 @@ body {
    ========================================================= */
 
 .metal {
-  background:
-    linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #f5f5f5 45%,
-      #e5e5e5 100%
-    );
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 45%, #e5e5e5 100%);
 
-  border:
-    1px solid #d4d4d4;
+  border: 1px solid #d4d4d4;
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
@@ -283,14 +259,11 @@ body {
    ========================================================= */
 
 .matte {
-  background:
-    #262626;
+  background: #262626;
 
-  color:
-    #ffffff;
+  color: #ffffff;
 
-  border:
-    1px solid #404040;
+  border: 1px solid #404040;
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
@@ -303,14 +276,11 @@ body {
    ========================================================= */
 
 .btn {
-  font-weight:
-    600;
+  font-weight: 600;
 
-  letter-spacing:
-    -0.01em;
+  letter-spacing: -0.01em;
 
-  border-width:
-    1px;
+  border-width: 1px;
 
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.08),
@@ -326,12 +296,9 @@ body {
 /* Press */
 
 .btn:active {
-  transform:
-    translateY(1px)
-    scale(0.98);
+  transform: translateY(1px) scale(0.98);
 
-  box-shadow:
-    inset 0 1px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 /* =========================================================
@@ -339,14 +306,11 @@ body {
    ========================================================= */
 
 .btn-primary {
-  background:
-    #171717;
+  background: #171717;
 
-  border-color:
-    #171717;
+  border-color: #171717;
 
-  color:
-    #ffffff;
+  color: #ffffff;
 
   box-shadow:
     0 3px 6px rgba(0, 0, 0, 0.14),
@@ -354,17 +318,13 @@ body {
 }
 
 .btn-primary:hover {
-  background:
-    #262626;
+  background: #262626;
 
-  border-color:
-    #262626;
+  border-color: #262626;
 
-  transform:
-    translateY(-1px);
+  transform: translateY(-1px);
 
-  box-shadow:
-    0 6px 14px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
 }
 
 /* =========================================================
@@ -372,32 +332,25 @@ body {
    ========================================================= */
 
 .btn-accent {
-  background:
-    #f97316;
+  background: #f97316;
 
-  border-color:
-    #f97316;
+  border-color: #f97316;
 
-  color:
-    #ffffff;
+  color: #ffffff;
 
   box-shadow:
-    0 4px 10px rgba(249, 115, 22, 0.20),
+    0 4px 10px rgba(249, 115, 22, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .btn-accent:hover {
-  background:
-    #ea580c;
+  background: #ea580c;
 
-  border-color:
-    #ea580c;
+  border-color: #ea580c;
 
-  transform:
-    translateY(-1px);
+  transform: translateY(-1px);
 
-  box-shadow:
-    0 7px 18px rgba(249, 115, 22, 0.28);
+  box-shadow: 0 7px 18px rgba(249, 115, 22, 0.28);
 }
 
 /* =========================================================
@@ -405,22 +358,17 @@ body {
    ========================================================= */
 
 .btn-secondary {
-  background:
-    #525252;
+  background: #525252;
 
-  border-color:
-    #525252;
+  border-color: #525252;
 
-  color:
-    #ffffff;
+  color: #ffffff;
 }
 
 .btn-secondary:hover {
-  background:
-    #404040;
+  background: #404040;
 
-  border-color:
-    #404040;
+  border-color: #404040;
 }
 
 /* =========================================================
@@ -428,22 +376,17 @@ body {
    ========================================================= */
 
 .btn-outline {
-  background:
-    #ffffff;
+  background: #ffffff;
 
-  border-color:
-    #a3a3a3;
+  border-color: #a3a3a3;
 
-  color:
-    #171717;
+  color: #171717;
 }
 
 .btn-outline:hover {
-  background:
-    #f5f5f5;
+  background: #f5f5f5;
 
-  border-color:
-    #525252;
+  border-color: #525252;
 }
 
 /* =========================================================
@@ -451,25 +394,19 @@ body {
    ========================================================= */
 
 .btn-ghost {
-  background:
-    transparent;
+  background: transparent;
 
-  border-color:
-    transparent;
+  border-color: transparent;
 
-  color:
-    #404040;
+  color: #404040;
 
-  box-shadow:
-    none;
+  box-shadow: none;
 }
 
 .btn-ghost:hover {
-  background:
-    #e5e5e5;
+  background: #e5e5e5;
 
-  color:
-    #171717;
+  color: #171717;
 }
 
 /* =========================================================
@@ -477,17 +414,13 @@ body {
    ========================================================= */
 
 .hardware-indicator {
-  width:
-    8px;
+  width: 8px;
 
-  height:
-    8px;
+  height: 8px;
 
-  border-radius:
-    999px;
+  border-radius: 999px;
 
-  background:
-    #f97316;
+  background: #f97316;
 
   box-shadow:
     0 0 0 3px rgba(249, 115, 22, 0.12),
@@ -501,17 +434,13 @@ body {
 .input,
 .textarea,
 .select {
-  background:
-    #ffffff;
+  background: #ffffff;
 
-  border:
-    1px solid #d4d4d4;
+  border: 1px solid #d4d4d4;
 
-  color:
-    #171717;
+  color: #171717;
 
-  box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
 
   transition:
     border-color 180ms var(--hardware-ease),
@@ -522,18 +451,15 @@ body {
 .input:hover,
 .textarea:hover,
 .select:hover {
-  border-color:
-    #a3a3a3;
+  border-color: #a3a3a3;
 }
 
 .input:focus,
 .textarea:focus,
 .select:focus {
-  background:
-    #ffffff;
+  background: #ffffff;
 
-  border-color:
-    #f97316;
+  border-color: #f97316;
 
   box-shadow:
     0 0 0 3px rgba(249, 115, 22, 0.12),
@@ -545,14 +471,11 @@ body {
    ========================================================= */
 
 .navbar {
-  background:
-    rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.94);
 
-  border-bottom:
-    1px solid #d4d4d4;
+  border-bottom: 1px solid #d4d4d4;
 
-  box-shadow:
-    0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 /* =========================================================
@@ -560,11 +483,9 @@ body {
    ========================================================= */
 
 .hardware-divider {
-  height:
-    1px;
+  height: 1px;
 
-  background:
-    #d4d4d4;
+  background: #d4d4d4;
 }
 
 /* =========================================================
@@ -572,34 +493,25 @@ body {
    ========================================================= */
 
 .orange-edge {
-  position:
-    relative;
+  position: relative;
 }
 
 .orange-edge::before {
-  content:
-    "";
+  content: "";
 
-  position:
-    absolute;
+  position: absolute;
 
-  left:
-    0;
+  left: 0;
 
-  top:
-    10%;
+  top: 10%;
 
-  bottom:
-    10%;
+  bottom: 10%;
 
-  width:
-    3px;
+  width: 3px;
 
-  border-radius:
-    999px;
+  border-radius: 999px;
 
-  background:
-    #f97316;
+  background: #f97316;
 }
 
 /* =========================================================
@@ -607,20 +519,15 @@ body {
    ========================================================= */
 
 .hardware-label {
-  font-size:
-    0.6875rem;
+  font-size: 0.6875rem;
 
-  font-weight:
-    700;
+  font-weight: 700;
 
-  letter-spacing:
-    0.08em;
+  letter-spacing: 0.08em;
 
-  text-transform:
-    uppercase;
+  text-transform: uppercase;
 
-  color:
-    #737373;
+  color: #737373;
 }
 
 /* =========================================================
@@ -638,7 +545,7 @@ body {
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: 'Inter Variable', sans-serif;
+  --font-sans: "Inter Variable", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);

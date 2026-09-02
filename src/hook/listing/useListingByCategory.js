@@ -14,3 +14,5 @@ export const useListingsByCategory = (categoryId) => {
     retry: false,
   });
 };
+// Fetches all ACTIVE public listings belonging to a specific category.
+// Used when a buyer filters listings by category.

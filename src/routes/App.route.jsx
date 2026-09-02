@@ -27,7 +27,7 @@ const router = createBrowserRouter([
         Component: HomePage,
       },
       {
-        path: "/categories",
+        path: "categories",
         Component: CatagoryPage,
       },
       {
