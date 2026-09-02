@@ -19,6 +19,9 @@ import CatagoryPage from "@/pages/public/CatagoryPage";
 import ListingPage from "@/pages/public/ListingPage";
 import { Component } from "lucide-react";
 import ListingDetailPage from "@/pages/listing/ListingDeatailPage";
+import CategoryListingPage from "@/components/category/ListByCategory";
+import AllProduct from "@/components/auth/AllProduct";
+import CartPage from "@/pages/cart/CartPage";
 
 const router = createBrowserRouter([
   {
@@ -30,18 +33,32 @@ const router = createBrowserRouter([
         Component: HomePage,
       },
       {
-        path: "categories",
-        Component: CatagoryPage,
-      },
-      {
-        path: "listings",
+        path: "products",
         Component: ListingPage,
         children: [
+          {
+            index: true, // 👈 เพิ่มใหม่ - ตรงกับ path "/products" เป๊ะๆ
+            Component: AllProduct,
+          },
+          {
+            path: "categories",
+            Component: CatagoryPage,
+            children: [
+              {
+                path: ":categoryId",
+                Component: CategoryListingPage,
+              },
+            ],
+          },
           {
             path: ":id",
             Component: ListingDetailPage,
           },
         ],
+      },
+      {
+        path: "/store",
+        Component: CartPage,
       },
       {
         Component: ProtectedRoute,

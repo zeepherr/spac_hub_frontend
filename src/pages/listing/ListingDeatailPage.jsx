@@ -290,6 +290,14 @@ export default function ListingDetailPage() {
               ))
             ) : (
               <>
+                {listing.category?.name && (
+                  <div className="flex justify-between px-4 py-3 text-sm">
+                    <span className="text-neutral-500">หมวดหมู่</span>
+                    <span className="font-medium text-neutral-900">
+                      {listing.category.name}
+                    </span>
+                  </div>
+                )}
                 {listing.brand && (
                   <div className="flex justify-between px-4 py-3 text-sm">
                     <span className="text-neutral-500">ยี่ห้อ</span>

@@ -76,7 +76,7 @@ export default function CategorySidebar() {
             return (
               <li key={category.id}>
                 <Link
-                  to={`/categories/${category.id}`}
+                  to={`/products/categories/${category.id}`}
                   className="flex items-center justify-between px-4 py-3 text-sm font-medium text-neutral-800 transition hover:bg-neutral-50 hover:text-[#f97316]"
                 >
                   <span className="flex items-center gap-3">
