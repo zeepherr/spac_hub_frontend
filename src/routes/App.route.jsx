@@ -17,6 +17,12 @@ import CreateProductPage from "@/pages/public/user/CreateProductPage";
 import Categories from "@/pages/admin/Categories";
 import CatagoryPage from "@/pages/public/CatagoryPage";
 
+import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
+import Inspection from "@/pages/admin/Inspection";
+import ReadyToShip from "@/pages/admin/ReadyToShip";
+import ActionRequired from "@/pages/admin/ActionRequired";
+import AdminChats from "@/pages/admin/AdminChats";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -80,13 +86,33 @@ const router = createBrowserRouter([
             Component: AdminLayout,
             children: [
               {
-                index: true,
-                Component: Dashboard,
-              },
-              {
-                path: "categories",
-                Component: Categories,
-              },
+              index: true,
+              Component: Dashboard,
+            },
+            {
+              path: "orders/awaiting-receipt",
+              Component: AwaitingReceipt,
+            },
+            {
+              path: "orders/inspection",
+              Component: Inspection,
+            },
+            {
+              path: "orders/ready-to-ship",
+              Component: ReadyToShip,
+            },
+            {
+              path: "orders/action-required",
+              Component: ActionRequired,
+            },
+            {
+              path: "chats",
+              Component: AdminChats,
+            },
+            {
+              path: "categories",
+              Component: Categories,
+            },
             ],
           },
         ],
