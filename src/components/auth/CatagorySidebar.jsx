@@ -56,7 +56,7 @@ export default function CategorySidebar() {
 
       <ul className="flex flex-col">
         {isLoading &&
-          Array.from({ length: categories?.length }).map((_, i) => (
+          Array.from({ length: 10 }).map((_, i) => (
             <li key={i} className="flex items-center gap-3 px-4 py-3">
               <div className="h-4 w-4 animate-pulse rounded bg-neutral-200" />
               <div className="h-3 w-24 animate-pulse rounded bg-neutral-200" />
@@ -76,7 +76,7 @@ export default function CategorySidebar() {
             return (
               <li key={category.id}>
                 <Link
-                  to={`/categories/${category.id}`}
+                  to={`/products/categories/${category.id}`}
                   className="flex items-center justify-between px-4 py-3 text-sm font-medium text-neutral-800 transition hover:bg-neutral-50 hover:text-[#f97316]"
                 >
                   <span className="flex items-center gap-3">

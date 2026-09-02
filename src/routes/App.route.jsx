@@ -16,6 +16,12 @@ import RoleRoute, { ROLES } from "./Role.route";
 import CreateProductPage from "@/pages/public/user/CreateProductPage";
 import Categories from "@/pages/admin/Categories";
 import CatagoryPage from "@/pages/public/CatagoryPage";
+import ListingPage from "@/pages/public/ListingPage";
+import { Component } from "lucide-react";
+import ListingDetailPage from "@/pages/listing/ListingDeatailPage";
+import CategoryListingPage from "@/components/category/ListByCategory";
+import AllProduct from "@/components/auth/AllProduct";
+import CartPage from "@/pages/cart/CartPage";
 
 import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
 import Inspection from "@/pages/admin/Inspection";
@@ -33,8 +39,32 @@ const router = createBrowserRouter([
         Component: HomePage,
       },
       {
-        path: "categories",
-        Component: CatagoryPage,
+        path: "products",
+        Component: ListingPage,
+        children: [
+          {
+            index: true, // 👈 เพิ่มใหม่ - ตรงกับ path "/products" เป๊ะๆ
+            Component: AllProduct,
+          },
+          {
+            path: "categories",
+            Component: CatagoryPage,
+            children: [
+              {
+                path: ":categoryId",
+                Component: CategoryListingPage,
+              },
+            ],
+          },
+          {
+            path: ":id",
+            Component: ListingDetailPage,
+          },
+        ],
+      },
+      {
+        path: "/store",
+        Component: CartPage,
       },
       {
         Component: ProtectedRoute,
