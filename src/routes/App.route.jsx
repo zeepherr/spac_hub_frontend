@@ -16,10 +16,8 @@ import RoleRoute, { ROLES } from "./Role.route";
 import CreateProductPage from "@/pages/public/user/CreateProductPage";
 import Categories from "@/pages/admin/Categories";
 import CatagoryPage from "@/pages/public/CatagoryPage";
-<<<<<<< HEAD
 import EditProfile from "@/pages/public/user/EditProfile";
 import NotFound from "@/components/์NotFound";
-=======
 import ListingPage from "@/pages/public/ListingPage";
 import { Component } from "lucide-react";
 import ListingDetailPage from "@/pages/listing/ListingDeatailPage";
@@ -32,7 +30,6 @@ import Inspection from "@/pages/admin/Inspection";
 import ReadyToShip from "@/pages/admin/ReadyToShip";
 import ActionRequired from "@/pages/admin/ActionRequired";
 import AdminChats from "@/pages/admin/AdminChats";
->>>>>>> a7bd9936c42f74c3763ed2a1b27e66040975803a
 
 const router = createBrowserRouter([
   {
@@ -129,19 +126,6 @@ const router = createBrowserRouter([
             Component: AdminLayout,
             children: [
               {
-<<<<<<< HEAD
-                index: true,
-                Component: Dashboard,
-              },
-              {
-                path: "categories",
-                Component: Categories,
-              },
-              {
-                path: "*",
-                Component: NotFound
-              },
-=======
               index: true,
               Component: Dashboard,
             },
@@ -169,7 +153,6 @@ const router = createBrowserRouter([
               path: "categories",
               Component: Categories,
             },
->>>>>>> a7bd9936c42f74c3763ed2a1b27e66040975803a
             ],
           },
         ],
