@@ -16,6 +16,9 @@ import RoleRoute, { ROLES } from "./Role.route";
 import CreateProductPage from "@/pages/public/user/CreateProductPage";
 import Categories from "@/pages/admin/Categories";
 import CatagoryPage from "@/pages/public/CatagoryPage";
+import ListingPage from "@/pages/public/ListingPage";
+import { Component } from "lucide-react";
+import ListingDetailPage from "@/pages/listing/ListingDeatailPage";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +32,16 @@ const router = createBrowserRouter([
       {
         path: "categories",
         Component: CatagoryPage,
+      },
+      {
+        path: "listings",
+        Component: ListingPage,
+        children: [
+          {
+            path: ":id",
+            Component: ListingDetailPage,
+          },
+        ],
       },
       {
         Component: ProtectedRoute,

@@ -56,7 +56,7 @@ export default function CategorySidebar() {
 
       <ul className="flex flex-col">
         {isLoading &&
-          Array.from({ length: categories?.length }).map((_, i) => (
+          Array.from({ length: 10 }).map((_, i) => (
             <li key={i} className="flex items-center gap-3 px-4 py-3">
               <div className="h-4 w-4 animate-pulse rounded bg-neutral-200" />
               <div className="h-3 w-24 animate-pulse rounded bg-neutral-200" />
