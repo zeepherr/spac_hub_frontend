@@ -7,6 +7,7 @@ import {
   Heart,
   UserRound,
 } from "lucide-react";
+import useAuthStore from "@/stores/auth.store";
 
 const menus = [
   {
@@ -37,6 +38,12 @@ const menus = [
 ];
 
 function ProfileLayout() {
+  const user = useAuthStore((state) => state.user);
+  const displayName =
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    user?.email ||
+    "ผู้ใช้งาน";
+
   return (
     <div className="flex min-h-screen flex-col bg-base-100 text-base-content md:flex-row">
       {/* Sidebar - ปรับเป็น md:w-80 เพื่อให้สมส่วนและเต็มกรอบ */}
@@ -45,18 +52,26 @@ function ProfileLayout() {
         {/* ส่วนโปรไฟล์ - จัดกึ่งกลาง (flex flex-col items-center text-center) */}
         <div className="flex flex-col items-center justify-center border-b border-base-300 px-6 py-8 text-center">
           <div className="relative mb-4 flex size-24 items-center justify-center rounded-full border border-base-300 bg-base-100 shadow-sm">
-            <UserRound
-              size={44}
-              strokeWidth={1.5}
-              className="text-neutral"
-              aria-hidden="true"
-            />
+            {user?.profileImageUrl ? (
+              <img
+                src={user.profileImageUrl}
+                alt={`รูปโปรไฟล์ของ ${displayName}`}
+                className="size-full rounded-full object-cover"
+              />
+            ) : (
+              <UserRound
+                size={44}
+                strokeWidth={1.5}
+                className="text-neutral"
+                aria-hidden="true"
+              />
+            )}
             {/* ไฟ LED สัญลักษณ์ธีม Hardware */}
             <span className="hardware-indicator absolute bottom-1 right-1" />
           </div>
 
           <h2 className="text-xl font-bold tracking-tight text-base-content">
-            ชื่อผู้ใช้งาน
+            {displayName}
           </h2>
 
           <p className="mt-1 text-xs font-bold uppercase tracking-wider text-neutral/70">

@@ -1,192 +1,20 @@
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { Camera, LoaderCircle, Save, UserRound, } from "lucide-react";
-import { toast } from "sonner";
-import { getMe, updateMe, } from "@/api/auth/auth.api";
-import useAuthStore from "@/stores/auth.store";
-
-const emptyProfile = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  address: "",
-};
+import {Camera,LoaderCircle,Save,UserRound,} from "lucide-react";
+import { useProfileForm } from "@/components/user/useProfileForm";
 
 function Profile() {
-  const setUser = useAuthStore((state) => state.setUser,);
-  const [originalProfile, setOriginalProfile] = useState(emptyProfile);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
-  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
-  const { register, handleSubmit, reset,
-    formState: { errors, isSubmitting, },
-  } = useForm({
-    defaultValues: emptyProfile,
-  });
+  const {
+    register,
+    handleSubmit,
+    errors,
+    imagePreview,
+    handleImageChange,
+    submitProfile,
+    isLoading,
+    isError,
+    isSaving,
+  } = useProfileForm();
 
-  useEffect(() => {
-    async function loadProfile() {
-      try {
-        setIsLoadingProfile(true);
-
-        const response = await getMe();
-        const user = response.user;
-
-        const profile = {
-          firstName: user.firstName || "",
-          lastName: user.lastName || "",
-          email: user.email || "",
-          phone: user.phone || "",
-          address: user.address || "",
-        };
-
-        reset(profile);
-        setOriginalProfile(profile);
-        setImagePreview(
-          user.profileImageUrl || "",
-        );
-
-        setUser(user);
-      } catch (error) {
-        toast.error(
-          error.response?.data?.message ||
-          "ไม่สามารถโหลดข้อมูลผู้ใช้ได้",
-        );
-      } finally {
-        setIsLoadingProfile(false);
-      }
-    }
-
-    loadProfile();
-  }, [reset, setUser]);
-
-  const handleImageChange = (event) => {
-    const file = event.target.files?.[0];
-
-    if (!file) return;
-
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
-      toast.error(
-        "รองรับเฉพาะไฟล์ JPG, PNG และ WEBP",
-      );
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error(
-        "รูปภาพต้องมีขนาดไม่เกิน 5 MB",
-      );
-      return;
-    }
-
-    setSelectedImage(file);
-    setImagePreview(URL.createObjectURL(file));
-  };
-
-  const onSubmit = async (data) => {
-    try {
-      const formData = new FormData();
-
-      /*
-       * ส่งเฉพาะช่องที่เปลี่ยน
-       */
-      if (
-        data.firstName.trim() !==
-        originalProfile.firstName
-      ) {
-        formData.append(
-          "firstName",
-          data.firstName.trim(),
-        );
-      }
-
-      if (
-        data.lastName.trim() !==
-        originalProfile.lastName
-      ) {
-        formData.append(
-          "lastName",
-          data.lastName.trim(),
-        );
-      }
-
-      if (
-        data.phone.trim() !==
-        originalProfile.phone
-      ) {
-        formData.append(
-          "phone",
-          data.phone.trim(),
-        );
-      }
-
-      if (
-        data.address.trim() !==
-        originalProfile.address
-      ) {
-        formData.append(
-          "address",
-          data.address.trim(),
-        );
-      }
-
-      if (selectedImage) {
-        formData.append(
-          "profileImage",
-          selectedImage,
-        );
-      }
-
-      /*
-       * ผู้ใช้ไม่ได้เปลี่ยนอะไรเลย
-       */
-      if ([...formData.keys()].length === 0) {
-        toast.info(
-          "ยังไม่มีข้อมูลที่เปลี่ยนแปลง",
-        );
-        return;
-      }
-
-      const response = await updateMe(formData);
-      const updatedUser = response.user;
-
-      const updatedProfile = {
-        firstName: updatedUser.firstName || "",
-        lastName: updatedUser.lastName || "",
-        email: updatedUser.email || "",
-        phone: updatedUser.phone || "",
-        address: updatedUser.address || "",
-      };
-
-      reset(updatedProfile);
-      setOriginalProfile(updatedProfile);
-      setSelectedImage(null);
-      setImagePreview(
-        updatedUser.profileImageUrl || "",
-      );
-
-      setUser(updatedUser);
-
-      toast.success(
-        response.message ||
-        "บันทึกข้อมูลสำเร็จ",
-      );
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-        "ไม่สามารถบันทึกข้อมูลได้",
-      );
-    }
-  };
-
-  if (isLoadingProfile) {
+  if (isLoading) {
     return (
       <div className="flex min-h-80 items-center justify-center">
         <LoaderCircle
@@ -197,6 +25,14 @@ function Profile() {
         <span className="ml-3 text-neutral-500">
           กำลังโหลดข้อมูล...
         </span>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex min-h-80 items-center justify-center text-red-500">
+        ไม่สามารถโหลดข้อมูลผู้ใช้ได้
       </div>
     );
   }
@@ -219,7 +55,7 @@ function Profile() {
         </header>
 
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(submitProfile)}
           className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm lg:p-8"
           noValidate
         >
@@ -263,7 +99,6 @@ function Profile() {
             </div>
           </div>
 
-          {/* ชื่อและนามสกุล */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <FormInput
               id="firstName"
@@ -286,7 +121,6 @@ function Profile() {
             />
           </div>
 
-          {/* อีเมล */}
           <div className="mt-5">
             <FormInput
               id="email"
@@ -301,7 +135,6 @@ function Profile() {
             </p>
           </div>
 
-          {/* เบอร์โทร */}
           <div className="mt-5">
             <FormInput
               id="phone"
@@ -319,7 +152,6 @@ function Profile() {
             />
           </div>
 
-          {/* ที่อยู่ */}
           <div className="mt-5">
             <label
               htmlFor="address"
@@ -332,10 +164,11 @@ function Profile() {
               id="address"
               rows={5}
               placeholder="กรอกที่อยู่สำหรับติดต่อ"
-              className={`w-full resize-none rounded-xl border px-4 py-3 text-sm text-neutral-900 outline-none transition focus:ring-2 ${errors.address
+              className={`w-full resize-none rounded-xl border px-4 py-3 text-sm text-neutral-900 outline-none transition focus:ring-2 ${
+                errors.address
                   ? "border-red-500 focus:ring-red-100"
                   : "border-neutral-300 focus:border-orange-500 focus:ring-orange-100"
-                }`}
+              }`}
               {...register("address", {
                 maxLength: {
                   value: 500,
@@ -355,10 +188,10 @@ function Profile() {
           <div className="mt-7 flex justify-end">
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSaving}
               className="inline-flex min-w-40 cursor-pointer items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 py-3 font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSubmitting ? (
+              {isSaving ? (
                 <>
                   <LoaderCircle
                     size={18}
@@ -403,10 +236,11 @@ function FormInput({
         type={type}
         placeholder={placeholder}
         disabled={disabled}
-        className={`w-full rounded-xl border px-4 py-3 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:ring-2 disabled:cursor-not-allowed disabled:bg-neutral-100 disabled:text-neutral-500 ${error
-            ? "border-red-500 focus:ring-red-100"
-            : "border-neutral-300 focus:border-orange-500 focus:ring-orange-100"
-          }`}
+        className={`w-full rounded-xl border px-4 py-3 text-sm outline-none transition ${
+          error
+            ? "border-red-500"
+            : "border-neutral-300 focus:border-orange-500"
+        }`}
         {...inputProps}
       />
 

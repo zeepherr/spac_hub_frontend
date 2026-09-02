@@ -52,11 +52,8 @@ export const getMe = async () => {
   return response.data;
 };
 
-export const updateMe = async (formData) => {
-  const response = await authApi.patch(
-    "/user/me",
-    formData,
-  );
+export const updateMe = async (payload) => {
+  const response = await authApi.patch("/user/me", payload);
 
   return response.data;
 };
