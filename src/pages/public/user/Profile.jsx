@@ -1,254 +1,234 @@
-import {Camera,LoaderCircle,Save,UserRound,} from "lucide-react";
-import { useProfileForm } from "@/components/user/useProfileForm";
+import {
+  BadgeCheck,
+  CalendarDays,
+  LoaderCircle,
+  Mail,
+  MapPin,
+  Pencil,
+  Phone,
+  Shield,
+  UserRound,
+} from "lucide-react";
+import { useNavigate } from "react-router";
+
+import { useUserProfile } from "@/hook/user/useUserProfile";
 
 function Profile() {
-  const {
-    register,
-    handleSubmit,
-    errors,
-    imagePreview,
-    handleImageChange,
-    submitProfile,
-    isLoading,
-    isError,
-    isSaving,
-  } = useProfileForm();
+  const navigate = useNavigate();
+  const profileQuery = useUserProfile();
 
-  if (isLoading) {
+  const user = profileQuery.data?.user;
+
+  if (profileQuery.isPending) {
     return (
-      <div className="flex min-h-80 items-center justify-center">
+      <div className="flex min-h-96 items-center justify-center">
         <LoaderCircle
           size={30}
           className="animate-spin text-orange-500"
         />
 
-        <span className="ml-3 text-neutral-500">
+        <span className="ml-3 text-sm text-neutral-500">
           กำลังโหลดข้อมูล...
         </span>
       </div>
     );
   }
 
-  if (isError) {
+  if (profileQuery.isError || !user) {
     return (
-      <div className="flex min-h-80 items-center justify-center text-red-500">
-        ไม่สามารถโหลดข้อมูลผู้ใช้ได้
+      <div className="flex min-h-96 flex-col items-center justify-center gap-3">
+        <p className="text-red-500">
+          ไม่สามารถโหลดข้อมูลผู้ใช้ได้
+        </p>
+
+        <button
+          type="button"
+          onClick={() => profileQuery.refetch()}
+          className="cursor-pointer rounded-lg border border-orange-500 px-4 py-2 text-sm font-semibold text-orange-500 transition hover:bg-orange-50"
+        >
+          ลองอีกครั้ง
+        </button>
       </div>
     );
   }
 
+  const fullName =
+    [user.firstName, user.lastName]
+      .filter(Boolean)
+      .join(" ") || "ยังไม่ได้ระบุชื่อ";
+
+  const roleLabel =
+    user.role === "ADMIN"
+      ? "ผู้ดูแลระบบ"
+      : user.role === "SELLER"
+        ? "ผู้ขาย"
+        : "ผู้ใช้งานทั่วไป";
+
+  const createdAt = user.createdAt
+    ? new Intl.DateTimeFormat("th-TH", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(new Date(user.createdAt))
+    : "ไม่พบข้อมูล";
+
   return (
     <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-6xl">
+        {/* หัวข้อ */}
         <header className="mb-7">
-          <p className="text-sm font-semibold uppercase tracking-wider text-orange-500">
-            Account settings
-          </p>
-
-          <h1 className="mt-1 text-3xl font-bold text-neutral-900">
-            ข้อมูลส่วนตัว
+          <h1 className="text-3xl font-bold text-neutral-900">
+            โปรไฟล์ของฉัน
           </h1>
 
           <p className="mt-2 text-sm text-neutral-500">
-            จัดการข้อมูลบัญชีและข้อมูลสำหรับติดต่อ
+            ดูข้อมูลบัญชีและรายละเอียดของคุณ
           </p>
         </header>
 
-        <form
-          onSubmit={handleSubmit(submitProfile)}
-          className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm lg:p-8"
-          noValidate
-        >
-          {/* รูปโปรไฟล์ */}
-          <div className="mb-8 flex items-center gap-5 border-b border-neutral-200 pb-8">
-            <div className="flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200 bg-neutral-100">
-              {imagePreview ? (
-                <img
-                  src={imagePreview}
-                  alt="รูปโปรไฟล์"
-                  className="size-full object-cover"
-                />
-              ) : (
-                <UserRound
-                  size={48}
-                  className="text-neutral-400"
-                />
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="profileImage"
-                className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-orange-500 px-4 py-2 text-sm font-semibold text-orange-500 transition hover:bg-orange-50"
-              >
-                <Camera size={18} />
-                เปลี่ยนรูปโปรไฟล์
-              </label>
-
-              <input
-                id="profileImage"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={handleImageChange}
-                className="hidden"
+        {/* กล่องข้อมูลโปรไฟล์ */}
+        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm lg:p-8">
+          {/* ข้อมูลด้านบน */}
+          <div className="flex flex-col gap-6 border-b border-neutral-200 pb-7 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-5">
+              <ProfileImage
+                imageUrl={user.profileImageUrl}
+                fullName={fullName}
               />
 
-              <p className="mt-2 text-xs text-neutral-400">
-                JPG, PNG หรือ WEBP ไม่เกิน 5 MB
-              </p>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="truncate text-2xl font-bold text-neutral-900">
+                    {fullName}
+                  </h2>
+
+                  {user.isVerified && (
+                    <span className="inline-flex items-center gap-1 text-sm font-medium text-neutral-600">
+                      <BadgeCheck
+                        size={21}
+                        className="fill-orange-500 text-white"
+                      />
+                      ยืนยันตัวตนแล้ว
+                    </span>
+                  )}
+                </div>
+
+                <p className="mt-2 truncate text-neutral-500">
+                  {user.email}
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            <FormInput
-              id="firstName"
-              label="ชื่อ"
-              placeholder="กรอกชื่อ"
-              error={errors.firstName?.message}
-              inputProps={register("firstName", {
-                required: "กรุณากรอกชื่อ",
-              })}
-            />
-
-            <FormInput
-              id="lastName"
-              label="นามสกุล"
-              placeholder="กรอกนามสกุล"
-              error={errors.lastName?.message}
-              inputProps={register("lastName", {
-                required: "กรุณากรอกนามสกุล",
-              })}
-            />
-          </div>
-
-          <div className="mt-5">
-            <FormInput
-              id="email"
-              label="อีเมล"
-              type="email"
-              disabled
-              inputProps={register("email")}
-            />
-
-            <p className="mt-2 text-xs text-neutral-400">
-              ไม่สามารถเปลี่ยนอีเมลจากหน้านี้ได้
-            </p>
-          </div>
-
-          <div className="mt-5">
-            <FormInput
-              id="phone"
-              label="เบอร์โทรศัพท์"
-              type="tel"
-              placeholder="0812345678"
-              error={errors.phone?.message}
-              inputProps={register("phone", {
-                pattern: {
-                  value: /^0[0-9]{8,9}$/,
-                  message:
-                    "เบอร์โทรศัพท์ไม่ถูกต้อง",
-                },
-              })}
-            />
-          </div>
-
-          <div className="mt-5">
-            <label
-              htmlFor="address"
-              className="mb-2 block text-sm font-semibold text-neutral-800"
-            >
-              ที่อยู่
-            </label>
-
-            <textarea
-              id="address"
-              rows={5}
-              placeholder="กรอกที่อยู่สำหรับติดต่อ"
-              className={`w-full resize-none rounded-xl border px-4 py-3 text-sm text-neutral-900 outline-none transition focus:ring-2 ${
-                errors.address
-                  ? "border-red-500 focus:ring-red-100"
-                  : "border-neutral-300 focus:border-orange-500 focus:ring-orange-100"
-              }`}
-              {...register("address", {
-                maxLength: {
-                  value: 500,
-                  message:
-                    "ที่อยู่ต้องไม่เกิน 500 ตัวอักษร",
-                },
-              })}
-            />
-
-            {errors.address && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.address.message}
-              </p>
-            )}
-          </div>
-
-          <div className="mt-7 flex justify-end">
             <button
-              type="submit"
-              disabled={isSaving}
-              className="inline-flex min-w-40 cursor-pointer items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 py-3 font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+              type="button"
+              onClick={() =>
+                navigate("/user/profile/edit")
+              }
+              className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl border border-orange-500 px-5 py-3 font-semibold text-orange-500 transition hover:bg-orange-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300"
             >
-              {isSaving ? (
-                <>
-                  <LoaderCircle
-                    size={18}
-                    className="animate-spin"
-                  />
-                  กำลังบันทึก...
-                </>
-              ) : (
-                <>
-                  <Save size={18} />
-                  บันทึกข้อมูล
-                </>
-              )}
+              <Pencil size={19} />
+              แก้ไขโปรไฟล์
             </button>
           </div>
-        </form>
+
+          {/* รายละเอียด */}
+          <div className="mt-7 space-y-4">
+            <ProfileRow
+              icon={UserRound}
+              label="ชื่อ-นามสกุล"
+              value={fullName}
+            />
+
+            <ProfileRow
+              icon={Mail}
+              label="อีเมล"
+              value={user.email}
+            />
+
+            <ProfileRow
+              icon={Phone}
+              label="เบอร์โทรศัพท์"
+              value={user.phone}
+              emptyText="ยังไม่ได้เพิ่มเบอร์โทรศัพท์"
+            />
+
+            <ProfileRow
+              icon={MapPin}
+              label="ที่อยู่"
+              value={user.address}
+              emptyText="ยังไม่ได้เพิ่มที่อยู่"
+            />
+
+            <ProfileRow
+              icon={Shield}
+              label="บทบาทในระบบ"
+              value={roleLabel}
+            />
+
+            <ProfileRow
+              icon={CalendarDays}
+              label="วันที่สมัครสมาชิก"
+              value={createdAt}
+            />
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-function FormInput({
-  id,
-  label,
-  type = "text",
-  placeholder,
-  error,
-  disabled = false,
-  inputProps,
-}) {
+function ProfileImage({ imageUrl, fullName }) {
   return (
-    <div>
-      <label
-        htmlFor={id}
-        className="mb-2 block text-sm font-semibold text-neutral-800"
-      >
-        {label}
-      </label>
-
-      <input
-        id={id}
-        type={type}
-        placeholder={placeholder}
-        disabled={disabled}
-        className={`w-full rounded-xl border px-4 py-3 text-sm outline-none transition ${
-          error
-            ? "border-red-500"
-            : "border-neutral-300 focus:border-orange-500"
-        }`}
-        {...inputProps}
-      />
-
-      {error && (
-        <p className="mt-1 text-sm text-red-500">
-          {error}
-        </p>
+    <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200 bg-neutral-100">
+      {imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={`รูปโปรไฟล์ของ ${fullName}`}
+          className="size-full object-cover"
+        />
+      ) : (
+        <UserRound
+          size={42}
+          className="text-neutral-400"
+          aria-hidden="true"
+        />
       )}
+    </div>
+  );
+}
+
+function ProfileRow({
+  icon: Icon,
+  label,
+  value,
+  emptyText = "ไม่พบข้อมูล",
+}) {
+  const hasValue =
+    value !== null &&
+    value !== undefined &&
+    String(value).trim() !== "";
+
+  return (
+    <div className="grid gap-3 rounded-2xl border border-neutral-200 px-5 py-4 sm:grid-cols-[260px_1fr] sm:items-center">
+      <div className="flex items-center gap-4">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-orange-50 text-orange-600">
+          <Icon size={21} />
+        </span>
+
+        <span className="font-semibold text-neutral-800">
+          {label}
+        </span>
+      </div>
+
+      <p
+        className={
+          hasValue
+            ? "break-words text-neutral-600"
+            : "text-neutral-400"
+        }
+      >
+        {hasValue ? value : emptyText}
+      </p>
     </div>
   );
 }

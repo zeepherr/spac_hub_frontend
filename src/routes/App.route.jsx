@@ -16,6 +16,8 @@ import RoleRoute, { ROLES } from "./Role.route";
 import CreateProductPage from "@/pages/public/user/CreateProductPage";
 import Categories from "@/pages/admin/Categories";
 import CatagoryPage from "@/pages/public/CatagoryPage";
+import EditProfile from "@/pages/public/user/EditProfile";
+import NotFound from "@/components/์NotFound";
 import ListingPage from "@/pages/public/ListingPage";
 import { Component } from "lucide-react";
 import ListingDetailPage from "@/pages/listing/ListingDeatailPage";
@@ -89,12 +91,20 @@ const router = createBrowserRouter([
                     Component: CreateProductPage,
                   },
                   {
-                    path: "details",
+                    path: "profile",
                     Component: Profile,
+                  },
+                  {
+                    path: "profile/edit",
+                    Component: EditProfile,
                   },
                   {
                     path: "favorites",
                     element: null,
+                  },
+                  {
+                    path: "*",
+                    Component: NotFound
                   },
                 ],
               },
@@ -165,13 +175,17 @@ const router = createBrowserRouter([
         path: "/verify-email",
         Component: VerifyPage,
       },
+      {
+        path: "*",
+        Component: NotFound
+      },
     ],
   },
   //admin routes
 
   {
     path: "*",
-    element: <p>This page is not found</p>,
+    Component: NotFound
   },
 ]);
 

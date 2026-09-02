@@ -24,9 +24,9 @@ const menus = [
     icon: Store,
   },
   {
-    id: "my-orders",
-    label: "My Order",
-    to: "/user/details",
+    id: "profile",
+    label: "โปรไฟล์",
+    to: "/user/profile",
     icon: Tag,
   },
   {
@@ -45,7 +45,7 @@ function ProfileLayout() {
     "ผู้ใช้งาน";
 
   return (
-    <div className="flex min-h-screen flex-col bg-base-100 text-base-content md:flex-row">
+    <div className="flex min-h-full flex-col bg-base-100 text-base-content md:flex-row">
       {/* Sidebar - ปรับเป็น md:w-80 เพื่อให้สมส่วนและเต็มกรอบ */}
       <aside className="flex w-full shrink-0 flex-col border-b border-base-300 bg-base-200/50 md:w-80 md:border-b-0 md:border-r">
         
@@ -81,6 +81,8 @@ function ProfileLayout() {
 
         {/* เมนูการใช้งาน */}
         <nav aria-label="เมนูบัญชี" className="p-4">
+        <p className="mb-3 px-4 text-m font-bold uppercase tracking-wider text-neutral/70">บัญชีของฉัน</p>
+
           <ul className="space-y-2">
             {menus.map((menu) => {
               const Icon = menu.icon;
@@ -111,6 +113,7 @@ function ProfileLayout() {
             })}
           </ul>
         </nav>
+        <div className="flex-1" />
 
         {/* ปุ่ม Logout ด้านล่าง Sidebar */}
         <div className="mt-auto border-t border-base-300 p-4">
@@ -119,7 +122,7 @@ function ProfileLayout() {
       </aside>
 
       {/* เนื้อหาด้านขวา */}
-      <main aria-label="เนื้อหาบัญชี" className="min-w-0 flex-1 bg-base-100 p-4 md:p-8">
+      <main aria-label="เนื้อหาบัญชี" className="min-w-0 flex-1 bg-base-100 ">
         <Outlet />
       </main>
     </div>
