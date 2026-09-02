@@ -25,3 +25,5 @@ export const useUploadListingImages = () => {
     },
   });
 };
+
+// Uploads product images for a seller's draft listing.

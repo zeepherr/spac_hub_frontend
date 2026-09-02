@@ -25,3 +25,5 @@ export const useSaveListingConditionAnswers = () => {
     },
   });
 };
+
+// Saves or updates the seller's answers to listing condition questions.

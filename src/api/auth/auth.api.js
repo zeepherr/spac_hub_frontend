@@ -43,3 +43,12 @@ export const resendRegistrationOtp = async (payload) => {
 
   return response.data;
 };
+
+//google login
+export const googleLogin = async (credential) => {
+  const response = await publicApi.post("/auth/google", {
+    credential,
+  });
+
+  return response.data;
+};
