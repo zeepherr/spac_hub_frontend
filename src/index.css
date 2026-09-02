@@ -4,10 +4,13 @@
 @import "@fontsource-variable/inter";
 
 @custom-variant dark (&:is(.dark *));
-@plugin "daisyui";
+@plugin "daisyui"{
+  themes : light --default
+
+}
 
 @plugin "daisyui/theme" {
-  name: "clean-hardware";
+  name: "light";
   default: true;
   color-scheme: light;
 
