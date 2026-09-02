@@ -118,3 +118,9 @@ export const getPublicListingById = async (listingId) => {
 
   return response.data.data;
 };
+
+export const deleteListing = async (listingId) => {
+  const response = await authApi.delete(`/listings/${listingId}`);
+
+  return response.data;
+};
