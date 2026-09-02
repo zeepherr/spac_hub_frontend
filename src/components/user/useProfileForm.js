@@ -1,7 +1,10 @@
-import {useEffect,useState,} from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
+import { useNavigate } from "react-router";
 import useAuthStore from "@/stores/auth.store";
 import { profileImageSchema } from "@/validations/image.schema";
 
@@ -17,34 +20,24 @@ const emptyProfile = {
 };
 
 export function useProfileForm() {
-  const setUser = useAuthStore(
-    (state) => state.setUser,
-  );
+  const navigate = useNavigate();
 
-  const [originalProfile, setOriginalProfile] =
-    useState(emptyProfile);
-
-  const [selectedImage, setSelectedImage] =
-    useState(null);
-
-  const [imagePreview, setImagePreview] =
-    useState("");
+  const setUser = useAuthStore((state) => state.setUser,);
+  const [originalProfile, setOriginalProfile] =useState(emptyProfile);
+  const [selectedImage, setSelectedImage] =useState(null);
+  const [imagePreview, setImagePreview] =useState("");
 
   const profileQuery = useUserProfile();
+  const {mutateAsync: updateProfile,isPending,} = useUpdateUserProfile();
 
-  const { mutateAsync: updateProfile, isPending } =
-    useUpdateUserProfile();
+  const { register,handleSubmit,reset,
+    formState: {errors,}, 
+                } = useForm({   defaultValues: emptyProfile, });
 
-  const {register,handleSubmit,reset,formState: {errors, },} = useForm({
-    defaultValues: emptyProfile,
-  });
-
-  /** นำข้อมูลจาก GET /user/me ใส่ Form*/
   useEffect(() => {
     const user = profileQuery.data?.user;
 
     if (!user) return;
-
     const profile = {
       firstName: user.firstName || "",
       lastName: user.lastName || "",
@@ -59,16 +52,12 @@ export function useProfileForm() {
       user.profileImageUrl || "",
     );
 
-    setUser(user);
-  }, [
+    setUser(user);}, [
     profileQuery.data,
     reset,
     setUser,
   ]);
 
-  /*
-   * ล้าง Preview URL ที่ Browser สร้าง
-   */
   useEffect(() => {
     return () => {
       if (imagePreview.startsWith("blob:")) {
@@ -77,137 +66,127 @@ export function useProfileForm() {
     };
   }, [imagePreview]);
 
-  /*
-   * ทำงานเมื่อผู้ใช้เลือกรูป
-   */
   const handleImageChange = (event) => {
     const file = event.target.files?.[0];
 
     if (!file) return;
-
-    /*
-     * ตรวจรูปด้วย Zod
-     */
     const result =
       profileImageSchema.safeParse({
         image: file,
       });
 
     if (!result.success) {
-      toast.error(
-        result.error.issues[0].message,
-      );
-
+      const message = result.error.issues[0]?.message || "ไฟล์รูปภาพไม่ถูกต้อง";
+      toast.error(message);
       event.target.value = "";
+
       return;
     }
 
     const validImage = result.data.image;
 
     setSelectedImage(validImage);
-    console.log(validImage)
+    const previewUrl =
+      URL.createObjectURL(validImage);
 
-    setImagePreview(
-      URL.createObjectURL(validImage),
-    );
+    setImagePreview(previewUrl);
   };
 
-  /*
-   * ทำงานเมื่อกดบันทึก
-   */
-  const submitProfile = async (formValues) => {
+
+  const submitProfile = async (
+    formValues,
+  ) => {
     const formData = new FormData();
+    const firstName =formValues.firstName.trim();
+    const lastName =formValues.lastName.trim();
+    const phone =formValues.phone?.trim() || "";
+    const address =formValues.address?.trim() || "";
 
-    const firstName =
-      formValues.firstName.trim();
 
-    const lastName =
-      formValues.lastName.trim();
-
-    const phone =
-      formValues.phone?.trim() || "";
-
-    const address =
-      formValues.address?.trim() || "";
-
-    /*
-     * ส่งเฉพาะข้อมูลที่เปลี่ยน
-     */
     if (
       firstName !== originalProfile.firstName
     ) {
-      formData.append(
-        "firstName",
-        firstName,
-      );
+      formData.append("firstName", firstName,);
     }
 
     if (
       lastName !== originalProfile.lastName
     ) {
-      formData.append(
-        "lastName",
-        lastName,
-      );
+      formData.append("lastName",lastName,);
+    }
+    if (
+      phone !== originalProfile.phone
+    ) {
+      formData.append("phone",phone,);
     }
 
-    if (phone !== originalProfile.phone) {
-      formData.append("phone", phone);
-    }
-
-    if (address !== originalProfile.address) {
-      formData.append("address", address);
+    if (
+      address !== originalProfile.address
+    ) {
+      formData.append("address",address,);
     }
 
     if (selectedImage) {
-      formData.append(
-        "profileImage",
-        selectedImage,
+      formData.append("profileImage", selectedImage,
       );
     }
 
-    /*
-     * ไม่มีอะไรเปลี่ยน
-     */
-    if ([...formData.keys()].length === 0) {
+    if (
+      [...formData.keys()].length === 0) {
       toast.info(
-        "ยังไม่มีข้อมูลที่เปลี่ยนแปลง",
-      );
+        "ยังไม่มีข้อมูลที่เปลี่ยนแปลง", );
 
       return;
     }
-
     try {
-  
-      const response = await updateProfile({ payload: formData });
+      const response = await updateProfile(formData);
+
+      console.log("Update profile response:",response,);
+
+      /*ป้องกัน Error กรณี Backend ไม่ได้ส่ง user กลับมา*/
+      if (!response?.user) {
+        console.error("Backend response does not contain user:",response,);
+
+        return; }
+
       const updatedUser = response.user;
 
-      const updatedProfiles = {
+      const updatedProfile = {
         firstName:
           updatedUser.firstName || "",
+
         lastName:
           updatedUser.lastName || "",
+
         email:
           updatedUser.email || "",
+
         phone:
           updatedUser.phone || "",
+
         address:
           updatedUser.address || "",
       };
 
-      reset(updatedProfiles);
-      setOriginalProfile(updatedProfiles);
+      /* นำข้อมูลล่าสุดกลับเข้า Form*/
+      reset(updatedProfile);
+
+      /* เก็บเป็นข้อมูลต้นฉบับรอบใหม่เพื่อใช้เปรียบเทียบครั้งต่อไป*/
+      setOriginalProfile(
+        updatedProfile,
+      );
+
+      /* รูปถูกส่งสำเร็จแล้ว*/
       setSelectedImage(null);
 
+      /* เปลี่ยน Preview จาก Blob URLเป็น URL จริงจาก R2*/
       setImagePreview(
         updatedUser.profileImageUrl || "",
       );
-    } catch {
-      /*
-       * useUpdateUserProfile
-       * จัดการ Error และ Toast แล้ว
-       */
-    }
+      navigate("/user/profile");
+    } catch (error) {
+      
+      console.error("Submit profile error:",error,);}
   };
 
   return {
@@ -219,8 +198,13 @@ export function useProfileForm() {
     handleImageChange,
     submitProfile,
 
-    isLoading: profileQuery.isPending,
-    isError: profileQuery.isError,
-    isSaving:isPending,
+    isLoading:
+      profileQuery.isPending,
+
+    isError:
+      profileQuery.isError,
+
+    isSaving:
+      isPending,
   };
 }

@@ -15,9 +15,7 @@ export function useUpdateUserProfile() {
   );
 
   return useMutation({
-    mutationFn: ({payload})=>{
-        return updateMe(payload)
-    },
+    mutationFn: updateMe,
 
     onSuccess: (response) => {
       /*
@@ -35,14 +33,14 @@ export function useUpdateUserProfile() {
 
       toast.success(
         response.message ||
-          "บันทึกข้อมูลสำเร็จ",
+          "บันทึกข้อมูลสำเร็จ",{position : "top-right"}
       );
     },
 
     onError: (error) => {
       toast.error(
         error.response?.data?.message ||
-          "ไม่สามารถบันทึกข้อมูลได้",
+          "ไม่สามารถบันทึกข้อมูลได้",{position : "top-right"}
       );
     },
   });

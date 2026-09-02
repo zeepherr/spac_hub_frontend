@@ -52,8 +52,11 @@ export const getMe = async () => {
   return response.data;
 };
 
-export const updateMe = async (payload) => {
-  const response = await authApi.patch("/user/me", payload);}
+export const updateMe = async (formData) => {
+  const response = await authApi.patch("/user/me", formData);
+
+  return response.data;
+};
 //google login
 
 export const googleLogin = async (credential) => {
