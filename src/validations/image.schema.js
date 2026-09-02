@@ -23,3 +23,21 @@ export const listingImagesSchema = z.object({
       "Only JPEG, PNG, and WebP images are allowed",
     ),
 });
+
+export const profileImageSchema = z.object({
+  image: z
+    .instanceof(File, {
+      message: "กรุณาเลือกไฟล์รูปภาพ",
+    })
+    .refine(
+      (file) =>
+        ALLOWED_IMAGE_TYPES.includes(
+          file.type,
+        ),
+      "รองรับเฉพาะไฟล์ JPEG, PNG และ WebP",
+    )
+    .refine(
+      (file) => file.size <= 5 * 1024 * 1024,
+      "รูปภาพต้องมีขนาดไม่เกิน 5 MB",
+    ),
+});
