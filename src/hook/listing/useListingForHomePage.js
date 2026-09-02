@@ -10,3 +10,6 @@ export const useListings = () => {
     retry: false,
   });
 };
+
+// Fetches all currently ACTIVE public listings.
+// Used on the marketplace home page or general listing page.

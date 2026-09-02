@@ -11,3 +11,6 @@ export const useListingConditionQuestions = (listingId) => {
     retry: false,
   });
 };
+
+// Fetches the condition questions required for a seller's listing.
+// Used while the seller is completing the listing condition form.

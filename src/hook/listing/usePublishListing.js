@@ -27,3 +27,6 @@ export const usePublishListing = () => {
     },
   });
 };
+
+// Publishes a completed draft listing and makes it visible
+// to buyers in the public marketplace.

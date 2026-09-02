@@ -10,3 +10,6 @@ export const useMyListings = () => {
     retry: false,
   });
 };
+
+// Fetches all listings created by the authenticated seller.
+// Used on the seller's "My Listings" page.
