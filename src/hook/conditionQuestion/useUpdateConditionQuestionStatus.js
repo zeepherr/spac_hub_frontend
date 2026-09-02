@@ -1,15 +1,15 @@
-import { updateConditionQuestion } from "@/api/conditionQuestion.api";
+import { updateConditionQuestionStatus } from "@/api/conditionQuestion.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { conditionQuestionKeys } from "./conditionQuestionKeys";
 import { categoryKeys } from "@/hook/category/categoryKeys";
+import { conditionQuestionKeys } from "./conditionQuestionKeys";
 
-export const useUpdateConditionQuestion = () => {
+export const useUpdateConditionQuestionStatus = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ categoryId, questionId, payload }) =>
-      updateConditionQuestion(categoryId, questionId, payload),
+      updateConditionQuestionStatus(categoryId, questionId, payload),
 
     onSuccess: (data, variables) => {
       toast.success(data.message, {
@@ -19,7 +19,7 @@ export const useUpdateConditionQuestion = () => {
       queryClient.invalidateQueries({
         queryKey: conditionQuestionKeys.byCategory(variables.categoryId),
       });
-
+      
       queryClient.invalidateQueries({
         queryKey: categoryKeys.includeInactive(),
       });

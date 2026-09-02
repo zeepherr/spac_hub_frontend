@@ -25,3 +25,11 @@ export const updateCategory = async (id, payload) => {
 
   return response.data;
 };
+
+// export const updateCategoryStatus = async (id, isActive) => {
+//   const response = await mainApi.patch(`/categories/${id}/status`, {
+//     isActive,
+//   });
+
+//   return response.data;
+// };
