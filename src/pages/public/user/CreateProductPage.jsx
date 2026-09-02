@@ -35,7 +35,7 @@ export default function CreateProductPage() {
   });
 
   const [answers, setAnswers] = useState({});
-  const [imageFiles, setImageFiles] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]); // เก็บ Array ของ File Objects จาก ImageUploadPreview
   const [aiResult, setAiResult] = useState(null);
 
   // --- React Query Mutations & Queries ---
@@ -215,6 +215,7 @@ export default function CreateProductPage() {
       return alert("กรุณาอัปโหลดรูปภาพสินค้าอย่างน้อย 1 รูป");
     }
 
+    // เรียกใช้ Hook useUploadListingImages() ที่ส่งค่า { listingId, images }
     uploadImagesMutation.mutate(
       { listingId, images: imageFiles },
       {
@@ -313,6 +314,7 @@ export default function CreateProductPage() {
 
               {currentStep >= 3 && (
                 <div className="space-y-4">
+                  {/* ส่ง imageFiles และ setImageFiles ตรงตามที่ ImageUploadPreview ต้องการ */}
                   <ImageUploadPreview
                     imageFiles={imageFiles}
                     setImageFiles={setImageFiles}
