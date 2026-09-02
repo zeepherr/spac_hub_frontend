@@ -91,9 +91,7 @@ function CategoryTable({
                         onClick={() => onStatusChange(category)}
                         disabled={isUpdatingStatus}
                         className={`cursor-pointer hover:underline disabled:cursor-not-allowed disabled:opacity-50 ${
-                          category.isActive
-                            ? "text-red-500"
-                            : "text-green-600"
+                          category.isActive ? "text-red-500" : "text-green-600"
                         }`}
                       >
                         {category.isActive ? "Disable" : "Enable"}
@@ -106,7 +104,6 @@ function CategoryTable({
                         className="flex cursor-pointer items-center gap-1 text-[#FF6B1A] hover:underline"
                       >
                         Manage Questions
-
                         {openCategoryId === category.id ? (
                           <ChevronDown size={13} />
                         ) : (
@@ -120,7 +117,9 @@ function CategoryTable({
                 {/* QUESTIONS DROPDOWN */}
                 <CategoryQuestionsDropdown
                   categoryId={category.id}
+                  questions={category.conditionQuestions}
                   isOpen={openCategoryId === category.id}
+                  isPending={isLoading}
                 />
               </Fragment>
             ))
@@ -135,9 +134,7 @@ function StatusBadge({ isActive }) {
   return (
     <span
       className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-        isActive
-          ? "bg-green-100 text-green-600"
-          : "bg-gray-100 text-gray-500"
+        isActive ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-500"
       }`}
     >
       {isActive ? "Active" : "Disabled"}

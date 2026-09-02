@@ -14,12 +14,8 @@ import HomePage from "../pages/public/HomePage";
 import ProtectedRoute from "./Protected.route";
 import RoleRoute, { ROLES } from "./Role.route";
 import CreateProductPage from "@/pages/public/user/CreateProductPage";
-<<<<<<< HEAD
 import Categories from "@/pages/admin/Categories";
-=======
-import Categories from "@/components/admin/Categories";
 import CatagoryPage from "@/pages/public/CatagoryPage";
->>>>>>> dev
 
 const router = createBrowserRouter([
   {

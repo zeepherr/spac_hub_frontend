@@ -62,7 +62,7 @@ function Categories() {
       return matchSearch && matchStatus;
     });
   }, [categories, search, status]);
-  // console.log(filteredCategories);
+  console.log(filteredCategories);
 
   const handleAddCategory = (event) => {
     event.preventDefault();
