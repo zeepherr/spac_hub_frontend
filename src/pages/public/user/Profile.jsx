@@ -22,10 +22,7 @@ function Profile() {
   if (profileQuery.isPending) {
     return (
       <div className="flex min-h-96 items-center justify-center">
-        <LoaderCircle
-          size={30}
-          className="animate-spin text-orange-500"
-        />
+        <LoaderCircle size={30} className="animate-spin text-orange-500" />
 
         <span className="ml-3 text-sm text-neutral-500">
           กำลังโหลดข้อมูล...
@@ -37,9 +34,7 @@ function Profile() {
   if (profileQuery.isError || !user) {
     return (
       <div className="flex min-h-96 flex-col items-center justify-center gap-3">
-        <p className="text-red-500">
-          ไม่สามารถโหลดข้อมูลผู้ใช้ได้
-        </p>
+        <p className="text-red-500">ไม่สามารถโหลดข้อมูลผู้ใช้ได้</p>
 
         <button
           type="button"
@@ -53,9 +48,8 @@ function Profile() {
   }
 
   const fullName =
-    [user.firstName, user.lastName]
-      .filter(Boolean)
-      .join(" ") || "ยังไม่ได้ระบุชื่อ";
+    [user.firstName, user.lastName].filter(Boolean).join(" ") ||
+    "ยังไม่ได้ระบุชื่อ";
 
   const roleLabel =
     user.role === "ADMIN"
@@ -66,10 +60,10 @@ function Profile() {
 
   const createdAt = user.createdAt
     ? new Intl.DateTimeFormat("th-TH", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }).format(new Date(user.createdAt))
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).format(new Date(user.createdAt))
     : "ไม่พบข้อมูล";
 
   return (
@@ -77,9 +71,7 @@ function Profile() {
       <div className="mx-auto max-w-6xl">
         {/* หัวข้อ */}
         <header className="mb-7">
-          <h1 className="text-3xl font-bold text-neutral-900">
-            โปรไฟล์ของฉัน
-          </h1>
+          <h1 className="text-3xl font-bold text-neutral-900">โปรไฟล์ของฉัน</h1>
 
           <p className="mt-2 text-sm text-neutral-500">
             ดูข้อมูลบัญชีและรายละเอียดของคุณ
@@ -113,16 +105,14 @@ function Profile() {
                   )}
                 </div>
 
-                <p className="mt-2 truncate text-neutral-500">
-                  {user.email}
-                </p>
+                <p className="mt-2 truncate text-neutral-500">{user.email}</p>
               </div>
             </div>
 
             <button
               type="button"
               onClick={() =>
-                navigate(`/${user.role.tolowerCase()}/profile/edit`)
+                navigate(`/${user.role.toLowerCase()}/profile/edit`)
               }
               className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl border border-orange-500 px-5 py-3 font-semibold text-orange-500 transition hover:bg-orange-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300"
             >
@@ -139,11 +129,7 @@ function Profile() {
               value={fullName}
             />
 
-            <ProfileRow
-              icon={Mail}
-              label="อีเมล"
-              value={user.email}
-            />
+            <ProfileRow icon={Mail} label="อีเมล" value={user.email} />
 
             <ProfileRow
               icon={Phone}
@@ -159,11 +145,7 @@ function Profile() {
               emptyText="ยังไม่ได้เพิ่มที่อยู่"
             />
 
-            <ProfileRow
-              icon={Shield}
-              label="บทบาทในระบบ"
-              value={roleLabel}
-            />
+            <ProfileRow icon={Shield} label="บทบาทในระบบ" value={roleLabel} />
 
             <ProfileRow
               icon={CalendarDays}
@@ -187,26 +169,15 @@ function ProfileImage({ imageUrl, fullName }) {
           className="size-full object-cover"
         />
       ) : (
-        <UserRound
-          size={42}
-          className="text-neutral-400"
-          aria-hidden="true"
-        />
+        <UserRound size={42} className="text-neutral-400" aria-hidden="true" />
       )}
     </div>
   );
 }
 
-function ProfileRow({
-  icon: Icon,
-  label,
-  value,
-  emptyText = "ไม่พบข้อมูล",
-}) {
+function ProfileRow({ icon: Icon, label, value, emptyText = "ไม่พบข้อมูล" }) {
   const hasValue =
-    value !== null &&
-    value !== undefined &&
-    String(value).trim() !== "";
+    value !== null && value !== undefined && String(value).trim() !== "";
 
   return (
     <div className="grid gap-3 rounded-2xl border border-neutral-200 px-5 py-4 sm:grid-cols-[260px_1fr] sm:items-center">
@@ -215,16 +186,12 @@ function ProfileRow({
           <Icon size={21} />
         </span>
 
-        <span className="font-semibold text-neutral-800">
-          {label}
-        </span>
+        <span className="font-semibold text-neutral-800">{label}</span>
       </div>
 
       <p
         className={
-          hasValue
-            ? "break-words text-neutral-600"
-            : "text-neutral-400"
+          hasValue ? "break-words text-neutral-600" : "text-neutral-400"
         }
       >
         {hasValue ? value : emptyText}
