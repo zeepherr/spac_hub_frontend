@@ -23,32 +23,13 @@ import VerifyPage from "../pages/auth/VerifyPage";
 import HomePage from "../pages/public/HomePage";
 import ProtectedRoute from "./Protected.route";
 import RoleRoute, { ROLES } from "./Role.route";
-<<<<<<< HEAD
-import CreateProductPage from "@/pages/public/user/CreateProductPage";
-import Categories from "@/pages/admin/Categories";
-import CatagoryPage from "@/pages/public/CatagoryPage";
-import EditProfile from "@/pages/public/user/EditProfile";
-
-import ListingPage from "@/pages/public/ListingPage";
-import { Component } from "lucide-react";
-import ListingDetailPage from "@/pages/listing/ListingDeatailPage";
-import CategoryListingPage from "@/components/category/ListByCategory";
-import AllProduct from "@/components/auth/AllProduct";
-import CartPage from "@/pages/cart/CartPage";
-=======
->>>>>>> dev
 
 import ActionRequired from "@/pages/admin/ActionRequired";
 import AdminChats from "@/pages/admin/AdminChats";
 import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
 import Inspection from "@/pages/admin/Inspection";
 import ReadyToShip from "@/pages/admin/ReadyToShip";
-<<<<<<< HEAD
-import ActionRequired from "@/pages/admin/ActionRequired";
-import AdminChats from "@/pages/admin/AdminChats";
-import NotFound from "@/components/NotFound";
-=======
->>>>>>> dev
+import BuyingOrders from "@/pages/public/user/BuyingOrders";
 
 const router = createBrowserRouter([
   {
@@ -100,6 +81,10 @@ const router = createBrowserRouter([
                   {
                     index: true,
                     Component: Buy,
+                  },
+                  {
+                    path: "orders",
+                    Component: BuyingOrders,
                   },
                   {
                     path: "sell",
