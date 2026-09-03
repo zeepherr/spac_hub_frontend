@@ -23,6 +23,7 @@ import VerifyPage from "../pages/auth/VerifyPage";
 import HomePage from "../pages/public/HomePage";
 import ProtectedRoute from "./Protected.route";
 import RoleRoute, { ROLES } from "./Role.route";
+import AdminProfile from "@/pages/admin/AdminProfile";
 
 import ActionRequired from "@/pages/admin/ActionRequired";
 import AdminChats from "@/pages/admin/AdminChats";
@@ -151,6 +152,14 @@ const router = createBrowserRouter([
               {
                 path: "categories",
                 Component: Categories,
+              },
+              {
+                path: "profile",
+                Component:AdminProfile ,
+              },
+              {
+                path: "profile/edit",
+                Component:EditProfile ,
               },
             ],
           },

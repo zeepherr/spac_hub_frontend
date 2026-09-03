@@ -9,8 +9,8 @@ import { clearClientSession } from "@/lib/clear.client.session";
 
 export function LogoutButton() {
   const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const [isLoggingOut, setIsLoggingOut] =useState(false);
   async function handleLogout() {
     if (isLoggingOut) return;
 
@@ -18,11 +18,10 @@ export function LogoutButton() {
       setIsLoggingOut(true);
 
       const data = await logout();
-      toast.success(
-        data?.message || "ออกจากระบบสำเร็จ",
-        {position: "top-center",},
 
-      );
+      toast.success(data?.message || "ออกจากระบบสำเร็จ", {
+        position: "top-center",
+      });
     } catch (error) {
       console.error("Logout error:", error);
 
@@ -37,7 +36,9 @@ export function LogoutButton() {
         explicit: true,
       });
 
-      navigate("/login", {replace: true,});
+      navigate("/login", {
+        replace: true,
+      });
 
       setIsLoggingOut(false);
     }
@@ -51,30 +52,32 @@ export function LogoutButton() {
       onClick={handleLogout}
       className={[
         "h-auto w-full cursor-pointer",
-        "justify-start gap-3 rounded-xl",
-        "px-4 py-3",
-        "text-sm font-bold text-base-content",
+        "justify-start gap-3 rounded-md",
+        "bg-white px-4 py-3",
+        "text-sm font-medium text-black",
         "transition-colors",
-        "hover:bg-red-50 hover:text-red-600",
+        // "hover:bg-red-500/10 hover:text-red-400",
         "disabled:cursor-not-allowed",
         "disabled:opacity-60",
       ].join(" ")}
     >
       {isLoggingOut ? (
         <LoaderCircle
-          size={20}
+          size={18}
           className="shrink-0 animate-spin"
           aria-hidden="true"
         />
       ) : (
-        <LogOut size={20} strokeWidth={2} className="shrink-0" aria-hidden="true"
+        <LogOut
+          size={18}
+          strokeWidth={2}
+          className="shrink-0"
+          aria-hidden="true"
         />
       )}
 
       <span>
-        {isLoggingOut
-          ? "กำลังออกจากระบบ..."
-          : "ออกจากระบบ"}
+        {isLoggingOut ? "กำลังออกจากระบบ..." : "ออกจากระบบ"}
       </span>
     </Button>
   );
