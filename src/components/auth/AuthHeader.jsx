@@ -1,3 +1,4 @@
+import { useMyCart } from "@/hook/cart/useMyCart";
 import useAuthStore from "@/stores/auth.store";
 import {
   Cpu,
@@ -91,6 +92,8 @@ function ProfileLink({ user }) {
 
 function MainNav() {
   const user = useAuthStore((store) => store.user);
+  const { data: cartItems = [] } = useMyCart();
+  const cartCount = cartItems.length;
 
   return (
     <nav className="flex shrink-0 items-center gap-6 whitespace-nowrap text-sm font-semibold">
@@ -108,7 +111,7 @@ function MainNav() {
         <span className="relative">
           <ShoppingCart size={18} />
           <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#f97316] text-[10px] text-white">
-            0
+            {cartCount}
           </span>
         </span>
         ตะกร้าสินค้า

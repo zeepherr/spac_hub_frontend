@@ -1,3 +1,4 @@
+import { useAddCartItem } from "@/hook/cart/useCreateItem";
 import { Cpu, ShoppingCart, Star } from "lucide-react";
 import { Link } from "react-router";
 
@@ -17,6 +18,15 @@ function getCoverImageUrl(listing) {
 function ProductCard({ product }) {
   const imageUrl = getCoverImageUrl(product);
   const price = Number(product.price);
+  const addCartItem = useAddCartItem();
+
+  const handleAddToCart = (e) => {
+    // กันไม่ให้ <Link> ที่ครอบการ์ดอยู่ทำการ navigate ไปหน้า detail ตอนกดปุ่มนี้
+    e.preventDefault();
+    e.stopPropagation();
+
+    addCartItem.mutate(product.id);
+  };
 
   return (
     <Link
@@ -60,8 +70,9 @@ function ProductCard({ product }) {
         <button
           type="button"
           aria-label="เพิ่มลงตะกร้า"
-          onClick={(e) => e.preventDefault()}
-          className="flex h-8 w-8 items-center justify-center rounded-field bg-[#f97316] text-white hover:bg-orange-600"
+          onClick={handleAddToCart}
+          disabled={addCartItem.isPending}
+          className="flex h-8 w-8 items-center justify-center rounded-field bg-[#f97316] text-white hover:bg-orange-600 disabled:opacity-50"
         >
           <ShoppingCart size={16} />
         </button>
