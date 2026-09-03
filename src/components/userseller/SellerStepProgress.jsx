@@ -14,7 +14,7 @@ export default function SellerStepProgress({ currentStep, onSaveDraft, savingDra
     <div className="w-full bg-base-100 rounded-2xl border border-base-200 p-4 md:p-5 shadow-xs mb-8 transition-all">
       <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
         
-        {/* Step Flow List (ขยายกว้าง กระจายตัวสวยงาม) */}
+        {/* Step Flow List */}
         <div className="flex items-center justify-between w-full lg:flex-1 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
           {steps.map((step, index) => {
             const isCompleted = currentStep > step.id;
@@ -60,7 +60,7 @@ export default function SellerStepProgress({ currentStep, onSaveDraft, savingDra
                   </div>
                 </div>
 
-                {/* Connecting Line (เส้นเชื่อมระหว่างขั้น) */}
+                {/* Connecting Line  */}
                 {index < steps.length - 1 && (
                   <div className="flex-1 mx-3 hidden sm:block min-w-5 max-w-20">
                     <div
@@ -77,7 +77,7 @@ export default function SellerStepProgress({ currentStep, onSaveDraft, savingDra
           })}
         </div>
 
-        {/* Action Button: Save Draft (ปรับปุ่มใหม่ให้พรีเมียมเข้ากับธีม) */}
+        {/* Action Button: Save Draft  */}
         <div className="shrink-0 w-full lg:w-auto pt-3 lg:pt-0 border-t lg:border-t-0 border-base-200 flex justify-end">
           <button
             type="button"

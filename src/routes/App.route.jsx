@@ -23,13 +23,18 @@ import VerifyPage from "../pages/auth/VerifyPage";
 import HomePage from "../pages/public/HomePage";
 import ProtectedRoute from "./Protected.route";
 import RoleRoute, { ROLES } from "./Role.route";
+import AdminProfile from "@/pages/admin/AdminProfile";
 
 import ActionRequired from "@/pages/admin/ActionRequired";
 import AdminChats from "@/pages/admin/AdminChats";
 import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
 import Inspection from "@/pages/admin/Inspection";
 import ReadyToShip from "@/pages/admin/ReadyToShip";
+<<<<<<< HEAD
 import BuyingOrders from "@/pages/public/user/BuyingOrders";
+=======
+import CheckoutPage from "@/pages/cart/CheckoutPage";
+>>>>>>> dev
 
 const router = createBrowserRouter([
   {
@@ -65,8 +70,14 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/store",
+        path: "cart",
         Component: CartPage,
+        children: [
+          {
+            path: "checkout",
+            Component: CheckoutPage,
+          },
+        ],
       },
       {
         Component: ProtectedRoute,
@@ -156,6 +167,14 @@ const router = createBrowserRouter([
               {
                 path: "categories",
                 Component: Categories,
+              },
+              {
+                path: "profile",
+                Component:AdminProfile ,
+              },
+              {
+                path: "profile/edit",
+                Component:EditProfile ,
               },
             ],
           },

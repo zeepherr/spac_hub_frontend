@@ -1,5 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import { CheckCircle2, Edit3, AlertCircle, Info, X } from "lucide-react";
+import { toast } from "sonner";
 
 
 // Components
@@ -19,21 +20,19 @@ import { usePublishListing } from "@/hook/listing/usePublishListing";
 import { useListingConditionQuestions } from "@/hook/listing/useListingConditionQuestions";
 import ProductSummaryModal from "@/components/userseller/ProductSummaryModal";
 import PublishStepSection from "@/components/userseller/PublishStepSection";
+import { useListingsByCategory } from "@/hook/listing/useListingByCategory";
 
 
 export default function CreateProductPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [listingId, setListingId] = useState(null);
 
-  // State สำหรับ Toast Notification
-  const [toast, setToast] = useState({ show: false, message: "", type: "info" });
-
-  const showToast = (message, type = "info") => {
-    setToast({ show: true, message, type });
-    setTimeout(() => {
-      setToast((prev) => ({ ...prev, show: false }));
-    }, 4000);
-  };
+  const [showToast] = useState(() => (message, type = "info") => {
+    if (type === "error") toast.error(message);
+    else if (type === "warning") toast.warning(message);
+    else if (type === "success") toast.success(message);
+    else toast.info(message);
+  });
 
   // Form States
   const [formData, setFormData] = useState({
@@ -43,6 +42,7 @@ export default function CreateProductPage() {
     model: "",
     price: "",
     description: "",
+    location: "",
   });
 
   const [answers, setAnswers] = useState({});
@@ -58,6 +58,23 @@ export default function CreateProductPage() {
   const uploadImagesMutation = useUploadListingImages();
   const analyzeConditionMutation = useAnalyzeListingCondition();
   const publishListingMutation = usePublishListing();
+
+  // ดึงรายการหมวดหมู่ทั้งหมดเพื่อนำมา match หาชื่อหมวดหมู่จริงจาก categoryId
+  const { categories: categoriesData } = useListingsByCategory();
+  const categories = useMemo(() => {
+    return Array.isArray(categoriesData)
+      ? categoriesData
+      : categoriesData?.data || [];
+  }, [categoriesData]);
+
+  // หาชื่อหมวดหมู่จาก categoryId ปัจจุบัน
+  const currentCategoryName = useMemo(() => {
+    if (!formData.categoryId) return "";
+    const found = categories.find(
+      (c) => String(c.id) === String(formData.categoryId)
+    );
+    return found?.name || found?.title || "";
+  }, [formData.categoryId, categories]);
 
   const {
     data: questionsData,
@@ -99,7 +116,7 @@ export default function CreateProductPage() {
     }
   };
 
-  // --- 0. AI AUTOFILL HANDLER ---
+  // --- AI AUTOFILL HANDLER ---
   const handleAiAutofill = (file) => {
     if (!file) return;
 
@@ -139,6 +156,7 @@ export default function CreateProductPage() {
       description: formData.description?.trim() || "",
       brand: formData.brand?.trim() || "",
       model: formData.model?.trim() || "",
+      location: formData.location?.trim() || "",
     };
 
     updateListingMutation.mutate(
@@ -155,22 +173,23 @@ export default function CreateProductPage() {
     );
   };
 
-  // --- STEP 1 SUBMIT (แก้ไขจุดที่ทำให้เกิด HTTP 400 Bad Request) ---
+  // --- STEP 1 SUBMIT ---
   const handleStep1Submit = (e) => {
     if (e && e.preventDefault) e.preventDefault();
 
     const parsedCategoryId = Number(formData.categoryId);
     const parsedPrice = Number(formData.price);
 
-    // ตรวจสอบค่า Number ป้องกันการส่ง NaN ไป Backend
     if (isNaN(parsedCategoryId) || parsedCategoryId <= 0) {
       return showToast("กรุณาเลือกหมวดหมู่สินค้าให้ถูกต้อง", "warning");
     }
     if (isNaN(parsedPrice) || parsedPrice <= 0) {
       return showToast("กรุณาระบุราคาที่มากกว่า 0", "warning");
     }
+    if (parsedPrice > 99999999) {
+      return showToast("ราคาสินค้าสูงเกินกำหนด (สูงสุดไม่เกิน 99,999,999 บาท)", "warning");
+    }
 
-    // สร้าง Payload ที่สมบูรณ์ตามที่ Backend ต้องการ
     const payload = {
       categoryId: parsedCategoryId,
       title: formData.title.trim(),
@@ -178,11 +197,10 @@ export default function CreateProductPage() {
       model: formData.model.trim(),
       price: parsedPrice,
       description: formData.description.trim(),
-      location: formData.location.trim(),
+      location: formData.location ? formData.location.trim() : "",
     };
 
     if (!listingId) {
-      // สร้าง Listing ใหม่
       createListingMutation.mutate(payload, {
         onSuccess: (res) => {
           const newId = res?.data?.id || res?.id || res?.data?.listing?.id;
@@ -192,13 +210,11 @@ export default function CreateProductPage() {
           showToast("บันทึกข้อมูลเบื้องต้นแล้ว", "success");
         },
         onError: (err) => {
-          console.error("Create Listing 400 Error Response:", err?.response?.data);
           const serverError = err?.response?.data?.message || err?.response?.data?.error || "ข้อมูลไม่ถูกต้อง (400 Bad Request)";
           showToast(Array.isArray(serverError) ? serverError[0]?.message || "ข้อมูลไม่ถูกต้อง" : serverError, "error");
         }
       });
     } else {
-      // อัปเดต Listing ที่มีอยู่
       updateListingMutation.mutate(
         { listingId, payload },
         {
@@ -208,7 +224,6 @@ export default function CreateProductPage() {
             showToast("อัปเดตข้อมูลเบื้องต้นเรียบร้อย", "success");
           },
           onError: (err) => {
-            console.error("Update Listing Error Response:", err?.response?.data);
             const serverError = err?.response?.data?.message || "อัปเดตข้อมูลไม่สำเร็จ";
             showToast(serverError, "error");
           }
@@ -217,7 +232,7 @@ export default function CreateProductPage() {
     }
   };
 
-  // --- STEP 2 ---
+  // --- STEP 2 SUBMIT ---
   const handleStep2Submit = (e) => {
     if (e && e.preventDefault) e.preventDefault();
 
@@ -242,7 +257,7 @@ export default function CreateProductPage() {
     );
   };
 
-  // --- STEP 3 ---
+  // --- STEP 3 SUBMIT ---
   const handleStep3Submit = () => {
     if (imageFiles.length === 0) {
       return showToast("กรุณาอัปโหลดรูปภาพสินค้าอย่างน้อย 1 รูป", "warning");
@@ -264,7 +279,7 @@ export default function CreateProductPage() {
     );
   };
 
-  // --- STEP 4 ---
+  // --- STEP 4 ANALYZE ---
   const handleStep4Analyze = () => {
     analyzeConditionMutation.mutate(listingId, {
       onSuccess: (res) => {
@@ -282,65 +297,69 @@ export default function CreateProductPage() {
   };
 
   // --- STEP 5: CONFIRM PUBLISH FROM MODAL ---
-  const handleFinalPublish = () => {
-    const payload = {
-      title: formData.title.trim(),
-      price: Number(formData.price) || 0,
-      categoryId: Number(formData.categoryId),
-      description: formData.description?.trim() || "",
-      brand: formData.brand?.trim() || "",
-      model: formData.model?.trim() || "",
-    };
+  const handleFinalPublish = async () => {
+    if (!listingId) {
+      showToast("ไม่พบรหัสสินค้า กรุณาลองใหม่อีกครั้ง", "error");
+      return;
+    }
 
-    updateListingMutation.mutate(
-      { listingId, payload },
-      {
-        onSuccess: () => {
-          publishListingMutation.mutate(listingId, {
-            onSuccess: () => {
-              setIsSummaryModalOpen(false);
-              showToast("ลงประกาศสินค้าเรียบร้อยแล้ว!", "success");
-              setTimeout(() => {
-                window.location.href = "/user/sell";
-              }, 1000);
-            },
-            onError: (err) => {
-              const errMsg = err?.response?.data?.message || "ไม่สามารถลงประกาศสินค้าได้";
-              showToast(errMsg, "error");
-            }
-          });
-        },
-        onError: (err) => {
-          const errMsg = err?.response?.data?.message || "บันทึกข้อมูลสินค้าก่อนลงประกาศไม่สำเร็จ";
-          showToast(errMsg, "error");
-        }
+    const parsedPrice = Number(formData.price) || 0;
+    if (parsedPrice > 99999999) {
+      showToast("ราคาสินค้าสูงเกินกำหนด (สูงสุดไม่เกิน 99,999,999 บาท)", "warning");
+      return;
+    }
+
+    try {
+      // 1. เซฟอัปเดตข้อมูลสินค้าล่าสุด
+      const payload = {
+        title: formData.title?.trim() || "",
+        price: parsedPrice,
+        categoryId: Number(formData.categoryId),
+        description: formData.description?.trim() || "",
+        brand: formData.brand?.trim() || "",
+        model: formData.model?.trim() || "",
+        location: formData.location?.trim() || "",
+      };
+
+      await updateListingMutation.mutateAsync({ listingId, payload });
+
+      // 2. เซฟอัปเดตคำตอบสภาพสินค้าล่าสุด
+      if (Object.keys(answers).length > 0) {
+        const formattedAnswers = Object.keys(answers).map((qId) => ({
+          questionId: Number(qId),
+          answerValue: answers[qId],
+        }));
+
+        await saveAnswersMutation.mutateAsync({
+          listingId,
+          answers: formattedAnswers,
+        });
       }
-    );
+
+      // 3. เรียก Publish
+      await publishListingMutation.mutateAsync(listingId);
+
+      setIsSummaryModalOpen(false);
+      showToast("ลงประกาศสินค้าเรียบร้อยแล้ว!", "success");
+
+      setTimeout(() => {
+        window.location.href = "/user/sell";
+      }, 1000);
+    } catch (err) {
+      console.error("Publish listing error:", err);
+      const serverErrorMessage =
+        err?.response?.data?.message ||
+        (Array.isArray(err?.response?.data?.error)
+          ? err?.response?.data?.error[0]?.message
+          : err?.response?.data?.error) ||
+        "เกิดข้อผิดพลาดในการลงประกาศสินค้า";
+
+      showToast(serverErrorMessage, "error");
+    }
   };
 
   return (
     <div className="w-full min-h-screen bg-base-100 text-base-content pb-20 relative">
-      
-      {/* TOAST NOTIFICATION FLOATING UI */}
-      {toast.show && (
-        <div className="toast toast-top toast-end z-50 animate-bounce-in">
-          <div className={`alert text-white font-bold shadow-lg flex items-center gap-2 ${
-            toast.type === "error" ? "alert-error bg-rose-600" :
-            toast.type === "warning" ? "alert-warning bg-amber-500" :
-            toast.type === "success" ? "alert-success bg-emerald-600" : "alert-info bg-blue-600"
-          }`}>
-            {toast.type === "error" && <AlertCircle className="w-5 h-5" />}
-            {toast.type === "warning" && <AlertCircle className="w-5 h-5" />}
-            {toast.type === "success" && <CheckCircle2 className="w-5 h-5" />}
-            {toast.type === "info" && <Info className="w-5 h-5" />}
-            <span>{toast.message}</span>
-            <button onClick={() => setToast({ ...toast, show: false })} className="ml-2 hover:opacity-80">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
       <SellerStepProgress
         currentStep={currentStep}
         onSaveDraft={handleSaveDraftAnytime}
@@ -489,9 +508,14 @@ export default function CreateProductPage() {
         imageFiles={imageFiles}
         aiResult={aiResult}
         onConfirmPublish={handleFinalPublish}
-        isPublishing={publishListingMutation.isPending || updateListingMutation.isPending}
+        isPublishing={
+          publishListingMutation.isPending ||
+          updateListingMutation.isPending ||
+          saveAnswersMutation.isPending
+        }
         onUpdateFormData={setFormData}
         onUpdateAnswers={setAnswers}
+        categoryName={currentCategoryName}
       />
     </div>
   );
