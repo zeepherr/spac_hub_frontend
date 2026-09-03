@@ -30,6 +30,7 @@ import AdminChats from "@/pages/admin/AdminChats";
 import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
 import Inspection from "@/pages/admin/Inspection";
 import ReadyToShip from "@/pages/admin/ReadyToShip";
+import CheckoutPage from "@/pages/cart/CheckoutPage";
 
 const router = createBrowserRouter([
   {
@@ -65,8 +66,14 @@ const router = createBrowserRouter([
         ],
       },
       {
-        path: "/store",
+        path: "cart",
         Component: CartPage,
+        children: [
+          {
+            path: "checkout",
+            Component: CheckoutPage,
+          },
+        ],
       },
       {
         Component: ProtectedRoute,
