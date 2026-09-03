@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useUpdateConditionQuestionStatus } from "@/hook/conditionQuestion/useUpdateConditionQuestionStatus";
 
 import AddQuestionModal from "./AddQuestionModal";
 import EditQuestionModal from "./EditQuestionModal";
@@ -15,10 +14,23 @@ function CategoryQuestionsDropdown({
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
-  const {
-    mutate: updateQuestionStatus,
-    isPending: isUpdatingStatus,
-  } = useUpdateConditionQuestionStatus();
+  
+  const [deleteQuestion, setDeleteQuestion] = useState(null);
+
+  const handleOpenDeleteModal = (question) => {
+    setDeleteQuestion(question);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeleteQuestion(null);
+  };
+
+  // ยังไม่ลบจริงและยังไม่เรียก API
+  const handleConfirmDelete = () => {
+    console.log("Question selected for deletion:", deleteQuestion);
+
+    handleCloseDeleteModal();
+  };
 
   if (!isOpen) return null;
 
@@ -48,13 +60,9 @@ function CategoryQuestionsDropdown({
 
         {/* QUESTIONS */}
         {isPending ? (
-          <p className="py-3 text-sm text-gray-500">
-            Loading questions...
-          </p>
+          <p className="py-3 text-sm text-gray-500">Loading questions...</p>
         ) : questions.length === 0 ? (
-          <p className="py-3 text-sm text-gray-500">
-            No questions found
-          </p>
+          <p className="py-3 text-sm text-gray-500">No questions found</p>
         ) : (
           <div className="space-y-3">
             {questions.map((question, index) => (
@@ -99,25 +107,13 @@ function CategoryQuestionsDropdown({
                       Edit
                     </button>
 
+                    {/* DELETE QUESTION */}
                     <button
                       type="button"
-                      onClick={() =>
-                        updateQuestionStatus({
-                          categoryId,
-                          questionId: question.id,
-                          payload: {
-                            isActive: !question.isActive,
-                          },
-                        })
-                      }
-                      disabled={isUpdatingStatus}
-                      className={`cursor-pointer text-xs font-medium hover:underline disabled:cursor-not-allowed disabled:opacity-50 ${
-                        question.isActive
-                          ? "text-red-500"
-                          : "text-green-600"
-                      }`}
+                      onClick={() => handleOpenDeleteModal(question)}
+                      className="cursor-pointer text-xs font-medium text-red-500 hover:underline"
                     >
-                      {question.isActive ? "Disable" : "Enable"}
+                      Delete
                     </button>
                   </div>
                 </div>
@@ -143,6 +139,55 @@ function CategoryQuestionsDropdown({
           categoryId={categoryId}
           question={selectedQuestion}
         />
+
+        {/* DELETE QUESTION MODAL */}
+        {deleteQuestion && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+            onClick={handleCloseDeleteModal}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="delete-question-title"
+              className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <h2
+                id="delete-question-title"
+                className="text-xl font-bold text-gray-900"
+              >
+                Confirm Question Deletion
+              </h2>
+
+              <p className="mt-3 text-sm text-gray-600">
+                Are you sure you want to delete this question?
+              </p>
+
+              <p className="mt-2 text-sm font-semibold text-gray-900">
+                {deleteQuestion.label}
+              </p>
+
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={handleCloseDeleteModal}
+                  className="cursor-pointer rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  className="cursor-pointer rounded-lg bg-red-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-600"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </td>
     </tr>
   );
