@@ -2,6 +2,7 @@ import { Fragment, useState } from "react";
 import { ArrowRight, ChevronDown } from "lucide-react";
 
 import CategoryQuestionsDropdown from "@/components/admin/conditionQuestion/CategoryQuestionsDropdown";
+import { useDeleteCategory } from "@/hook/category/useDeleteCategory";
 
 function CategoryTable({
   categories,
@@ -11,9 +12,13 @@ function CategoryTable({
   onStatusChange,
 }) {
   const [openCategoryId, setOpenCategoryId] = useState(null);
-
-  // หมวดหมู่ที่กำลังจะลบ
   const [deleteCategory, setDeleteCategory] = useState(null);
+
+  // Hook ต้องอยู่ภายใน Component
+  const {
+    mutate: deleteCategoryMutation,
+    isPending: isDeletingCategory,
+  } = useDeleteCategory();
 
   const handleManageQuestions = (categoryId) => {
     setOpenCategoryId((currentId) =>
@@ -26,14 +31,19 @@ function CategoryTable({
   };
 
   const handleCloseDeleteModal = () => {
+    if (isDeletingCategory) return;
+
     setDeleteCategory(null);
   };
 
-  // ยังไม่เรียก API และยังไม่ลบข้อมูลจริง
   const handleConfirmDelete = () => {
-    console.log("Category selected for deletion:", deleteCategory);
+    if (!deleteCategory) return;
 
-    handleCloseDeleteModal();
+    deleteCategoryMutation(deleteCategory.id, {
+      onSuccess: () => {
+        setDeleteCategory(null);
+      },
+    });
   };
 
   return (
@@ -80,7 +90,7 @@ function CategoryTable({
 
                     {/* QUESTIONS */}
                     <td className="px-4 py-4 text-gray-500">
-                      {category._count.conditionQuestions} questions
+                      {category._count?.conditionQuestions ?? 0} questions
                     </td>
 
                     {/* CREATED */}
@@ -99,7 +109,8 @@ function CategoryTable({
                         <button
                           type="button"
                           onClick={() => onEdit(category)}
-                          className="cursor-pointer text-[#FF6B1A] hover:underline"
+                          disabled={isDeletingCategory}
+                          className="cursor-pointer text-[#FF6B1A] hover:underline disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           Edit
                         </button>
@@ -108,7 +119,9 @@ function CategoryTable({
                         <button
                           type="button"
                           onClick={() => onStatusChange(category)}
-                          disabled={isUpdatingStatus}
+                          disabled={
+                            isUpdatingStatus || isDeletingCategory
+                          }
                           className={`cursor-pointer hover:underline disabled:cursor-not-allowed disabled:opacity-50 ${
                             category.isActive
                               ? "text-red-500"
@@ -124,7 +137,8 @@ function CategoryTable({
                           onClick={() =>
                             handleManageQuestions(category.id)
                           }
-                          className="flex cursor-pointer items-center gap-1 whitespace-nowrap text-[#FF6B1A] hover:underline"
+                          disabled={isDeletingCategory}
+                          className="flex cursor-pointer items-center gap-1 whitespace-nowrap text-[#FF6B1A] hover:underline disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           Manage Questions
 
@@ -139,7 +153,8 @@ function CategoryTable({
                         <button
                           type="button"
                           onClick={() => handleOpenDeleteModal(category)}
-                          className="ml-auto cursor-pointer whitespace-nowrap text-red-500 hover:underline"
+                          disabled={isDeletingCategory}
+                          className="ml-auto cursor-pointer whitespace-nowrap text-red-500 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           Delete
                         </button>
@@ -193,7 +208,8 @@ function CategoryTable({
               <button
                 type="button"
                 onClick={handleCloseDeleteModal}
-                className="cursor-pointer rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                disabled={isDeletingCategory}
+                className="cursor-pointer rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -201,9 +217,10 @@ function CategoryTable({
               <button
                 type="button"
                 onClick={handleConfirmDelete}
-                className="cursor-pointer rounded-lg bg-red-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-600"
+                disabled={isDeletingCategory}
+                className="cursor-pointer rounded-lg bg-red-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Delete
+                {isDeletingCategory ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>
