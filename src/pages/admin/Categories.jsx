@@ -4,14 +4,14 @@ import { useCategories } from "@/hook/category/useCategory";
 import { useCreateCategory } from "@/hook/category/useCreateCategory";
 import { useUpdateCategory } from "@/hook/category/useUpdateCategory";
 
+import CategoryFilters from "@/components/admin/category/CategoryFilters";
 import CategoryHeader from "@/components/admin/category/CategoryHeader";
 import CategoryStats from "@/components/admin/category/CategoryStats";
-import CategoryFilters from "@/components/admin/category/CategoryFilters";
 import CategoryTable from "@/components/admin/category/CategoryTable";
 
 import AddCategoryModal from "@/components/admin/category/AddCategoryModal";
-import EditCategoryModal from "@/components/admin/category/EditCategoryModal";
 import CategoryStatusModal from "@/components/admin/category/CategoryStatusModal";
+import EditCategoryModal from "@/components/admin/category/EditCategoryModal";
 
 function Categories() {
   const [search, setSearch] = useState("");
@@ -106,7 +106,7 @@ function Categories() {
   };
 
   return (
-    <div className="mx-auto max-w-[1200px] px-4 py-6">
+    <div className="mx-auto max-w-300 px-4 py-6 h-full">
       <CategoryHeader onAdd={() => setIsAddOpen(true)} />
 
       <CategoryStats stats={stats} />

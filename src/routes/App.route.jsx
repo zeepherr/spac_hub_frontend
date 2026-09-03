@@ -1,5 +1,15 @@
+import AllProduct from "@/components/auth/AllProduct";
+import CategoryListingPage from "@/components/category/ListByCategory";
+import NotFound from "@/components/NotFound";
 import ProfileLayout from "@/layouts/ProfileLayout";
+import Categories from "@/pages/admin/Categories";
+import CartPage from "@/pages/cart/CartPage";
+import ListingDetailPage from "@/pages/listing/ListingDeatailPage";
+import CatagoryPage from "@/pages/public/CatagoryPage";
+import ListingPage from "@/pages/public/ListingPage";
 import Buy from "@/pages/public/user/Buy";
+import CreateProductPage from "@/pages/public/user/CreateProductPage";
+import EditProfile from "@/pages/public/user/EditProfile";
 import Profile from "@/pages/public/user/Profile";
 import Sell from "@/pages/public/user/Sell";
 import { createBrowserRouter } from "react-router";
@@ -13,23 +23,12 @@ import VerifyPage from "../pages/auth/VerifyPage";
 import HomePage from "../pages/public/HomePage";
 import ProtectedRoute from "./Protected.route";
 import RoleRoute, { ROLES } from "./Role.route";
-import CreateProductPage from "@/pages/public/user/CreateProductPage";
-import Categories from "@/pages/admin/Categories";
-import CatagoryPage from "@/pages/public/CatagoryPage";
-import EditProfile from "@/pages/public/user/EditProfile";
-import NotFound from "@/components/์NotFound";
-import ListingPage from "@/pages/public/ListingPage";
-import { Component } from "lucide-react";
-import ListingDetailPage from "@/pages/listing/ListingDeatailPage";
-import CategoryListingPage from "@/components/category/ListByCategory";
-import AllProduct from "@/components/auth/AllProduct";
-import CartPage from "@/pages/cart/CartPage";
 
+import ActionRequired from "@/pages/admin/ActionRequired";
+import AdminChats from "@/pages/admin/AdminChats";
 import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
 import Inspection from "@/pages/admin/Inspection";
 import ReadyToShip from "@/pages/admin/ReadyToShip";
-import ActionRequired from "@/pages/admin/ActionRequired";
-import AdminChats from "@/pages/admin/AdminChats";
 
 const router = createBrowserRouter([
   {
@@ -104,7 +103,7 @@ const router = createBrowserRouter([
                   },
                   {
                     path: "*",
-                    Component: NotFound
+                    Component: NotFound,
                   },
                 ],
               },
@@ -126,33 +125,33 @@ const router = createBrowserRouter([
             Component: AdminLayout,
             children: [
               {
-              index: true,
-              Component: Dashboard,
-            },
-            {
-              path: "orders/awaiting-receipt",
-              Component: AwaitingReceipt,
-            },
-            {
-              path: "orders/inspection",
-              Component: Inspection,
-            },
-            {
-              path: "orders/ready-to-ship",
-              Component: ReadyToShip,
-            },
-            {
-              path: "orders/action-required",
-              Component: ActionRequired,
-            },
-            {
-              path: "chats",
-              Component: AdminChats,
-            },
-            {
-              path: "categories",
-              Component: Categories,
-            },
+                index: true,
+                Component: Dashboard,
+              },
+              {
+                path: "orders/awaiting-receipt",
+                Component: AwaitingReceipt,
+              },
+              {
+                path: "orders/inspection",
+                Component: Inspection,
+              },
+              {
+                path: "orders/ready-to-ship",
+                Component: ReadyToShip,
+              },
+              {
+                path: "orders/action-required",
+                Component: ActionRequired,
+              },
+              {
+                path: "chats",
+                Component: AdminChats,
+              },
+              {
+                path: "categories",
+                Component: Categories,
+              },
             ],
           },
         ],
@@ -177,7 +176,7 @@ const router = createBrowserRouter([
       },
       {
         path: "*",
-        Component: NotFound
+        Component: NotFound,
       },
     ],
   },
@@ -185,7 +184,7 @@ const router = createBrowserRouter([
 
   {
     path: "*",
-    Component: NotFound
+    Component: NotFound,
   },
 ]);
 
