@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronRight, Layers, Sparkles, Upload, X, Loader2, Image as ImageIcon, CheckCircle2, MapPin } from "lucide-react";
 import CategorySelectModal from "./CategorySelectModal";
-import ProvinceSelectModal from "./ProvinceSelectModal"; // 👈 import modal จังหวัดเข้ามา
+import ProvinceSelectModal from "./ProvinceSelectModal";
+import AiProcessingCard from "./AiProcessingCard";
 import { createListingSchema } from "@/validations/listing.schema";
+import { useCategories } from "@/hook/category/useCategory";
 
 export default function ProductBasicForm({ 
   formData, 
@@ -13,7 +15,7 @@ export default function ProductBasicForm({
   showToast 
 }) {
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [isProvinceModalOpen, setIsProvinceModalOpen] = useState(false); // 👈 State เปิดปิด Modal จังหวัด
+  const [isProvinceModalOpen, setIsProvinceModalOpen] = useState(false);
   const [selectedCategoryName, setSelectedCategoryName] = useState("");
   
   const [selectedFile, setSelectedFile] = useState(null);
@@ -21,6 +23,22 @@ export default function ProductBasicForm({
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isAiSuccess, setIsAiSuccess] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // ดึงรายการหมวดหมู่เพื่อใช้จับคู่ชื่อหมวดหมู่
+  const { data: categoriesData } = useCategories({ includeInactive: false });
+
+  // อัปเดตชื่อหมวดหมู่แสดงบน UI ทันทีเมื่อ formData.categoryId มีการเปลี่ยนแปลง
+  useEffect(() => {
+    if (formData.categoryId) {
+      const list = Array.isArray(categoriesData) ? categoriesData : categoriesData?.data || [];
+      const found = list.find((c) => String(c.id) === String(formData.categoryId));
+      if (found) {
+        setSelectedCategoryName(found.name || found.title || "");
+      }
+    } else {
+      setSelectedCategoryName("");
+    }
+  }, [formData.categoryId, categoriesData]);
 
   const notify = (msg, type = "error") => {
     if (showToast) showToast(msg, type);
@@ -39,7 +57,6 @@ export default function ProductBasicForm({
     if (errors.categoryId) setErrors((prev) => ({ ...prev, categoryId: null }));
   };
 
-  // 👈 Handler เมื่อเลือกจังหวัดใน Modal
   const handleSelectProvince = (provinceName) => {
     setFormData((prev) => ({ ...prev, location: provinceName }));
     if (errors.location) setErrors((prev) => ({ ...prev, location: null }));
@@ -59,7 +76,6 @@ export default function ProductBasicForm({
       setIsAiLoading(true);
       await onAiAutofill(selectedFile);
       setIsAiSuccess(true);
-      notify("วิเคราะห์และเติมข้อมูลด้วย AI สำเร็จแล้ว!", "success");
     } catch (error) {
       console.error("AI Autofill Failed:", error);
       notify("ไม่สามารถวิเคราะห์ข้อมูลจากรูปภาพได้ กรุณาลองใหม่อีกครั้ง", "error");
@@ -143,7 +159,7 @@ export default function ProductBasicForm({
                 <div className="flex items-center gap-4">
                   <div className="relative shrink-0">
                     <img src={aiImagePreview} alt="AI Scan Preview" className="w-20 h-20 rounded-xl border-2 border-amber-500/60 object-cover" />
-                    <button type="button" onClick={handleClearAiImage} disabled={isAiLoading} className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full p-1.5">
+                    <button type="button" onClick={handleClearAiImage} disabled={isAiLoading || loading} className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full p-1.5 hover:bg-rose-700 transition-colors">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -162,7 +178,7 @@ export default function ProductBasicForm({
                     <CheckCircle2 className="w-4.5 h-4.5" /> วิเคราะห์ข้อมูลสำเร็จแล้ว
                   </div>
                 ) : (
-                  <button type="button" onClick={handleConfirmAiAutofill} disabled={isAiLoading} className="btn border-none bg-linear-to-r from-[#f97316] to-[#d97706] text-white font-extrabold rounded-xl">
+                  <button type="button" onClick={handleConfirmAiAutofill} disabled={isAiLoading || loading} className="btn border-none bg-linear-to-r from-[#f97316] to-[#d97706] text-white font-extrabold rounded-xl">
                     {isAiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                     <span>{isAiLoading ? "กำลังวิเคราะห์..." : "ยืนยันให้ AI อ่านข้อมูล"}</span>
                   </button>
@@ -172,12 +188,23 @@ export default function ProductBasicForm({
           </div>
         </div>
 
+        {/* การ์ดแสดงสถานะ */}
+        <AiProcessingCard isAiLoading={isAiLoading} isSaving={loading} />
+
         {/* INPUT: ชื่อสินค้า */}
         <div className="form-control w-full">
           <label className="label py-1">
             <span className="label-text font-bold text-base-content">ชื่อสินค้า <span className="text-error">*</span></span>
           </label>
-          <input type="text" name="title" value={formData.title || ""} onChange={handleChange} placeholder="เช่น NVIDIA RTX 4090 Founders Edition" className={`input w-full rounded-field ${errors.title ? "border-error" : ""}`} />
+          <input 
+            type="text" 
+            name="title" 
+            disabled={isAiLoading || loading}
+            value={formData.title || ""} 
+            onChange={handleChange} 
+            placeholder="เช่น NVIDIA RTX 4090 Founders Edition" 
+            className={`input w-full rounded-field ${errors.title ? "border-error" : ""}`} 
+          />
           {errors.title && <span className="text-xs text-error mt-1">{errors.title}</span>}
         </div>
 
@@ -189,6 +216,7 @@ export default function ProductBasicForm({
             </label>
             <button
               type="button"
+              disabled={isAiLoading || loading}
               onClick={() => setIsCategoryModalOpen(true)}
               className={`w-full h-12 px-4 rounded-field border bg-base-100 hover:bg-base-200/60 flex items-center justify-between text-left ${errors.categoryId ? "border-error" : "border-base-300"}`}
             >
@@ -207,7 +235,15 @@ export default function ProductBasicForm({
             <label className="label py-1">
               <span className="label-text font-bold text-base-content">แบรนด์ <span className="text-error">*</span></span>
             </label>
-            <input type="text" name="brand" value={formData.brand || ""} onChange={handleChange} placeholder="NVIDIA, ASUS, MSI..." className={`input w-full rounded-field ${errors.brand ? "border-error" : ""}`} />
+            <input 
+              type="text" 
+              name="brand" 
+              disabled={isAiLoading || loading}
+              value={formData.brand || ""} 
+              onChange={handleChange} 
+              placeholder="NVIDIA, ASUS, MSI..." 
+              className={`input w-full rounded-field ${errors.brand ? "border-error" : ""}`} 
+            />
             {errors.brand && <span className="text-xs text-error mt-1">{errors.brand}</span>}
           </div>
         </div>
@@ -218,7 +254,15 @@ export default function ProductBasicForm({
             <label className="label py-1">
               <span className="label-text font-bold text-base-content">รุ่น (MODEL) <span className="text-error">*</span></span>
             </label>
-            <input type="text" name="model" value={formData.model || ""} onChange={handleChange} placeholder="RTX 4090" className={`input w-full rounded-field ${errors.model ? "border-error" : ""}`} />
+            <input 
+              type="text" 
+              name="model" 
+              disabled={isAiLoading || loading}
+              value={formData.model || ""} 
+              onChange={handleChange} 
+              placeholder="RTX 4090" 
+              className={`input w-full rounded-field ${errors.model ? "border-error" : ""}`} 
+            />
             {errors.model && <span className="text-xs text-error mt-1">{errors.model}</span>}
           </div>
 
@@ -228,13 +272,21 @@ export default function ProductBasicForm({
             </label>
             <div className="relative">
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold">฿</span>
-              <input type="number" name="price" value={formData.price || ""} onChange={handleChange} placeholder="55000" className={`input w-full pl-8 rounded-field ${errors.price ? "border-error" : ""}`} />
+              <input 
+                type="number" 
+                name="price" 
+                disabled={isAiLoading || loading}
+                value={formData.price || ""} 
+                onChange={handleChange} 
+                placeholder="55000" 
+                className={`input w-full pl-8 rounded-field ${errors.price ? "border-error" : ""}`} 
+              />
             </div>
             {errors.price && <span className="text-xs text-error mt-1">{errors.price}</span>}
           </div>
         </div>
 
-        {/* 👈 ปุ่มกดเปิด MODAL เลือกจังหวัด (LOCATION) */}
+        {/* MODAL เลือกจังหวัด */}
         <div className="form-control w-full">
           <label className="label py-1">
             <span className="label-text font-bold text-base-content flex items-center gap-1.5">
@@ -244,6 +296,7 @@ export default function ProductBasicForm({
           </label>
           <button
             type="button"
+            disabled={isAiLoading || loading}
             onClick={() => setIsProvinceModalOpen(true)}
             className={`w-full h-12 px-4 rounded-field border bg-base-100 hover:bg-base-200/60 flex items-center justify-between text-left transition-colors ${
               errors.location ? "border-error" : "border-base-300 focus:border-accent"
@@ -265,14 +318,34 @@ export default function ProductBasicForm({
           <label className="label py-1">
             <span className="label-text font-bold text-base-content">รายละเอียดเพิ่มเติม <span className="text-error">*</span></span>
           </label>
-          <textarea name="description" rows={4} value={formData.description || ""} onChange={handleChange} placeholder="ระบุวันที่ซื้อ, การใช้งานที่ผ่านมาระบุเหตุผลที่ขาย..." className={`textarea w-full rounded-field ${errors.description ? "border-error" : ""}`} />
+          <textarea 
+            name="description" 
+            rows={4} 
+            disabled={isAiLoading || loading}
+            value={formData.description || ""} 
+            onChange={handleChange} 
+            placeholder="ระบุวันที่ซื้อ, การใช้งานที่ผ่านมาระบุเหตุผลที่ขาย..." 
+            className={`textarea w-full rounded-field ${errors.description ? "border-error" : ""}`} 
+          />
           {errors.description && <span className="text-xs text-error mt-1">{errors.description}</span>}
         </div>
 
         {/* ปุ่มถัดไป */}
         <div className="flex justify-end pt-3 border-t border-base-200">
-          <button type="button" onClick={handleFormSubmit} disabled={loading} className="btn btn-accent px-8 rounded-field font-bold shadow-md w-full sm:w-auto">
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>ถัดไป ➔</span>}
+          <button 
+            type="button" 
+            onClick={handleFormSubmit} 
+            disabled={loading || isAiLoading} 
+            className="btn btn-accent px-8 rounded-field font-bold shadow-md w-full sm:w-auto"
+          >
+            {loading || isAiLoading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>{isAiLoading ? "กำลังวิเคราะห์..." : "กำลังบันทึก..."}</span>
+              </div>
+            ) : (
+              <span>ถัดไป ➔</span>
+            )}
           </button>
         </div>
       </div>
@@ -285,7 +358,7 @@ export default function ProductBasicForm({
         onSelectCategory={handleSelectCategory}
       />
 
-      {/* 👈 Modal เลือกจังหวัด */}
+      {/* Modal เลือกจังหวัด */}
       <ProvinceSelectModal
         isOpen={isProvinceModalOpen}
         onClose={() => setIsProvinceModalOpen(false)}

@@ -16,28 +16,7 @@ export default function CategorySelectModal({
   const [searchQuery, setSearchQuery] = useState("");
   const {data:categories,isPending} = useCategories({includeInactive:false})
 
-// //   useEffect(() => {
-// //     if (!isOpen) return;
 
-// //     const fetchCategories = async () => {
-// //       try {
-// //         setLoading(true);
-// //         // เรียก Endpoint API getAllCategoriesForUser
-// //         const response = await authApi.get("/categories");
-// //         console.log(response.data)
-// //         if (response.data && response.data.data) {
-// //           setCategories(response.data.data);
-// //         }
-// //       } catch (err) {
-// //         console.error("Failed to fetch categories:", err);
-// //         setError("ไม่สามารถโหลดรายการหมวดหมู่ได้");
-// //       } finally {
-// //         setLoading(false);
-// //       }
-// //     };
-
-//     fetchCategories();
-//   }, [isOpen]);
 
   if (!isOpen) return null;
 

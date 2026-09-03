@@ -16,4 +16,4 @@ export const useCategories = ({ includeInactive = false } = {}) => {
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
-};
+};    
