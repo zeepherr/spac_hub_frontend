@@ -13,7 +13,7 @@ import { LogoutButton } from "@/components/auth/LogoutButton";
 
 const menuItems = [
   {
-    name: "Dashboard",
+    name: "หน้าหลัก",
     path: "/admin",
     icon: LayoutGrid,
   },
