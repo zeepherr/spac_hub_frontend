@@ -17,7 +17,7 @@ import CreateProductPage from "@/pages/public/user/CreateProductPage";
 import Categories from "@/pages/admin/Categories";
 import CatagoryPage from "@/pages/public/CatagoryPage";
 import EditProfile from "@/pages/public/user/EditProfile";
-import NotFound from "@/components/์NotFound";
+
 import ListingPage from "@/pages/public/ListingPage";
 import { Component } from "lucide-react";
 import ListingDetailPage from "@/pages/listing/ListingDeatailPage";
@@ -30,6 +30,7 @@ import Inspection from "@/pages/admin/Inspection";
 import ReadyToShip from "@/pages/admin/ReadyToShip";
 import ActionRequired from "@/pages/admin/ActionRequired";
 import AdminChats from "@/pages/admin/AdminChats";
+import NotFound from "@/components/NotFound";
 
 const router = createBrowserRouter([
   {
