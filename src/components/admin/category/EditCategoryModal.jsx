@@ -7,7 +7,7 @@ function EditCategoryModal({
   category,
 }) {
   const [categoryName, setCategoryName] = useState("");
-  console.log(category)
+  // console.log(category)
 
   const {
     mutate: updateCategory,

@@ -4,9 +4,8 @@
 @import "@fontsource-variable/inter";
 
 @custom-variant dark (&:is(.dark *));
-@plugin "daisyui"{
-  themes : light --default
-
+@plugin "daisyui" {
+  themes: light --default;
 }
 
 @plugin "daisyui/theme" {
@@ -198,7 +197,14 @@ body {
 
   -webkit-font-smoothing: antialiased;
 }
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
 /* =========================================================
    HARDWARE SURFACE
    ========================================================= */
