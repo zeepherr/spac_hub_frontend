@@ -1,9 +1,11 @@
-import useAuthStore from "@/stores/auth.store"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { useMyCart } from "@/hook/cart/useMyCart"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
+import useAuthStore from "@/stores/auth.store";
+
 import { ArrowLeft, ArrowRight, Info, Lock, Plus } from "lucide-react";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
-import ProductCartCard from "@/components/cart/ProductCartjCard";
+import { useEffect, useState } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router";
+
+import { useMyCart } from "@/hook/cart/useMyCart";
+import ProductCartCard from "@/components/cart/ProductCartCard";
 
 // ค่าธรรมเนียมคงที่ต่อออเดอร์ - ปรับให้ตรงกับจริงทีหลัง (อาจต้องดึงจาก backend เหมือนกัน)
 const INSPECTION_FEE_PER_ITEM = 50; // คิดชิ้นละ 50
@@ -59,7 +61,7 @@ function OrderSummary({
         สรุปคำสั่งซื้อ
       </h2>
 
-      <div className="flex flex-col gap-3 text-sm">
+      <div className="flex flex-col gap-6 text-sm">
         <div className="flex items-center justify-between">
           <span className="text-neutral-500">
             ยอดรวมสินค้า ({summary.itemCount} ชิ้น)
@@ -89,7 +91,7 @@ function OrderSummary({
             type="checkbox"
             checked={summary.includeAssembly}
             onChange={onToggleAssembly}
-            className="checkbox checkbox-sm mt-0.5"
+            className="checkbox checkbox-sm text-[#f97316] inset-shadow-sm/25 mt-0.5"
           />
           <span className="flex-1">
             <span className="flex items-center justify-between">
@@ -154,14 +156,23 @@ function OrderSummary({
 export default function CartPage() {
   const user = useAuthStore((store) => store.user);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const { data: fetchedItems = [], isLoading, isError } = useMyCart();
-  // ไม่ login = ไม่มีตะกร้าให้ดึงอยู่แล้ว โชว์เป็น empty state เฉยๆ ไม่ใช่ error
-  // (useMyCart ยังยิง request อยู่เบื้องหลังแม้เป็น guest เพราะ hook ไม่มี option "enabled"
-  //  ให้ปิดได้ - ถ้าอยากเลี่ยง request ที่ไม่จำเป็นนี้ ต้องไปเพิ่ม enabled: !!user ในตัว useMyCart.js เอง)
-  const items = user ? fetchedItems : [];
-  const isLoadingCart = user ? isLoading : false;
-  const isErrorCart = user ? isError : false;
+  const isChildRoute = location.pathname !== "/cart";
+
+  // ตอนนี้ "เข้าหน้าตะกร้า" ต้อง login เท่านั้น (icon บน header ก็เด้งไป /login ให้แล้วถ้ายังไม่ login)
+  // useEffect กันไว้อีกชั้น เผื่อมีคนพิมพ์ URL /cart ตรงๆ โดยไม่ได้กดผ่าน icon
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+
+  const {
+    data: items = [],
+    isLoading: isLoadingCart,
+    isError: isErrorCart,
+  } = useMyCart();
 
   const [includeAssembly, setIncludeAssembly] = useState(false);
 
@@ -196,16 +207,19 @@ export default function CartPage() {
   const summary = calculateSummary(selectedItems, includeAssembly);
 
   const handleCheckout = () => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-    // TODO: ต่อ flow ชำระเงินจริง (ไปหน้า checkout / เรียก API สร้าง order)
+    if (summary.itemCount === 0) return;
+    // ส่ง items ที่เลือกไว้ + สถานะติ๊กบริการประกอบเครื่อง ไปหน้า checkout ผ่าน navigate state
+    navigate("/cart/checkout", {
+      state: { items: selectedItems, includeAssembly },
+    });
   };
 
-  // ยังไม่ login ปุ่มก็ยังกดได้เสมอ (เพื่อพาไปหน้า login) ส่วน login แล้วค่อย disable ตอนไม่ได้เลือกอะไรเลย
-  const checkoutDisabled = user ? summary.itemCount === 0 : false;
+  const checkoutDisabled = summary.itemCount === 0;
 
+  // ยังไม่ login: useEffect ด้านบนกำลังเด้งไป /login อยู่ ไม่ต้อง render เนื้อหาหน้านี้เลย
+  if (!user) return null;
+
+  if (isChildRoute) return <Outlet />;
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6 flex items-start justify-between border-b border-neutral-100 pb-6">
@@ -245,7 +259,7 @@ export default function CartPage() {
                   type="checkbox"
                   checked={allSelected}
                   onChange={toggleSelectAll}
-                  className="checkbox checkbox-sm"
+                  className="checkbox checkbox-sm text-[#f97316] inset-shadow-sm/25"
                 />
                 เลือกทั้งหมด ({selectedItems.length}/{items.length})
               </label>

@@ -92,8 +92,16 @@ function ProfileLink({ user }) {
 
 function MainNav() {
   const user = useAuthStore((store) => store.user);
+  const location = useLocation();
+  // ยังไม่ login ก็ยิง useMyCart() ได้อยู่ดี (ไม่มี enabled guard) แต่ retry: false ในตัว hook
+  // เลยไม่ยิงซ้ำรัว ๆ ผลคือ cartItems จะเป็น [] เฉยๆ ตอนไม่ login (ไม่กระทบอะไรเพราะกดแล้วเด้งไป login อยู่แล้ว)
   const { data: cartItems = [] } = useMyCart();
   const cartCount = cartItems.length;
+
+  // ตอนยังไม่ login, to ของปุ่มนี้คือ "/login" เอง เลยเช็ค isActive ของ NavLink ตรงๆ ไม่ได้
+  // เพราะพอ MainNav โดน render บนหน้า /login (ตอน isAuthPage) มันจะ isActive=true ไปโดยบังเอิญ
+  // (path ตรงกับ /login แต่ไม่ได้แปลว่ากำลังอยู่ "ตะกร้า") เลยเช็คจาก pathname จริงแทนว่าอยู่ /cart รึเปล่า
+  const isCartActive = location.pathname === "/cart";
 
   return (
     <nav className="flex shrink-0 items-center gap-6 whitespace-nowrap text-sm font-semibold">
@@ -107,12 +115,22 @@ function MainNav() {
         รายการโปรด
       </NavLink>
 
-      <NavLink to="/store" className={iconLinkClass}>
+      {/* ยังไม่ login -> เด้งไป /login แทนหน้าตะกร้า (CartPage เองก็กันไว้อีกชั้นถ้าพิมพ์ URL ตรงๆ) */}
+      <NavLink
+        to={user ? "/cart" : "/login"}
+        className={() =>
+          `flex items-center gap-1.5 hover:text-[#f97316] ${
+            isCartActive ? "text-[#f97316]" : "text-neutral-700"
+          }`
+        }
+      >
         <span className="relative">
           <ShoppingCart size={18} />
-          <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#f97316] text-[10px] text-white">
-            {cartCount}
-          </span>
+          {cartCount > 0 && (
+            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#f97316] text-[10px] text-white">
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          )}
         </span>
         ตะกร้าสินค้า
       </NavLink>

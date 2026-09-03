@@ -1,4 +1,6 @@
-import { usePublicListingDetail } from "@/hook/listing/usePublicListingDetail"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์ hook จริง
+import { useAddCartItem } from "@/hook/cart/useCreateItem";
+import { usePublicListingDetail } from "@/hook/listing/usePublicListingDetail";
+import useAuthStore from "@/stores/auth.store"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
 import {
   ChevronRight,
   Cpu,
@@ -11,12 +13,7 @@ import {
   Thermometer,
 } from "lucide-react";
 import { useState } from "react";
-import { Link, useParams } from "react-router";
-
-// แก้สแลชซ้อน (เช่น "r2.dev//listings/...") เหมือนที่ทำไว้ใน HomeStore.jsx
-function normalizeUrl(url) {
-  return url?.replace(/([^:])\/{2,}/g, "$1/");
-}
+import { Link, useNavigate, useParams } from "react-router";
 
 function DetailSkeleton() {
   return (
@@ -50,21 +47,77 @@ function DetailError() {
   );
 }
 
+// label ภาษาไทยของ estimatedCondition - schema ยืนยันเจอค่า "FAIR" จริงจาก backend
+// ค่าอื่นเป็นการเดาตามรูปแบบทั่วไป (LIKE_NEW/GOOD/FAIR/POOR) ถ้าใช้ enum คนละชื่อปรับ key ตรงนี้ให้ตรง
+const CONDITION_LABELS = {
+  LIKE_NEW: { label: "เหมือนใหม่", color: "text-green-600" },
+  GOOD: { label: "สภาพดี", color: "text-green-600" },
+  FAIR: { label: "สภาพปานกลาง", color: "text-[#f97316]" },
+  POOR: { label: "สภาพต้องซ่อมแซม", color: "text-[#dc2626]" },
+};
+
+function getConditionInfo(condition) {
+  return (
+    CONDITION_LABELS[condition] ?? {
+      label: condition,
+      color: "text-neutral-700",
+    }
+  );
+}
+
+// สีของหลอดคะแนนไล่ตามช่วงคะแนน (เขียว/ส้ม/แดง) ให้เห็นภาพเร็วๆ ว่าสภาพสินค้าอยู่ระดับไหน
+function ConditionScoreBar({ score }) {
+  const clamped = Math.min(100, Math.max(0, score));
+  const barColor =
+    clamped >= 80
+      ? "bg-green-500"
+      : clamped >= 50
+        ? "bg-[#f97316]"
+        : "bg-[#dc2626]";
+
+  return (
+    <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-100">
+      <div
+        className={`h-full rounded-full transition-all ${barColor}`}
+        style={{ width: `${clamped}%` }}
+      />
+    </div>
+  );
+}
+
 export default function ListingDetailPage() {
   const { id } = useParams();
   const { data: listing, isLoading, isError } = usePublicListingDetail(id);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
+  const user = useAuthStore((store) => store.user);
+  const navigate = useNavigate();
+  const addCartItem = useAddCartItem();
+
   if (isLoading) return <DetailSkeleton />;
   if (isError || !listing) return <DetailError />;
 
   const images = listing.images ?? [];
-  const activeImage = normalizeUrl(images[activeImageIndex]?.imageUrl);
+  const activeImage = images[activeImageIndex]?.imageUrl;
   const price = Number(listing.price);
   // schema ยังไม่ยืนยัน field ราคาเดิม/originalPrice ตรงๆ เว้นไว้เผื่อมี ถ้าไม่มีจะไม่โชว์ราคาขีดฆ่า
   const originalPrice = listing.originalPrice
     ? Number(listing.originalPrice)
     : null;
+
+  const conditionInfo = getConditionInfo(listing.estimatedCondition);
+  const estimatedScore =
+    listing.estimatedScore != null ? Number(listing.estimatedScore) : null;
+
+  // เหมือนปุ่ม "เพิ่มลงตะกร้า" ใน ProductCard.jsx เป๊ะ: ไม่ login เด้งไป /login แทนการ add เลย
+  const handleAddToCart = () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    addCartItem.mutate(listing.id);
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
@@ -125,7 +178,7 @@ export default function ListingDetailPage() {
                   }`}
                 >
                   <img
-                    src={normalizeUrl(img.imageUrl)}
+                    src={img.imageUrl}
                     alt=""
                     className="h-full w-full object-contain"
                   />
@@ -169,7 +222,12 @@ export default function ListingDetailPage() {
               )}
             </div>
 
-            <button type="button" className="btn btn-accent mt-4 w-full gap-2">
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={user ? addCartItem.isPending : false}
+              className="btn btn-accent mt-4 w-full gap-2 disabled:opacity-50"
+            >
               <ShoppingCart size={18} />
               เพิ่มลงตะกร้า
             </button>
@@ -185,6 +243,29 @@ export default function ListingDetailPage() {
               คุ้มครองการซื้อขายโดย SpecHub Escrow
             </p>
           </div>
+
+          {/* คะแนนประเมินสภาพสินค้า - estimatedScore/estimatedCondition มาจาก listing จริง (ยืนยันจาก response แล้ว) */}
+          {estimatedScore != null && (
+            <div className="hardware-surface p-5">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-sm font-bold text-neutral-900">
+                  คะแนนประเมินสภาพสินค้า
+                </h2>
+                <span
+                  className={`text-xs font-semibold ${conditionInfo.color}`}
+                >
+                  {conditionInfo.label}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <ConditionScoreBar score={estimatedScore} />
+                <span className="shrink-0 text-sm font-bold text-neutral-900">
+                  {estimatedScore}/100
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* สรุปผลตรวจสอบ - อิงจาก Inspection model ใน schema ปรับชื่อ field ตามจริง */}
           {listing.inspection && (
