@@ -30,8 +30,15 @@ import AdminChats from "@/pages/admin/AdminChats";
 import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
 import Inspection from "@/pages/admin/Inspection";
 import ReadyToShip from "@/pages/admin/ReadyToShip";
+
 import CheckoutPage from "@/pages/cart/CheckoutPage";
 import BuyingOrders from "@/pages/public/user/BuyingOrders";
+import OrderDetail from "@/pages/public/user/OrderDetail";
+import CheckoutStep1Page from "@/pages/cart/CheckoutStep1Page";
+import CheckoutStep2Page from "@/pages/cart/CheckoutStep2Page";
+import CheckoutStep3Page from "@/pages/cart/CheckoutStep3Page";
+
+import PaymentSuccessPage from "@/pages/auth/payments/PaymentSuccessPage";
 
 const router = createBrowserRouter([
   {
@@ -66,15 +73,13 @@ const router = createBrowserRouter([
           },
         ],
       },
+      { path: "/payment/success", Component: PaymentSuccessPage },
+      { path: "/checkoutstep1", Component: CheckoutStep1Page },
+      { path: "/checkoutstep2", Component: CheckoutStep2Page },
+      { path: "/checkoutstep3", Component: CheckoutStep3Page },
       {
         path: "cart",
         Component: CartPage,
-        children: [
-          {
-            path: "checkout",
-            Component: CheckoutPage,
-          },
-        ],
       },
       {
         Component: ProtectedRoute,
@@ -93,6 +98,14 @@ const router = createBrowserRouter([
                   {
                     path: "orders",
                     Component: BuyingOrders,
+                  },
+                   {
+                    path: "orders/:orderId",
+                    Component: OrderDetail,
+                  },
+                  {
+                    path: "orders/:orderId",
+                    Component: OrderDetail,
                   },
                   {
                     path: "sell",
