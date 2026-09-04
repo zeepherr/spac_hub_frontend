@@ -13,7 +13,7 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
   const navigate = useNavigate();
   const { mutate: deleteListing, isPending: isDeleting } = useDeleteListing();
 
-  // State สำหรับ Modal ต่างๆ
+  // State สำหรับ Modals
   const [selectedListingForEdit, setSelectedListingForEdit] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -29,7 +29,7 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
   };
 
   const handleOpenDeleteModal = (e, item) => {
-    e.stopPropagation(); // กันไม่ให้ไปติด Event คลิกของ Card
+    e.stopPropagation(); // กันไม่ให้ Event ทะลุไปเปิด Detail Modal
     setSelectedListingForDelete(item);
     setIsDeleteModalOpen(true);
   };
@@ -45,7 +45,7 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
   };
 
   const handleOpenEdit = (e, item) => {
-    e.stopPropagation(); // กันไม่ให้ไปติด Event คลิกของ Card
+    e.stopPropagation(); // กันไม่ให้ Event ทะลุไปเปิด Detail Modal
     setSelectedListingForEdit(item);
     setIsEditModalOpen(true);
   };
@@ -175,8 +175,10 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
-          setIsDeleteModalOpen(false);
-          setSelectedListingForDelete(null);
+          if (!isDeleting) {
+            setIsDeleteModalOpen(false);
+            setSelectedListingForDelete(null);
+          }
         }}
         onConfirm={handleConfirmDelete}
         isDeleting={isDeleting}

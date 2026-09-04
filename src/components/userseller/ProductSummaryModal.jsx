@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useMemo } from "react";
 import { X, CheckCircle, Image as ImageIcon, Sparkles, Edit3, HelpCircle, AlertCircle, MapPin, ChevronRight, Layers, Lock } from "lucide-react";
 import ProvinceSelectModal from "./ProvinceSelectModal"; 
@@ -73,13 +71,6 @@ export default function ProductSummaryModal({
 
   const handleSelectProvinceInModal = (provinceName) => {
     handleInputChange("location", provinceName);
-  };
-
-  const handleAnswerChange = (qId, value) => {
-    const updated = { ...editAnswers, [qId]: value };
-    setEditAnswers(updated);
-    onUpdateAnswers(updated);
-    setIsEditedByUser(true);
   };
 
   const handleAiTextChange = (e) => {
@@ -232,39 +223,47 @@ export default function ProductSummaryModal({
               </div>
             </div>
 
-            {/* Section 3: คำตอบสภาพสินค้า */}
+            {/* Section 3: คำตอบสภาพสินค้า (🔒 ล็อกไม่ให้แก้ไข) */}
             {questions.length > 0 && (
               <>
                 <hr className="border-base-300" />
                 <div className="space-y-4">
-                  <h4 className="font-bold text-base text-primary">ตอบคำถามสภาพสินค้า</h4>
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-base text-primary flex items-center gap-2">
+                      ตอบคำถามสภาพสินค้า
+                    </h4>
+                    <span className="text-xs text-base-content/50 flex items-center gap-1 bg-base-200 px-2 py-1 rounded-md">
+                      <Lock className="w-3 h-3" /> ไม่สามารถแก้ไขคำตอบได้
+                    </span>
+                  </div>
+
                   <div className="space-y-4">
                     {questions.map((q) => (
-                      <div key={q.id} className="p-4 bg-base-200/50 rounded-field space-y-2">
+                      <div key={q.id} className="p-4 bg-base-200/50 rounded-field space-y-2 opacity-80 cursor-not-allowed">
                         <label className="label-text font-bold text-base-content flex items-center gap-2">
                           <HelpCircle className="w-4 h-4 text-primary" />
                           {q.label} {q.isRequired && <span className="text-error">*</span>}
                         </label>
 
                         {q.answerType === "BOOLEAN" && (
-                          <div className="flex gap-6 pt-1">
-                            <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+                          <div className="flex gap-6 pt-1 pointer-events-none">
+                            <label className="flex items-center gap-2 text-sm font-medium">
                               <input
                                 type="radio"
                                 name={`modal_q_${q.id}`}
                                 className="radio radio-primary radio-sm"
                                 checked={editAnswers[q.id] === true}
-                                onChange={() => handleAnswerChange(q.id, true)}
+                                disabled
                               />
                               <span>ใช่ / ทำงานปกติ (Yes)</span>
                             </label>
-                            <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+                            <label className="flex items-center gap-2 text-sm font-medium">
                               <input
                                 type="radio"
                                 name={`modal_q_${q.id}`}
                                 className="radio radio-primary radio-sm"
                                 checked={editAnswers[q.id] === false}
-                                onChange={() => handleAnswerChange(q.id, false)}
+                                disabled
                               />
                               <span>ไม่ใช่ / มีปัญหา (No)</span>
                             </label>
@@ -273,9 +272,9 @@ export default function ProductSummaryModal({
 
                         {q.answerType === "SELECT" && (
                           <select
-                            className="select select-bordered select-sm w-full rounded-field font-semibold"
+                            className="select select-bordered select-sm w-full rounded-field font-semibold bg-base-200 cursor-not-allowed pointer-events-none"
                             value={editAnswers[q.id] || ""}
-                            onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                            disabled
                           >
                             <option value="">-- โปรดเลือกคำตอบ --</option>
                             {q.options?.map((opt, i) => (
