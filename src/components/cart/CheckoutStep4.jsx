@@ -1,17 +1,16 @@
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router";
-import CheckoutStepIndicator from "./CheckoutStepLine";
+import CheckoutStepIndicator from "@/components/cart/CheckoutStepLine";
 
 function CheckoutStep4({ sessionId }) {
   const navigate = useNavigate();
 
   return (
-    <div className="mx-auto flex min-h-[75vh] max-w-6xl flex-col justify-center px-4 py-8">
+    <div className="mx-auto max-w-6xl px-4 py-8">
       <CheckoutStepIndicator currentStep={3} />
 
-      <div className="mx-auto w-full max-w-xl">
+      <div className="mx-auto flex min-h-[60vh] w-full max-w-xl flex-col justify-center">
         <div className="hardware-surface flex flex-col items-center gap-4 p-10 text-center">
-          {/* ไอคอนวงกลมใหญ่ขึ้น + วงแสงสีส้มเรืองอยู่ข้างหลังให้ดูมีมิติ ไม่ใช่วงกลมทึบแบนๆ เฉยๆ */}
           <div className="relative flex h-20 w-20 items-center justify-center">
             <span className="absolute inset-0 rounded-full bg-[#f97316]/15 blur-xl" />
             <span className="matte relative flex h-20 w-20 items-center justify-center rounded-full">

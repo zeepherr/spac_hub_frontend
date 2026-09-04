@@ -1,27 +1,30 @@
 import { zodResolver } from "@hookform/resolvers/zod"; // ปรับตามที่โปรเจกต์คุณใช้จริง
-import { ArrowLeft, ArrowRight, Lock, ShieldCheck } from "lucide-react";
-import { useEffect, useMemo } from "react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  Lock,
+  ShieldCheck,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router";
 import { z } from "zod";
-import useAuthStore from "@/stores/auth.store"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { useUpdateUserProfile } from "@/hook/user/useUpdateUserProfile"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { useCheckoutQuote } from "@/hook/checkout/useCheckoutQuote"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
+import useAuthStore from "@/stores/auth.store";
+import { useUpdateUserProfile } from "@/hook/user/useUpdateUserProfile";
+import { useCheckoutQuote } from "@/hook/checkout/useCheckoutQuote";
+import { useCreateCheckout } from "@/hook/checkout/useCreateCheckout";
+import { useCreatePaymentCheckout } from "@/hook/payment/useCreatePaymentCheckout";
 import CheckoutStep1 from "@/components/cart/CheckoutStep1";
+import CheckoutStep3 from "@/components/cart/CheckoutStep3";
 import CheckoutStepIndicator from "@/components/cart/CheckoutStepLine";
 
-// หน้านี้คือ route จริง /checkoutstep1 (จัดส่ง) แยกออกจาก /checkoutstep2 (การ์ด "กำลังนำคุณไปสู่หน้าชำระเงิน"
-// + ยิง createCheckout/createPayment จริง - เดิมชื่อ /checkoutstep3 แต่เปลี่ยนเลขให้ตรงกับ indicator step 2
-// "ชำระเงิน" แล้ว) กด "ดำเนินการชำระเงิน" แล้ว URL จะเปลี่ยนไป /checkoutstep2 จริงๆ
-// flow เต็มๆ: /checkoutstep1 (ไฟล์นี้) -> /checkoutstep2 -> Stripe -> /payment/success -> /checkoutstep3
-// (การ์ดสำเร็จ)
 const ASSEMBLY_SERVICE_FEE = 400;
 
 function formatPrice(amount) {
   return `฿${amount.toLocaleString()}`;
 }
 
-// field เหมือนฟอร์ม EditProfile.jsx เป๊ะ (ชื่อ/นามสกุลแยกกัน + ที่อยู่ช่องเดียว) แค่ตัด email ออก
 const shippingSchema = z.object({
   firstName: z.string().trim().min(1, "กรุณากรอกชื่อ"),
   lastName: z.string().trim().min(1, "กรุณากรอกนามสกุล"),
@@ -48,7 +51,6 @@ function OrderSummary({
   submitting,
 }) {
   const hasItems = items.length > 0;
-  // ตอนยังไม่มี quote กลับมา (กำลังโหลด/ยังไม่เคยยิง) โชว์ "..." แทนเลขที่เดาไม่ได้ ไม่ใช้เลขคำนวณเองฝั่ง frontend
   const isPending = hasItems && (isQuoteLoading || !quote);
   const grandTotal = hasItems
     ? (quote?.grandTotal ?? 0) + (includeAssembly ? ASSEMBLY_SERVICE_FEE : 0)
@@ -75,15 +77,12 @@ function OrderSummary({
       </div>
 
       {hasItems && isQuoteError ? (
-        // โชว์ message จริงจาก backend แทน (เช่น listing บางชิ้นสถานะไม่ใช่ ACTIVE แล้ว)
         <p className="mb-4 text-sm text-red-300">
           {quoteError?.response?.data?.message ||
             "คำนวณยอดไม่สำเร็จ กรุณาลองใหม่อีกครั้ง"}
         </p>
       ) : (
         <div className="flex flex-col gap-2 text-sm text-neutral-300">
-          {/* feeLines มาจาก POST /api/checkouts/quote ตรงๆ (PRODUCT_CHECKING, DELIVERY ตอนนี้)
-              ไม่ได้คำนวณเองฝั่ง frontend แล้ว ตาม contract ที่ backend ให้มา */}
           {isPending ? (
             <div className="flex items-center justify-between">
               <span>กำลังคำนวณยอด...</span>
@@ -148,11 +147,11 @@ export default function CheckoutStep1Page() {
   const navigate = useNavigate();
   const user = useAuthStore((store) => store.user);
   const updateUserProfile = useUpdateUserProfile();
+  const createCheckoutMutation = useCreateCheckout();
+  const createPaymentMutation = useCreatePaymentCheckout();
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentError, setPaymentError] = useState("");
 
-  // items/includeAssembly ถูกส่งมาจาก CartPage.jsx / ListingDetailPage.jsx (ปุ่ม "ซื้อเลย") ตอน navigate มาที่
-  // หน้านี้ผ่าน { state } (รายละเอียดสินค้า title/thumbnail ต้องมาจากตรงนี้อยู่ดี เพราะ endpoint quote ไม่ได้
-  // คืนพวกนี้มาด้วย) ถ้าเข้าหน้านี้ตรงๆ โดยไม่มี state (เช่น พิมพ์ URL เอง / refresh หน้าแล้ว state หาย)
-  // ให้เด้งกลับไปตะกร้า
   const items = location.state?.items ?? [];
   const includeAssembly = location.state?.includeAssembly ?? false;
 
@@ -163,8 +162,6 @@ export default function CheckoutStep1Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ยอดเงิน (subtotal/feeLines/feeTotal/grandTotal) ดึงจาก POST /api/checkouts/quote ตรงๆ ไม่ได้คำนวณเองฝั่ง
-  // frontend
   const listingIds = useMemo(
     () => items.map((item) => item.listingId),
     [items],
@@ -187,10 +184,6 @@ export default function CheckoutStep1Page() {
     },
   });
 
-  // เผื่อ user ใน store ยังโหลดไม่เสร็จตอน mount (ค่าว่างตอนแรก) พอโหลดเสร็จค่อย reset ฟอร์มให้เป็นข้อมูลจริง
-  // TODO: useAuthStore's user เป็นข้อมูล auth เบาๆ ไม่แน่ใจว่ามี phone/address ติดมาด้วยรึเปล่า
-  // (ใน EditProfile.jsx ข้อมูลพวกนี้ดึงแยกผ่าน useProfileForm() ต่างหาก) ถ้า user.phone/user.address
-  // ว่างเปล่าตลอด ให้บอกผมว่ามี hook ดึงโปรไฟล์เต็ม (เช่น useMyProfile) รึเปล่า จะสลับมาใช้อันนั้นแทน
   useEffect(() => {
     if (user) {
       reset({
@@ -203,31 +196,98 @@ export default function CheckoutStep1Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  // step 1 -> validate ฟอร์มที่อยู่จัดส่งก่อน แล้วบันทึกเป็นข้อมูลโปรไฟล์เลย (เหมือน EditProfile.jsx) ใช้ hook
-  // เดียวกับหน้าแก้โปรไฟล์ (useUpdateUserProfile -> updateMe) toast สำเร็จ/error มาจากในนั้นอัตโนมัติ
-  // บันทึกโปรไฟล์สำเร็จแล้ว navigate ไปหน้า /checkoutstep2 จริงๆ (เปลี่ยน URL) พร้อม state items/includeAssembly/
-  // shippingAddress ที่ประกอบจากฟอร์มตรงนี้ - การสร้าง checkout/payment จริง (POST /api/checkouts,
-  // POST /api/payments/checkout) ย้ายไปทำที่ CheckoutStep2Page.jsx แทน (หน้าโน้นเป็นคนยิง mutation เอง
-  // ตอน mount ไม่ใช่ที่นี่แล้ว)
   const submitShippingAndPay = handleSubmit((values) => {
     updateUserProfile.mutate(values, {
-      onSuccess: () => {
+      onSuccess: async () => {
         const shippingAddress = {
           recipientName: `${values.firstName} ${values.lastName}`.trim(),
           phone: values.phone,
           address: values.address,
         };
-        navigate("/checkoutstep2", {
-          state: { items, includeAssembly, shippingAddress },
-        });
+
+        setPaymentError("");
+        setIsProcessingPayment(true);
+        try {
+          const listingIds = items.map((item) => item.listingId);
+          const checkout = await createCheckoutMutation.mutateAsync({
+            listingIds,
+            shippingAddress,
+          });
+          const checkoutId = checkout?.data?.id;
+
+          if (!checkoutId) {
+            console.error(
+              "[checkout] checkoutId is falsy — response shape ไม่ตรงกับที่คาดไว้:",
+              checkout,
+            );
+            throw new Error(
+              "ไม่พบ checkoutId จาก response ของ /api/checkouts (ดู console.log ว่า id อยู่ตรงไหนจริงๆ)",
+            );
+          }
+
+          await createPaymentMutation.mutateAsync(checkoutId);
+        } catch (error) {
+          console.error("[checkout] failed:", error);
+          setPaymentError(
+            error?.response?.data?.message || error?.message || "ไม่ทราบสาเหตุ",
+          );
+          setIsProcessingPayment(false);
+        }
       },
     });
   });
 
+  const retryPayment = () => {
+    setPaymentError("");
+    setIsProcessingPayment(false);
+  };
+
   if (items.length === 0) return null;
+
+  if (isProcessingPayment && !paymentError) {
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <CheckoutStepIndicator currentStep={1} />
+        <div className="mx-auto flex min-h-[60vh] w-full max-w-xl flex-col justify-center">
+          <CheckoutStep3 />
+        </div>
+      </div>
+    );
+  }
+
+  if (paymentError) {
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <CheckoutStepIndicator currentStep={1} />
+        <div className="mx-auto flex min-h-[60vh] w-full max-w-xl flex-col justify-center">
+          <div className="hardware-surface flex flex-col items-center gap-3 p-10 text-center">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
+              <AlertTriangle className="h-7 w-7 text-red-500" />
+            </span>
+            <h2 className="text-lg font-bold text-neutral-900">
+              ดำเนินการชำระเงินไม่สำเร็จ
+            </h2>
+            <p className="max-w-sm rounded-lg bg-red-50 px-3 py-2 font-mono text-xs text-red-600">
+              {paymentError}
+            </p>
+            <button
+              type="button"
+              onClick={retryPayment}
+              className="btn btn-accent mt-2 gap-2 text-white"
+            >
+              <ArrowLeft size={16} />
+              ลองใหม่อีกครั้ง
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
+      <CheckoutStepIndicator currentStep={1} />
+
       <button
         type="button"
         onClick={() => navigate("/cart")}
@@ -237,8 +297,6 @@ export default function CheckoutStep1Page() {
         <ArrowLeft size={16} />
         ย้อนกลับ
       </button>
-
-      <CheckoutStepIndicator currentStep={1} />
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="flex flex-col gap-6">
@@ -254,7 +312,7 @@ export default function CheckoutStep1Page() {
             quoteError={quoteQuery.error}
             includeAssembly={includeAssembly}
             onContinue={submitShippingAndPay}
-            submitting={updateUserProfile.isPending}
+            submitting={updateUserProfile.isPending || isProcessingPayment}
           />
         </div>
       </div>

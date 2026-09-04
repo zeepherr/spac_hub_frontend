@@ -17,13 +17,10 @@ function PaymentSuccessPage() {
   }, []);
 
   return (
-    <div className="mx-auto flex min-h-[75vh] max-w-6xl flex-col justify-center px-4 py-8">
+    <div className="mx-auto max-w-6xl px-4 py-8">
       <CheckoutStepIndicator currentStep={3} />
 
-      <div className="mx-auto w-full max-w-xl">
-        {/* ขนาดการ์ด/ไอคอน/โครงสร้างตรงนี้ต้องเท่ากับของ CheckoutStep4.jsx เป๊ะ (หน้าถัดไปที่จะ navigate ไป) -
-            hardware-surface p-10, ไอคอนวงกลม h-20 w-20 มีวงแสงสีส้มเรืองข้างหลัง, ป้าย eyebrow, เส้นคั่น +
-            แถวเลขอ้างอิง ไม่งั้นพอ navigate ไป /checkoutstep3 การ์ดจะเปลี่ยนหน้าตาโดด */}
+      <div className="mx-auto flex min-h-[60vh] w-full max-w-xl flex-col justify-center">
         <div className="hardware-surface flex flex-col items-center gap-4 p-10 text-center">
           <div className="relative flex h-20 w-20 items-center justify-center">
             <span className="absolute inset-0 rounded-full bg-[#f97316]/15 blur-xl" />
