@@ -32,6 +32,7 @@ import Inspection from "@/pages/admin/Inspection";
 import ReadyToShip from "@/pages/admin/ReadyToShip";
 import CheckoutPage from "@/pages/cart/CheckoutPage";
 import BuyingOrders from "@/pages/public/user/BuyingOrders";
+import OrderDetail from "@/pages/public/user/OrderDetail";
 
 const router = createBrowserRouter([
   {
@@ -93,6 +94,10 @@ const router = createBrowserRouter([
                   {
                     path: "orders",
                     Component: BuyingOrders,
+                  },
+                   {
+                    path: "orders/:orderId",
+                    Component: OrderDetail,
                   },
                   {
                     path: "sell",
