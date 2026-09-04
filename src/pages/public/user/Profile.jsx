@@ -122,7 +122,7 @@ function Profile() {
             <button
               type="button"
               onClick={() =>
-                navigate(`/${user.role.tolowerCase()}/profile/edit`)
+                navigate(`/${user.role.toLowerCase()}/profile/edit`)
               }
               className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl border border-orange-500 px-5 py-3 font-semibold text-orange-500 transition hover:bg-orange-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300"
             >

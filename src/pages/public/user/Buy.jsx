@@ -18,9 +18,6 @@ const FINISHED_ORDER_STATUSES = new Set([
  * Mock เฉพาะข้อมูลที่ Backend ยังไม่มี API
  * เมื่อมี API แล้วค่อยลบและเปลี่ยนเป็น Query จริง
  */
-const cartMock = {
-  totalItems: 3,
-};
 
 const recentMessagesMock = [
   {
@@ -138,7 +135,7 @@ function Buy() {
     {
       id: "cart",
       label: "สินค้าในตะกร้า",
-      value: cartMock.totalItems,
+      value: 0,
       unit: "รายการ",
       icon: ShoppingCart,
       iconClassName:

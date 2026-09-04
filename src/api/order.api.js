@@ -11,3 +11,9 @@ export const getOrderById = async (orderId) => {
 
   return response.data.data;
 };
+
+export const confirmOrderDelivery = async (orderId) => {
+  const response = await authApi.post(`/orders/${orderId}/confirm-delivery`);
+
+  return response.data;
+}

@@ -30,11 +30,9 @@ import AdminChats from "@/pages/admin/AdminChats";
 import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
 import Inspection from "@/pages/admin/Inspection";
 import ReadyToShip from "@/pages/admin/ReadyToShip";
-<<<<<<< HEAD
 import BuyingOrders from "@/pages/public/user/BuyingOrders";
-=======
 import CheckoutPage from "@/pages/cart/CheckoutPage";
->>>>>>> dev
+import OrderDetail from "@/pages/public/user/OrderDetail";
 
 const router = createBrowserRouter([
   {
@@ -96,6 +94,10 @@ const router = createBrowserRouter([
                   {
                     path: "orders",
                     Component: BuyingOrders,
+                  },
+                  {
+                    path: "orders/:orderId",
+                    Component: OrderDetail,
                   },
                   {
                     path: "sell",
