@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"; // ปรับตามที่โปรเจกต์คุณใช้จริง
-import { ArrowLeft, ArrowRight, Lock, ShieldCheck, Truck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lock, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router";
@@ -8,7 +8,11 @@ import { z } from "zod";
 import useAuthStore from "@/stores/auth.store"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
 import { useUpdateUserProfile } from "@/hook/user/useUpdateUserProfile"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
 import { useCreateCheckout } from "@/hook/checkout/useCreateCheckout"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { useCreatePaymentCheckout } from "@/hook/payment/useCreatePaymentCheckout";
+import { useCreatePaymentCheckout } from "@/hook/payment/useCreatePaymentCheckout"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
+import CheckoutStep4 from "@/components/cart/CheckoutStep4";
+import CheckoutStep3 from "@/components/cart/CheckoutStep3";
+import CheckoutStep1 from "@/components/cart/CheckoutStep1";
+import CheckoutStep2 from "@/components/cart/CheckoutStep2";
 
 const INSPECTION_FEE_PER_ITEM = 50;
 const INSPECTION_FEE_CAP = 250;
@@ -35,7 +39,8 @@ const shippingSchema = z.object({
     .max(500, "ที่อยู่ต้องไม่เกิน 500 ตัวอักษร"),
 });
 
-// step 1 (จัดส่ง) และ step 2 (บริการเสริม) ทำงานจริงแล้ว ส่วน 3/4 ยังเป็นแค่ visual รอทำ flow ชำระเงินจริง
+// Step 3 "ชำระเงิน" กลับมาโชว์ในแถบนี้แล้ว แต่ในแอปเป็นแค่หน้า transient สั้นๆ (กำลังสร้าง checkout/payment)
+// ก่อนเด้งออกไปหน้า Stripe Checkout จริง ไม่ใช่หน้าที่ผู้ใช้กรอกข้อมูลบัตรเอง
 const STEPS = [
   { id: 1, label: "จัดส่ง" },
   { id: 2, label: "บริการเสริม" },
@@ -46,68 +51,44 @@ const STEPS = [
 function StepIndicator({ currentStep }) {
   return (
     <div className="mb-8 flex items-center justify-between">
-      {STEPS.map((step, i) => (
-        <div key={step.id} className="flex flex-1 items-center">
-          <div className="flex flex-col items-center gap-1.5">
-            <span
-              className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
-                step.id === currentStep
-                  ? "bg-neutral-900 text-white"
-                  : step.id < currentStep
-                    ? "bg-[#f97316] text-white"
-                    : "bg-neutral-100 text-neutral-400"
-              }`}
-            >
-              {step.id}
-            </span>
-            <span
-              className={`hardware-label normal-case ${
-                step.id === currentStep ? "text-neutral-900" : "text-secondary"
-              }`}
-            >
-              {step.label}
-            </span>
+      {STEPS.map((step, i) => {
+        const isDone = step.id < currentStep;
+        const isCurrent = step.id === currentStep;
+        // เส้นขีดหลังวงกลมนี้เขียวตามไปด้วยถ้าสเต็ปนี้ผ่านไปแล้ว (ไม่ใช่แค่วงกลมเขียวเฉยๆ)
+        const isLineDone = isDone;
+
+        return (
+          <div key={step.id} className="flex flex-1 items-center">
+            <div className="flex flex-col items-center gap-1.5">
+              <span
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                  isCurrent
+                    ? "bg-neutral-900 text-white"
+                    : isDone
+                      ? "bg-green-500 text-white"
+                      : "bg-neutral-100 text-neutral-400"
+                }`}
+              >
+                {step.id}
+              </span>
+              <span
+                className={`hardware-label normal-case ${
+                  isCurrent ? "text-neutral-900" : "text-secondary"
+                }`}
+              >
+                {step.label}
+              </span>
+            </div>
+            {i < STEPS.length - 1 && (
+              <div
+                className={`mx-2 h-px flex-1 ${
+                  isLineDone ? "bg-green-500" : "bg-neutral-200"
+                }`}
+              />
+            )}
           </div>
-          {i < STEPS.length - 1 && (
-            <div className="mx-2 h-px flex-1 bg-neutral-200" />
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ก็อปสไตล์มาจาก FormInput ใน EditProfile.jsx ให้ข้อมูลจัดส่งหน้าตาเหมือนกัน
-function FormInput({
-  id,
-  label,
-  type = "text",
-  placeholder,
-  error,
-  inputProps,
-}) {
-  return (
-    <div>
-      <label
-        htmlFor={id}
-        className="mb-2 block text-sm font-semibold text-neutral-800"
-      >
-        {label}
-      </label>
-
-      <input
-        id={id}
-        type={type}
-        placeholder={placeholder}
-        className={`w-full rounded-xl border px-4 py-3 text-sm outline-none transition ${
-          error
-            ? "border-red-500"
-            : "border-neutral-300 focus:border-orange-500"
-        }`}
-        {...inputProps}
-      />
-
-      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+        );
+      })}
     </div>
   );
 }
@@ -282,7 +263,6 @@ export default function CheckoutPage() {
 
   // step 1 -> validate ฟอร์มที่อยู่จัดส่งก่อน แล้วบันทึกเป็นข้อมูลโปรไฟล์เลย (เหมือน EditProfile.jsx)
   // ใช้ hook เดียวกับหน้าแก้โปรไฟล์ (useUpdateUserProfile -> updateMe) toast สำเร็จ/ error มาจากในนั้นอัตโนมัติ
-  // ผ่านแล้วค่อยไป step 2 ต่อ (ยังไม่เกี่ยวกับการสร้าง order จริง อันนั้นรอ endpoint แยกต่างหาก)
   const goToStep2 = handleSubmit((values) => {
     updateUserProfile.mutate(values, {
       onSuccess: () => {
@@ -291,26 +271,52 @@ export default function CheckoutPage() {
     });
   });
 
-  // step 2 -> สร้าง checkout จาก listingId ของ items ที่เลือกไว้ แล้วต่อด้วยสร้าง payment
+  // step 2 -> เข้า step 3 (หน้า transient "กำลังนำไปสู่หน้าชำระเงิน") ทันทีที่กด แล้วค่อยสร้าง checkout
+  // จาก listingId ของ items ที่เลือกไว้ ตามด้วยสร้าง payment session แล้วเด้งออกจากแอปไปหน้า Stripe Checkout
   // POST /api/checkouts body: { listingIds: [...] } ตาม useCreateCheckout จริงที่ให้มา
-  // (เหมือน handleBuyNow ที่ให้มา แค่ปรับจาก listingId เดี่ยวเป็น array เพราะตะกร้าเลือกได้หลายชิ้น)
   // TODO: includeAssembly ยังไม่ได้ส่งไปกับ createCheckoutMutation เพราะยังไม่รู้ว่า endpoint นี้รับ field นี้ไหม
+  // TODO: ยังไม่เห็นโค้ด/response จริงของ useCreatePaymentCheckout เดาว่า response หน้าตาแบบ Stripe Checkout
+  // Session ปกติคือ { data: { url } } - ถ้า field จริงชื่ออื่น (เช่น checkoutUrl, sessionUrl) ปรับตรงนี้ให้ตรง
   const confirmCheckout = async () => {
+    setCurrentStep(3);
+
     try {
       const listingIds = items.map((item) => item.listingId);
       const checkout = await createCheckoutMutation.mutateAsync(listingIds);
       const checkoutId = checkout.data.id;
 
-      createPaymentMutation.mutate(checkoutId);
+      const payment = await createPaymentMutation.mutateAsync(checkoutId);
+      const stripeUrl = payment?.data?.url;
+
+      if (stripeUrl) {
+        // ออกจากแอปไป Stripe Checkout จริงๆ (ไม่ใช่ navigate ภายในแอป)
+        window.location.href = stripeUrl;
+      } else {
+        // เผื่อ backend ยังไม่คืน url การชำระเงินมา (เช่น hook ยังทำไม่เสร็จ) อย่างน้อยพาไปหน้ายืนยันในแอปแทน
+        // ไม่ให้ผู้ใช้ค้างอยู่หน้า "กำลังนำไปสู่หน้าชำระเงิน" เฉยๆ โดยไม่รู้ว่าเกิดอะไรขึ้น
+        setCurrentStep(4);
+      }
     } catch (error) {
-      // useCreateCheckout จริงมีแค่ mutationFn เฉยๆ ไม่มี onError/toast ในตัว (ไม่เหมือน useUpdateUserProfile)
-      // เลยต้อง toast.error เองตรงนี้ ไม่งั้น error ตอนสร้าง checkout จะเงียบ ผู้ใช้ไม่รู้ว่าทำไมปุ่มไม่ไปต่อ
+      // useCreateCheckout / useCreatePaymentCheckout จริงไม่มี onError/toast ในตัว (ไม่เหมือน useUpdateUserProfile)
+      // เลยต้อง toast.error เองตรงนี้ ไม่งั้น error ตอนสร้าง checkout/payment จะเงียบ ผู้ใช้ไม่รู้ว่าทำไมปุ่มไม่ไปต่อ
       toast.error(
         error.response?.data?.message ||
           "สร้างคำสั่งซื้อไม่สำเร็จ กรุณาลองใหม่อีกครั้ง",
         { position: "top-right" },
       );
       console.error("checkout failed:", error);
+      // ล้มเหลว พากลับไป step 2 ให้กดลองใหม่ได้ (ไม่ปล่อยค้างอยู่หน้า transient ของ step 3)
+      setCurrentStep(2);
+    }
+  };
+
+  // ปุ่มย้อนกลับกลาง ๆ เหนือ StepIndicator ใช้ร่วมกันทุก step ที่ย้อนได้ (1, 2) ส่วน step 3 (กำลังส่งคำขออยู่)
+  // และ step 4 (จบ flow แล้ว) ไม่ให้ย้อนกลับ
+  const handleBack = () => {
+    if (currentStep === 1) {
+      navigate("/cart");
+    } else {
+      setCurrentStep((prev) => prev - 1);
     }
   };
 
@@ -318,159 +324,61 @@ export default function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
+      {(currentStep === 1 || currentStep === 2) && (
+        <button
+          type="button"
+          onClick={handleBack}
+          className="mb-4 flex items-center gap-1.5 rounded-field border border-neutral-200 bg-white px-3 py-1.5 text-sm font-semibold text-neutral-700 hardware-shadow hover:border-[#f97316] hover:text-[#f97316]"
+        >
+          <ArrowLeft size={16} />
+          ย้อนกลับ
+        </button>
+      )}
+
       <StepIndicator currentStep={currentStep} />
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
-        <div className="flex flex-col gap-6">
-          {currentStep === 1 && (
-            <div className="hardware-surface p-6">
-              <h2 className="mb-5 flex items-center gap-2 text-base font-bold text-neutral-900">
-                <Truck size={18} className="text-[#f97316]" />
-                ข้อมูลการจัดส่ง
-              </h2>
-
-              <form className="flex flex-col gap-5">
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  <FormInput
-                    id="firstName"
-                    label="ชื่อ"
-                    placeholder="กรอกชื่อ"
-                    error={errors.firstName?.message}
-                    inputProps={register("firstName")}
-                  />
-
-                  <FormInput
-                    id="lastName"
-                    label="นามสกุล"
-                    placeholder="กรอกนามสกุล"
-                    error={errors.lastName?.message}
-                    inputProps={register("lastName")}
-                  />
-                </div>
-
-                <FormInput
-                  id="phone"
-                  label="เบอร์โทรศัพท์"
-                  type="tel"
-                  placeholder="0812345678"
-                  error={errors.phone?.message}
-                  inputProps={register("phone")}
-                />
-
-                <div>
-                  <label
-                    htmlFor="address"
-                    className="mb-2 block text-sm font-semibold text-neutral-800"
-                  >
-                    ที่อยู่
-                  </label>
-
-                  <textarea
-                    id="address"
-                    rows={5}
-                    placeholder="กรอกที่อยู่สำหรับจัดส่ง"
-                    className={`w-full resize-none rounded-xl border px-4 py-3 text-sm text-neutral-900 outline-none transition focus:ring-2 ${
-                      errors.address
-                        ? "border-red-500 focus:ring-red-100"
-                        : "border-neutral-300 focus:border-orange-500 focus:ring-orange-100"
-                    }`}
-                    {...register("address")}
-                  />
-
-                  {errors.address && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {errors.address.message}
-                    </p>
-                  )}
-                </div>
-              </form>
-            </div>
-          )}
-
-          {currentStep === 2 && (
-            <div className="hardware-surface p-6">
-              <div className="mb-5 flex items-center justify-between">
-                <h2 className="flex items-center gap-2 text-base font-bold text-neutral-900">
-                  บริการเสริมและการคุ้มครอง
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => setCurrentStep(1)}
-                  className="flex items-center gap-1 text-xs font-medium text-secondary hover:text-[#f97316]"
-                >
-                  <ArrowLeft size={14} />
-                  แก้ไขที่อยู่จัดส่ง
-                </button>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <label className="hardware-shadow flex items-start gap-3 rounded-box border-2 border-[#f97316] p-4">
-                  <input
-                    type="radio"
-                    checked
-                    readOnly
-                    className="radio radio-accent radio-sm mt-0.5"
-                  />
-                  <span className="flex-1">
-                    <span className="flex items-center justify-between">
-                      <span className="font-semibold text-neutral-900">
-                        SpecHub Escrow
-                      </span>
-                      <span className="hardware-label rounded-field bg-green-50 px-2 py-0.5 normal-case text-green-700">
-                        รวมอยู่แล้ว
-                      </span>
-                    </span>
-                    <span className="mt-1 block text-sm text-neutral-500">
-                      เงินของคุณถูกพักไว้อย่างปลอดภัยจนกว่าจะได้รับและตรวจสอบสินค้าเรียบร้อย
-                      รวมค่าตรวจสอบมาตรฐานแล้ว
-                    </span>
-                  </span>
-                </label>
-
-                <label className="flex cursor-pointer items-start gap-3 rounded-box border border-neutral-200 p-4">
-                  <input
-                    type="checkbox"
-                    checked={includeAssembly}
-                    onChange={() => setIncludeAssembly((prev) => !prev)}
-                    className="checkbox checkbox-sm mt-0.5"
-                  />
-                  <span className="flex-1">
-                    <span className="flex items-center justify-between">
-                      <span className="font-semibold text-neutral-900">
-                        บริการประกอบเครื่อง
-                      </span>
-                      <span className="font-medium text-neutral-900">
-                        +{formatPrice(ASSEMBLY_SERVICE_FEE)}
-                      </span>
-                    </span>
-                    <span className="mt-1 block text-sm text-neutral-500">
-                      ประกอบโดยช่างมืออาชีพ + จัดสายไฟให้เรียบร้อย
-                    </span>
-                  </span>
-                </label>
-              </div>
-            </div>
-          )}
+      {currentStep === 4 ? (
+        <div className="mx-auto max-w-xl">
+          <CheckoutStep4 />
         </div>
-
-        <div>
-          <OrderSummary
-            items={items}
-            summary={summary}
-            includeAssembly={includeAssembly}
-            continueLabel={
-              currentStep === 1 ? "ไปขั้นตอนถัดไป" : "ดำเนินการชำระเงิน"
-            }
-            onContinue={currentStep === 1 ? goToStep2 : confirmCheckout}
-            submitting={
-              currentStep === 1
-                ? updateUserProfile.isPending
-                : createCheckoutMutation.isPending ||
-                  createPaymentMutation.isPending
-            }
-          />
+      ) : currentStep === 3 ? (
+        <div className="mx-auto max-w-xl">
+          <CheckoutStep3 />
         </div>
-      </div>
+      ) : (
+        <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+          <div className="flex flex-col gap-6">
+            {currentStep === 1 && (
+              <CheckoutStep1 register={register} errors={errors} />
+            )}
+
+            {currentStep === 2 && (
+              <CheckoutStep2
+                includeAssembly={includeAssembly}
+                onToggleAssembly={() => setIncludeAssembly((prev) => !prev)}
+              />
+            )}
+          </div>
+
+          <div>
+            <OrderSummary
+              items={items}
+              summary={summary}
+              includeAssembly={includeAssembly}
+              continueLabel={
+                currentStep === 1 ? "ไปขั้นตอนถัดไป" : "ดำเนินการชำระเงิน"
+              }
+              onContinue={currentStep === 1 ? goToStep2 : confirmCheckout}
+              submitting={
+                currentStep === 1
+                  ? updateUserProfile.isPending
+                  : createCheckoutMutation.isPending ||
+                    createPaymentMutation.isPending
+              }
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
