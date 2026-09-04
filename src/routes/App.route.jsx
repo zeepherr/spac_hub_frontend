@@ -2,6 +2,7 @@ import AllProduct from "@/components/auth/AllProduct";
 import CategoryListingPage from "@/components/category/ListByCategory";
 import NotFound from "@/components/NotFound";
 import ProfileLayout from "@/layouts/ProfileLayout";
+import AdminProfile from "@/pages/admin/AdminProfile";
 import Categories from "@/pages/admin/Categories";
 import CartPage from "@/pages/cart/CartPage";
 import ListingDetailPage from "@/pages/listing/ListingDeatailPage";
@@ -23,15 +24,19 @@ import VerifyPage from "../pages/auth/VerifyPage";
 import HomePage from "../pages/public/HomePage";
 import ProtectedRoute from "./Protected.route";
 import RoleRoute, { ROLES } from "./Role.route";
-import AdminProfile from "@/pages/admin/AdminProfile";
 
 import ActionRequired from "@/pages/admin/ActionRequired";
 import AdminChats from "@/pages/admin/AdminChats";
 import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
 import Inspection from "@/pages/admin/Inspection";
 import ReadyToShip from "@/pages/admin/ReadyToShip";
+<<<<<<< HEAD
 import BuyingOrders from "@/pages/public/user/BuyingOrders";
 import CheckoutPage from "@/pages/cart/CheckoutPage";
+=======
+import CheckoutPage from "@/pages/cart/CheckoutPage";
+import BuyingOrders from "@/pages/public/user/BuyingOrders";
+>>>>>>> children
 import OrderDetail from "@/pages/public/user/OrderDetail";
 
 const router = createBrowserRouter([
@@ -94,6 +99,10 @@ const router = createBrowserRouter([
                   {
                     path: "orders",
                     Component: BuyingOrders,
+                  },
+                   {
+                    path: "orders/:orderId",
+                    Component: OrderDetail,
                   },
                   {
                     path: "orders/:orderId",
@@ -172,11 +181,11 @@ const router = createBrowserRouter([
               },
               {
                 path: "profile",
-                Component:AdminProfile ,
+                Component: AdminProfile,
               },
               {
                 path: "profile/edit",
-                Component:EditProfile ,
+                Component: EditProfile,
               },
             ],
           },

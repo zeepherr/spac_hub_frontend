@@ -76,7 +76,7 @@ function Buy() {
     isError,
     refetch,
   } = useBuyingOrders();
-
+console.log(buyingOrders)
   const displayName = user?.firstName || user?.email || "ผู้ใช้งาน";
 
   /*จำนวนคำสั่งซื้อทั้งหมด*/
