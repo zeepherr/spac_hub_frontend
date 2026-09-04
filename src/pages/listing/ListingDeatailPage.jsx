@@ -119,6 +119,34 @@ export default function ListingDetailPage() {
     addCartItem.mutate(listing.id);
   };
 
+  // "ซื้อเลย" - ข้ามตะกร้าไปหน้า checkout ตรงๆ เลย ไม่ต้อง add เข้าตะกร้าก่อน
+  // CheckoutStep1Page.jsx อ่าน items จาก location.state โดยคาดหวัง shape เดียวกับ cart item จริง
+  // ({ id, listingId, listing: { title, price, ... } }) เพราะปกติมันมาจาก useMyCart() ตอนมาจากหน้าตะกร้า
+  // ตรงนี้เลยต้องประกอบ object หลอกให้ตรง shape เดียวกันเอง (ไม่ได้มาจาก useMyCart จริงๆ)
+  // (เปลี่ยนจาก /cart/checkout เป็น /checkoutstep1 เพราะแยก step 1/3 ออกเป็น route จริงคนละหน้าแล้ว)
+  const handleBuyNow = () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    navigate("/checkoutstep1", {
+      state: {
+        items: [
+          {
+            id: listing.id,
+            listingId: listing.id,
+            listing: {
+              title: listing.title,
+              price: listing.price,
+            },
+          },
+        ],
+        includeAssembly: false,
+      },
+    });
+  };
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       {/* Breadcrumb */}
@@ -233,6 +261,7 @@ export default function ListingDetailPage() {
             </button>
             <button
               type="button"
+              onClick={handleBuyNow}
               className="btn mt-2 w-full gap-2 border-none bg-neutral-900 text-white hover:bg-neutral-800"
             >
               ซื้อเลย
