@@ -18,14 +18,7 @@ export const getOrderById = async (orderId) => {
 
   return response.data.data;
 };
-<<<<<<< HEAD
 
-export const confirmOrderDelivery = async (orderId) => {
-  const response = await authApi.post(`/orders/${orderId}/confirm-delivery`);
-
-  return response.data;
-}
-=======
 // Seller
 export const getSellingOrders = async () => {
   const response = await authApi.get("/orders/selling");
@@ -94,4 +87,3 @@ export const shipOrderToBuyer = async (orderId, payload) => {
 
   return response.data;
 };
->>>>>>> children

@@ -30,23 +30,15 @@ import AdminChats from "@/pages/admin/AdminChats";
 import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
 import Inspection from "@/pages/admin/Inspection";
 import ReadyToShip from "@/pages/admin/ReadyToShip";
-<<<<<<< HEAD
-<<<<<<< HEAD
-import BuyingOrders from "@/pages/public/user/BuyingOrders";
-import CheckoutPage from "@/pages/cart/CheckoutPage";
-=======
-import CheckoutPage from "@/pages/cart/CheckoutPage";
-import BuyingOrders from "@/pages/public/user/BuyingOrders";
->>>>>>> children
-import OrderDetail from "@/pages/public/user/OrderDetail";
-=======
 
+import CheckoutPage from "@/pages/cart/CheckoutPage";
+import BuyingOrders from "@/pages/public/user/BuyingOrders";
+import OrderDetail from "@/pages/public/user/OrderDetail";
 import CheckoutStep1Page from "@/pages/cart/CheckoutStep1Page";
 import CheckoutStep2Page from "@/pages/cart/CheckoutStep2Page";
 import CheckoutStep3Page from "@/pages/cart/CheckoutStep3Page";
-import BuyingOrders from "@/pages/public/user/BuyingOrders";
+
 import PaymentSuccessPage from "@/pages/auth/payments/PaymentSuccessPage";
->>>>>>> dev
 
 const router = createBrowserRouter([
   {
