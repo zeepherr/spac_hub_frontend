@@ -36,10 +36,16 @@ function FormInput({
 }
 
 // Step 1: ฟอร์มที่อยู่จัดส่ง
-// register/errors เป็นของ useForm instance ที่ CheckoutPage.jsx (parent) เป็นคนถืออยู่ ส่งลงมาเป็น prop เฉยๆ
+// register/errors เป็นของ useForm instance ที่ parent (CheckoutStep1Page.jsx) เป็นคนถืออยู่ ส่งลงมาเป็น prop เฉยๆ
 // เพราะปุ่ม "ไปขั้นตอนถัดไป" ที่ยิง handleSubmit จริงๆ อยู่ใน OrderSummary ฝั่ง parent (คนละ component กับฟอร์มนี้)
-// ปุ่มย้อนกลับย้ายไปอยู่ตรงกลางบน StepIndicator แล้ว (ใน CheckoutPage.jsx) ไม่ได้อยู่ในการ์ดนี้อีกต่อไป
-function CheckoutStep1({ register, errors }) {
+// ปุ่มย้อนกลับย้ายไปอยู่ตรงกลางบน StepIndicator แล้ว (ใน CheckoutStep1Page.jsx) ไม่ได้อยู่ในการ์ดนี้อีกต่อไป
+//
+// default errors={{}} กันไว้เผื่อ parent ยังไม่ได้ส่ง errors prop มา (หรือส่งมาเป็น undefined) - เมื่อก่อนถ้า
+// parent ลืมส่ง errors มา component นี้จะพังทันทีตรง errors.firstName?.message (อ่าน .firstName จาก undefined)
+// ใส่ default ไว้ให้ component ไม่ crash แม้ parent จะยังไม่ผูก errors ให้ครบ (แค่ validation error จะไม่โชว์เฉยๆ
+// ไม่ถึงกับทำแอปพัง) - ถ้าเจอ error นี้อีก ให้เช็คว่าไฟล์ที่ render <CheckoutStep1 /> (ควรจะเป็น
+// CheckoutStep1Page.jsx) ส่ง errors={errors} จาก useForm's formState ไปด้วยจริงๆ รึเปล่า
+function CheckoutStep1({ register, errors = {} }) {
   return (
     <div className="hardware-surface p-6">
       <div className="mb-5 flex items-center gap-2">
