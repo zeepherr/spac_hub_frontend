@@ -18,6 +18,7 @@ export const getOrderById = async (orderId) => {
 
   return response.data.data;
 };
+
 // Seller
 export const getSellingOrders = async () => {
   const response = await authApi.get("/orders/selling");

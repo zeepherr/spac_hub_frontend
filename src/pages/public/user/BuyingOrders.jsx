@@ -1,11 +1,53 @@
 import { useBuyingOrders } from "@/hook/order/useBuyingOrders";
 import { ChevronRight, LoaderCircle, PackageOpen } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useNavigate,useSearchParams } from "react-router";
 
 function BuyingOrders() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const selectedStatus = searchParams.get("status") || "all";
 
   const { data: orders = [], isPending, isError, refetch } = useBuyingOrders();
+
+  const finishedStatuses = new Set([
+  "COMPLETED",
+  "CANCELLED",
+  "REJECTED",
+  "REFUNDED",
+]);
+
+const filteredOrders = orders.filter(
+  (order) => {
+    /*กดการ์ด "กำลังจัดส่ง"*/
+    if (selectedStatus === "shipping") {
+      return (
+        order.status === "SHIPPING_TO_BUYER")}
+
+
+    /* กดการ์ด "กำลังดำเนินการ" */
+    if (selectedStatus === "processing") {
+      return (
+        !finishedStatuses.has( 
+          order.status ) &&
+          order.status !=="SHIPPING_TO_BUYER");}
+
+
+    /* ไม่ใส่ status หรือ status เป็น all แสดงคำสั่งซื้อทั้งหมด */
+    return true;
+  },
+);
+
+const pageTitles = {
+  all: "คำสั่งซื้อของฉัน",
+  processing:
+    "คำสั่งซื้อที่กำลังดำเนินการ",
+  shipping:
+    "คำสั่งซื้อที่กำลังจัดส่ง",
+};
+
+const pageTitle =
+  pageTitles[selectedStatus] || pageTitles.all;
 
   if (isPending) {
     return (
@@ -37,19 +79,17 @@ function BuyingOrders() {
       <div className="mx-auto max-w-6xl">
         <header className="mb-7">
           <h1 className="text-3xl font-bold text-neutral-900">
-            คำสั่งซื้อของฉัน
+            {pageTitle}
           </h1>
 
-          <p className="mt-2 text-sm text-neutral-500">
-            ดูและติดตามสถานะคำสั่งซื้อทั้งหมด
-          </p>
+          <p className="mt-2 text-sm text-neutral-500">ดูและติดตามสถานะคำสั่งซื้อทั้งหมด</p>
         </header>
 
-        {orders.length === 0 ? (
+        {filteredOrders.length === 0 ? (
           <EmptyOrders />
         ) : (
           <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <OrderRow
                 key={order.id}
                 order={order}
