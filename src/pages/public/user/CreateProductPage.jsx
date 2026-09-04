@@ -27,13 +27,6 @@ export default function CreateProductPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [listingId, setListingId] = useState(null);
 
-  const [showToast] = useState(() => (message, type = "info") => {
-    if (type === "error") toast.error(message);
-    else if (type === "warning") toast.warning(message);
-    else if (type === "success") toast.success(message);
-    else toast.info(message);
-  });
-
   // Form States
   const [formData, setFormData] = useState({
     title: "",
@@ -106,16 +99,6 @@ export default function CreateProductPage() {
     }, 150);
   };
 
-  const handleGoToStep = (targetStep) => {
-    if (targetStep < currentStep) {
-      setCurrentStep(targetStep);
-      if (targetStep === 1) scrollToSection(step1Ref);
-      if (targetStep === 2) scrollToSection(step2Ref);
-      if (targetStep === 3) scrollToSection(step3Ref);
-      if (targetStep === 4) scrollToSection(step4Ref);
-    }
-  };
-
   // --- AI AUTOFILL HANDLER ---
   const handleAiAutofill = (file) => {
     if (!file) return;
@@ -135,19 +118,12 @@ export default function CreateProductPage() {
           }));
         }
       },
-      onError: (err) => {
-        const errMsg = err?.response?.data?.message || "ไม่สามารถดึงข้อมูลอัตโนมัติได้ กรุณากรอกข้อมูลด้วยตัวเอง";
-        showToast(errMsg, "error");
-      }
     });
   };
 
   // --- SAVE DRAFT BUTTON HANDLER ---
   const handleSaveDraftAnytime = () => {
-    if (!listingId) {
-      showToast("กรุณากรอกข้อมูลเบื้องต้นและกดถัดไปอย่างน้อย 1 ครั้ง เพื่อสร้างแบบร่างก่อนครับ", "warning");
-      return;
-    }
+    if (!listingId) return;
 
     const payload = {
       title: formData.title.trim(),
@@ -159,18 +135,7 @@ export default function CreateProductPage() {
       location: formData.location?.trim() || "",
     };
 
-    updateListingMutation.mutate(
-      { listingId, payload },
-      {
-        onSuccess: () => {
-          showToast("บันทึกแบบร่างเรียบร้อยแล้ว!", "success");
-        },
-        onError: (err) => {
-          const errMsg = err?.response?.data?.message || "เกิดข้อผิดพลาดในการบันทึกแบบร่าง";
-          showToast(errMsg, "error");
-        }
-      }
-    );
+    updateListingMutation.mutate({ listingId, payload });
   };
 
   // --- STEP 1 SUBMIT ---
@@ -180,15 +145,9 @@ export default function CreateProductPage() {
     const parsedCategoryId = Number(formData.categoryId);
     const parsedPrice = Number(formData.price);
 
-    if (isNaN(parsedCategoryId) || parsedCategoryId <= 0) {
-      return showToast("กรุณาเลือกหมวดหมู่สินค้าให้ถูกต้อง", "warning");
-    }
-    if (isNaN(parsedPrice) || parsedPrice <= 0) {
-      return showToast("กรุณาระบุราคาที่มากกว่า 0", "warning");
-    }
-    if (parsedPrice > 99999999) {
-      return showToast("ราคาสินค้าสูงเกินกำหนด (สูงสุดไม่เกิน 99,999,999 บาท)", "warning");
-    }
+    if (isNaN(parsedCategoryId) || parsedCategoryId <= 0) return;
+    if (isNaN(parsedPrice) || parsedPrice <= 0) return;
+    if (parsedPrice > 99999999) return;
 
     const payload = {
       categoryId: parsedCategoryId,
@@ -207,12 +166,7 @@ export default function CreateProductPage() {
           setListingId(newId);
           setCurrentStep(2);
           scrollToSection(step2Ref);
-          showToast("บันทึกข้อมูลเบื้องต้นแล้ว", "success");
         },
-        onError: (err) => {
-          const serverError = err?.response?.data?.message || err?.response?.data?.error || "ข้อมูลไม่ถูกต้อง (400 Bad Request)";
-          showToast(Array.isArray(serverError) ? serverError[0]?.message || "ข้อมูลไม่ถูกต้อง" : serverError, "error");
-        }
       });
     } else {
       updateListingMutation.mutate(
@@ -221,12 +175,7 @@ export default function CreateProductPage() {
           onSuccess: () => {
             setCurrentStep(2);
             scrollToSection(step2Ref);
-            showToast("อัปเดตข้อมูลเบื้องต้นเรียบร้อย", "success");
           },
-          onError: (err) => {
-            const serverError = err?.response?.data?.message || "อัปเดตข้อมูลไม่สำเร็จ";
-            showToast(serverError, "error");
-          }
         }
       );
     }
@@ -247,21 +196,14 @@ export default function CreateProductPage() {
         onSuccess: () => {
           setCurrentStep(3);
           scrollToSection(step3Ref);
-          showToast("บันทึกข้อมูลสภาพสินค้าแล้ว", "success");
         },
-        onError: (err) => {
-          const errMsg = err?.response?.data?.message || "บันทึกข้อมูลสภาพสินค้าไม่สำเร็จ";
-          showToast(errMsg, "error");
-        }
       }
     );
   };
 
   // --- STEP 3 SUBMIT ---
   const handleStep3Submit = () => {
-    if (imageFiles.length === 0) {
-      return showToast("กรุณาอัปโหลดรูปภาพสินค้าอย่างน้อย 1 รูป", "warning");
-    }
+    if (imageFiles.length === 0) return;
 
     uploadImagesMutation.mutate(
       { listingId, images: imageFiles },
@@ -269,12 +211,7 @@ export default function CreateProductPage() {
         onSuccess: () => {
           setCurrentStep(4);
           scrollToSection(step4Ref);
-          showToast("อัปโหลดรูปภาพสินค้าเรียบร้อย", "success");
         },
-        onError: (err) => {
-          const errMsg = err?.response?.data?.message || "เกิดข้อผิดพลาดในการอัปโหลดรูปภาพ";
-          showToast(errMsg, "error");
-        }
       }
     );
   };
@@ -287,27 +224,16 @@ export default function CreateProductPage() {
         setAiResult(analysisData);
         setCurrentStep(5);
         scrollToSection(step5Ref);
-        showToast("AI ประเมินสภาพสินค้าเรียบร้อยแล้ว", "success");
       },
-      onError: (err) => {
-        const errMsg = err?.response?.data?.message || "AI ไม่สามารถประเมินสภาพสินค้าได้";
-        showToast(errMsg, "error");
-      }
     });
   };
 
   // --- STEP 5: CONFIRM PUBLISH FROM MODAL ---
   const handleFinalPublish = async () => {
-    if (!listingId) {
-      showToast("ไม่พบรหัสสินค้า กรุณาลองใหม่อีกครั้ง", "error");
-      return;
-    }
+    if (!listingId) return;
 
     const parsedPrice = Number(formData.price) || 0;
-    if (parsedPrice > 99999999) {
-      showToast("ราคาสินค้าสูงเกินกำหนด (สูงสุดไม่เกิน 99,999,999 บาท)", "warning");
-      return;
-    }
+    if (parsedPrice > 99999999) return;
 
     try {
       // 1. เซฟอัปเดตข้อมูลสินค้าล่าสุด
@@ -340,21 +266,12 @@ export default function CreateProductPage() {
       await publishListingMutation.mutateAsync(listingId);
 
       setIsSummaryModalOpen(false);
-      showToast("ลงประกาศสินค้าเรียบร้อยแล้ว!", "success");
 
       setTimeout(() => {
         window.location.href = "/user/sell";
       }, 1000);
     } catch (err) {
       console.error("Publish listing error:", err);
-      const serverErrorMessage =
-        err?.response?.data?.message ||
-        (Array.isArray(err?.response?.data?.error)
-          ? err?.response?.data?.error[0]?.message
-          : err?.response?.data?.error) ||
-        "เกิดข้อผิดพลาดในการลงประกาศสินค้า";
-
-      showToast(serverErrorMessage, "error");
     }
   };
 
@@ -365,7 +282,6 @@ export default function CreateProductPage() {
         onSaveDraft={handleSaveDraftAnytime}
         savingDraft={updateListingMutation.isPending}
         listingId={listingId}
-        onStepClick={handleGoToStep}
       />
 
       <div className="max-w-7xl mx-auto px-4">
@@ -375,40 +291,17 @@ export default function CreateProductPage() {
             
             {/* Step 1: ข้อมูลเบื้องต้น */}
             <div ref={step1Ref} className="relative">
-              {currentStep > 1 && (
-                <div className="mb-2 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => handleGoToStep(1)}
-                    className="btn btn-ghost btn-xs text-accent gap-1 font-bold"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" /> แก้ไข
-                  </button>
-                </div>
-              )}
               <ProductBasicForm
                 formData={formData}
                 setFormData={setFormData}
                 onSubmit={handleStep1Submit}
                 loading={isGlobalLoading}
                 onAiAutofill={handleAiAutofill}
-                showToast={showToast}
               />
             </div>
 
             {/* Step 2: ตอบคำถามสภาพสินค้า */}
             <div className="relative">
-              {currentStep > 2 && (
-                <div className="mb-2 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => handleGoToStep(2)}
-                    className="btn btn-ghost btn-xs text-accent gap-1 font-bold"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" /> แก้ไข 
-                  </button>
-                </div>
-              )}
               <ConditionFormSection
                 stepRef={step2Ref}
                 currentStep={currentStep}
@@ -436,18 +329,6 @@ export default function CreateProductPage() {
                     อัปโหลดรูปภาพสินค้าจริง
                   </h2>
                 </div>
-                {currentStep > 3 && (
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => handleGoToStep(3)}
-                      className="btn btn-ghost btn-xs text-accent gap-1 font-bold"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" /> แก้ไขรูปภาพ
-                    </button>
-                    <CheckCircle2 className="w-6 h-6 text-success" />
-                  </div>
-                )}
               </div>
 
               {currentStep >= 3 && (
