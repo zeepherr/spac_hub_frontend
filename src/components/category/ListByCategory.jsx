@@ -30,12 +30,12 @@ export default function CategoryListingPage() {
         </div>
       ) : isError ? (
         <div className="hardware-surface flex h-40 items-center justify-center">
-          <p className="text-sm text-[#dc2626]">โหลดสินค้าไม่สำเร็จ</p>
+          <p className="text-sm text-[#dc2626]">Failed to load products</p>
         </div>
       ) : listings.length === 0 ? (
         <div className="hardware-surface flex h-40 items-center justify-center">
           <p className="text-sm text-neutral-400">
-            ยังไม่มีสินค้าในหมวดหมู่นี้
+            No products in this category
           </p>
         </div>
       ) : (

@@ -76,7 +76,7 @@ export function useProfileForm() {
       });
 
     if (!result.success) {
-      const message = result.error.issues[0]?.message || "ไฟล์รูปภาพไม่ถูกต้อง";
+      const message = result.error.issues[0]?.message || "Invalid image file";
       toast.error(message);
       event.target.value = "";
 
@@ -134,7 +134,7 @@ export function useProfileForm() {
     if (
       [...formData.keys()].length === 0) {
       toast.info(
-        "ยังไม่มีข้อมูลที่เปลี่ยนแปลง", );
+        "No changes to save", );
 
       return;
     }

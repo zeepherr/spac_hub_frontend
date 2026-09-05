@@ -3,7 +3,7 @@ import { ShoppingBag, Tag, ShieldCheck, MessageSquare, ChevronRight } from "luci
 
 const stats = [
   {
-    label: "กำลังซื้อ",
+    label: "Buying",
     value: "2",
     icon: ShoppingBag,
     color: "text-blue-500 dark:text-blue-400",
@@ -12,7 +12,7 @@ const stats = [
     glowColor: "group-hover:shadow-blue-500/10",
   },
   {
-    label: "กำลังขาย",
+    label: "Selling",
     value: "3",
     icon: Tag,
     color: "text-emerald-500 dark:text-emerald-400",
@@ -21,7 +21,7 @@ const stats = [
     glowColor: "group-hover:shadow-emerald-500/10",
   },
   {
-    label: "รอตรวจสอบ",
+    label: "Pending Verification",
     value: "1",
     icon: ShieldCheck,
     color: "text-amber-500 dark:text-amber-400",
@@ -30,7 +30,7 @@ const stats = [
     glowColor: "group-hover:shadow-amber-500/10",
   },
   {
-    label: "ข้อความใหม่",
+    label: "New Messages",
     value: "4",
     icon: MessageSquare,
     color: "text-indigo-500 dark:text-indigo-400",

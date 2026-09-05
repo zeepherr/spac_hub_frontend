@@ -31,7 +31,7 @@ function SearchForm() {
     <form className="flex w-full max-w-2xl overflow-hidden rounded-full border border-neutral-200 bg-neutral-50">
       <input
         type="text"
-        placeholder="ค้นหาสินค้า, แบรนด์, รุ่น..."
+        placeholder="Search products, brands, models..."
         className="w-full bg-transparent px-5 py-3 text-sm text-neutral-800 outline-none placeholder:text-neutral-400"
       />
       <button
@@ -58,11 +58,11 @@ function AuthLinks() {
     <div className="flex items-center gap-1.5 text-neutral-700">
       <User size={18} />
       <NavLink to="/login" className={navLinkClass}>
-        เข้าสู่ระบบ
+       Register
       </NavLink>
       <span> / </span>
       <NavLink to="/register" className={navLinkClass}>
-        สมัตรสมาชิก
+        Sign up
       </NavLink>
     </div>
   );
@@ -77,7 +77,7 @@ function ProfileLink({ user }) {
       {user.profileImageUrl ? (
         <img
           src={user.profileImageUrl}
-          alt={user.firstName ?? "โปรไฟล์"}
+          alt={user.firstName ?? "My Profile "}
           className="h-8 w-8 rounded-full object-cover ring-2 ring-transparent hover:ring-[#f97316]"
         />
       ) : (
@@ -107,12 +107,12 @@ function MainNav() {
     <nav className="flex shrink-0 items-center gap-6 whitespace-nowrap text-sm font-semibold">
       <NavLink to="/" end className={iconLinkClass}>
         <RefreshCw size={18} />
-        เปรียบเทียบ
+        Compare Products
       </NavLink>
 
       <NavLink to="/about" className={iconLinkClass}>
         <Heart size={18} />
-        รายการโปรด
+        Wishlist
       </NavLink>
 
       {/* ยังไม่ login -> เด้งไป /login แทนหน้าตะกร้า (CartPage เองก็กันไว้อีกชั้นถ้าพิมพ์ URL ตรงๆ) */}
@@ -132,7 +132,7 @@ function MainNav() {
             </span>
           )}
         </span>
-        ตะกร้าสินค้า
+        Cart
       </NavLink>
 
       {user ? <ProfileLink user={user} /> : <AuthLinks />}

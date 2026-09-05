@@ -20,7 +20,7 @@ export default function AiConditionAnalysisSection({
           <span className="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center font-bold text-sm">
             4
           </span>
-          <h2 className="text-xl font-bold text-base-content">วิเคราะห์สภาพสินค้าด้วย AI</h2>
+          <h2 className="text-xl font-bold text-base-content">AI Condition Analysis</h2>
         </div>
         {currentStep > 4 && <CheckCircle2 className="w-6 h-6 text-success" />}
       </div>
@@ -30,7 +30,7 @@ export default function AiConditionAnalysisSection({
           {currentStep === 4 && !aiResult && (
             <div className="text-center py-4 space-y-3">
               <p className="text-sm text-base-content/70">
-                ระบบจะนำข้อมูลทั้งหมดและรูปภาพสินค้า ส่งให้ AI ช่วยประเมินเกรดและคะแนนความสมบูรณ์
+                The system will send all item details and images to the AI to evaluate the grade and overall condition score.
               </p>
               <button
                 type="button"
@@ -38,7 +38,7 @@ export default function AiConditionAnalysisSection({
                 disabled={loading}
                 className="btn btn-accent text-accent-content font-bold w-full rounded-field gap-2"
               >
-                {loading ? <span className="loading loading-spinner" /> : <><Bot className="w-5 h-5" /> เริ่มวิเคราะห์ด้วย AI</>}
+                {loading ? <span className="loading loading-spinner" /> : <><Bot className="w-5 h-5" /> Analyze with AI</>}
               </button>
             </div>
           )}
@@ -47,10 +47,10 @@ export default function AiConditionAnalysisSection({
             <div className="p-5 bg-accent/10 border border-accent/30 rounded-field space-y-3">
               <div className="flex justify-between items-center border-b border-accent/20 pb-2">
                 <span className="font-bold text-accent flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" /> สภาพประเมิน: {aiResult.estimatedCondition}
+                  <Sparkles className="w-4 h-4" /> Estimated Condition: {aiResult.estimatedCondition}
                 </span>
                 <span className="badge badge-accent font-black text-sm p-3">
-                  {aiResult.estimatedScore} / 100 คะแนน
+                  {aiResult.estimatedScore} / 100 PTS
                 </span>
               </div>
               <p className="text-xs text-base-content/80 leading-relaxed">{aiResult.summary}</p>

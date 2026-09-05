@@ -26,7 +26,7 @@ export default function ConditionFormSection({
           <span className="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center font-bold text-sm">
             2
           </span>
-          <h2 className="text-xl font-bold text-base-content">ตอบคำถามสภาพสินค้า</h2>
+          <h2 className="text-xl font-bold text-base-content">Item Condition Assessment</h2>
         </div>
         {currentStep > 2 && <CheckCircle2 className="w-6 h-6 text-success" />}
       </div>
@@ -34,7 +34,7 @@ export default function ConditionFormSection({
       {currentStep >= 2 && (
         <form onSubmit={onSubmit} className="space-y-4">
           {questions.length === 0 ? (
-            <p className="text-sm text-base-content/60 italic">หมวดหมู่นี้ไม่มีคำถามเพิ่มเติม สามารถกดข้ามไปยังขั้นตอนถัดไปได้</p>
+            <p className="text-sm text-base-content/60 italic">No additional questions for this category. You may proceed to the next step.</p>
           ) : (
             questions.map((q) => (
               <div key={q.id} className="p-4 bg-base-200/50 rounded-field space-y-2">
@@ -55,7 +55,7 @@ export default function ConditionFormSection({
                         onChange={() => handleAnswerChange(q.id, true)}
                         disabled={currentStep > 2}
                       />
-                      <span>ใช่ / ทำงานปกติ (Yes)</span>
+                      <span>Yes / Fully Functional</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
                       <input
@@ -66,7 +66,7 @@ export default function ConditionFormSection({
                         onChange={() => handleAnswerChange(q.id, false)}
                         disabled={currentStep > 2}
                       />
-                      <span>ไม่ใช่ / มีปัญหา (No)</span>
+                      <span>No / Defective</span>
                     </label>
                   </div>
                 )}
@@ -79,7 +79,7 @@ export default function ConditionFormSection({
                     onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                     disabled={currentStep > 2}
                   >
-                    <option value="">-- โปรดเลือกคำตอบ --</option>
+                    <option value="">-- Please Select --</option>
                     {q.options?.map((opt, i) => (
                       <option key={i} value={opt}>
                         {opt}
@@ -97,7 +97,7 @@ export default function ConditionFormSection({
               disabled={loading}
               className="btn btn-primary w-full rounded-field font-bold text-white"
             >
-              {loading ? <span className="loading loading-spinner" /> : "บันทึกคำตอบสภาพ & ถัดไป"}
+              {loading ? <span className="loading loading-spinner" /> : "Save Condition & Next"}
             </button>
           )}
         </form>

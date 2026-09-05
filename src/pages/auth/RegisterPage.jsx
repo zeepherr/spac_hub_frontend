@@ -15,7 +15,7 @@ function RegisterPage() {
   const user = useAuthStore((store) => store.user);
   const navigate = useNavigate();
 
-  // ใช้เฉพาะเปิด–ปิดการแสดงรหัสผ่าน
+  // Password visibility states
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -37,7 +37,7 @@ function RegisterPage() {
     },
   });
 
-  // ทำงานเมื่อข้อมูลผ่าน Zod
+  // Handle submit when Zod validation passes
   const onSubmit = async (values) => {
     const { confirmPassword, ...restData } = values;
     try {
@@ -60,11 +60,11 @@ function RegisterPage() {
   const inputStyle =
     "w-full rounded-lg border bg-white py-3 pl-11 pr-4 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:ring-2";
   if (user) return <Navigate to={getRoleHome(user.role)} replace />;
-  if (isSubmitting) return <GlobalLoading label="กำลังส่ง OTP..." />;
+  if (isSubmitting) return <GlobalLoading label="Sending OTP..." />;
 
   return (
     <section className="w-full hardware-surface max-w-xl rounded-2xl border border-neutral-200 bg-white px-6 py-6 shadow-xl sm:px-10 sm:py-7">
-      {/* ส่วนหัว */}
+      {/* Header */}
       <header className="mb-4 text-center">
         <Link
           to="/"
@@ -74,10 +74,10 @@ function RegisterPage() {
           <span className="text-orange-500">HUB</span>
         </Link>
 
-        <h1 className="text-2xl font-bold text-neutral-900">สมัครสมาชิก</h1>
+        <h1 className="text-2xl font-bold text-neutral-900">Sign Up</h1>
 
         <p className="mt-1 text-sm text-neutral-500">
-          สร้างบัญชีเพื่อเริ่มซื้อขายอุปกรณ์ไอทีมือสอง
+          Create an account to start buying and selling second-hand IT gear
         </p>
       </header>
 
@@ -92,7 +92,7 @@ function RegisterPage() {
               htmlFor="firstName"
               className="mb-1.5 block text-sm font-semibold text-neutral-800"
             >
-              ชื่อ
+              First Name
             </label>
 
             <div className="relative">
@@ -104,7 +104,7 @@ function RegisterPage() {
               <input
                 id="firstName"
                 type="text"
-                placeholder="กรอกชื่อ"
+                placeholder="Enter first name"
                 aria-invalid={errors.firstName ? "true" : "false"}
                 className={`${inputStyle} ${
                   errors.firstName
@@ -127,7 +127,7 @@ function RegisterPage() {
               htmlFor="lastName"
               className="mb-1.5 block text-sm font-semibold text-neutral-800"
             >
-              นามสกุล
+              Last Name
             </label>
 
             <div className="relative">
@@ -139,7 +139,7 @@ function RegisterPage() {
               <input
                 id="lastName"
                 type="text"
-                placeholder="กรอกนามสกุล"
+                placeholder="Enter last name"
                 aria-invalid={errors.lastName ? "true" : "false"}
                 className={`${inputStyle} ${
                   errors.lastName
@@ -163,7 +163,7 @@ function RegisterPage() {
             htmlFor="email"
             className="block text-sm font-semibold text-neutral-800 mb-2"
           >
-            อีเมล
+            Email
           </label>
 
           <div className="relative">
@@ -196,7 +196,7 @@ function RegisterPage() {
             htmlFor="password"
             className="block text-sm font-semibold text-neutral-800 mb-2"
           >
-            รหัสผ่าน
+            Password
           </label>
 
           <div className="relative">
@@ -208,7 +208,7 @@ function RegisterPage() {
             <input
               id="password"
               type={showPassword ? "text" : "password"}
-              placeholder="รหัสผ่านอย่างน้อย 8 ตัวอักษร"
+              placeholder="Minimum 8 characters"
               aria-invalid={errors.password ? "true" : "false"}
               className={`${inputStyle}  pr-12 ${
                 errors.password
@@ -222,7 +222,7 @@ function RegisterPage() {
               type="button"
               onClick={() => setShowPassword((current) => !current)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-900 cursor-pointer"
-              aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
@@ -240,7 +240,7 @@ function RegisterPage() {
             htmlFor="confirmPassword"
             className="mb-1.5 block text-sm font-semibold text-neutral-800"
           >
-            ยืนยันรหัสผ่าน
+            Confirm Password
           </label>
 
           <div className="relative">
@@ -252,7 +252,7 @@ function RegisterPage() {
             <input
               id="confirmPassword"
               type={showConfirmPassword ? "text" : "password"}
-              placeholder="กรอกรหัสผ่านอีกครั้ง"
+              placeholder="Re-enter password"
               aria-invalid={errors.confirmPassword ? "true" : "false"}
               className={`${inputStyle} pr-12 ${
                 errors.confirmPassword
@@ -268,8 +268,8 @@ function RegisterPage() {
               className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-900 cursor-pointer"
               aria-label={
                 showConfirmPassword
-                  ? "ซ่อนยืนยันรหัสผ่าน"
-                  : "แสดงยืนยันรหัสผ่าน"
+                  ? "Hide confirm password"
+                  : "Show confirm password"
               }
             >
               {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
@@ -288,23 +288,23 @@ function RegisterPage() {
           disabled={isSubmitting}
           className="w-full cursor-pointer rounded-lg bg-[#f97316] py-2.5 font-semibold text-[#ffffff] transition hover:bg-orange-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isSubmitting ? "กำลังสมัครสมาชิก..." : "สร้างบัญชี"}
+          {isSubmitting ? "Creating Account..." : "Create Account"}
         </button>
       </form>
 
       <div className="mt-4 flex items-center gap-4">
         <div className="h-px flex-1 bg-neutral-200" />
-        <span className="text-xs text-neutral-400">หรือ</span>
+        <span className="text-xs text-neutral-400">OR</span>
         <div className="h-px flex-1 bg-neutral-200" />
       </div>
 
       <p className="mt-4 text-center text-sm text-neutral-500">
-        มีบัญชีอยู่แล้ว?{" "}
+        Already have an account?{" "}
         <Link
           to="/login"
           className="font-semibold text-[#f97316] hover:text-orange-600 hover:underline"
         >
-          เข้าสู่ระบบ
+          Sign In
         </Link>
       </p>
     </section>

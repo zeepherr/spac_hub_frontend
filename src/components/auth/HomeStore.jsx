@@ -7,13 +7,13 @@ import ProductCard from "./ProductCard";
 const TRUST_ITEMS = [
   {
     icon: ShieldCheck,
-    title: "ของแท้ 100%",
-    subtitle: "รับประกันศูนย์ไทยทุกชิ้น",
+    title: "100% Genuine Products",
+    subtitle: "Official Warranty on Every Item",
   },
-  { icon: Truck, title: "จัดส่งทั่วประเทศ", subtitle: "รวดเร็วทันใจ" },
-  { icon: Wrench, title: "ประกันหลังการขาย", subtitle: "มั่นใจทุกการใช้งาน" },
-  { icon: Percent, title: "ผ่อนชำระ 0%", subtitle: "สูงสุด 10 เดือน" },
-  { icon: Headset, title: "บริการหลังการขาย", subtitle: "ดูแลตลอดการใช้งาน" },
+  { icon: Truck, title: "Nationwide Delivery", subtitle: "Fast and Reliable" },
+  { icon: Wrench, title: "After-Sales Warranty", subtitle: "Confidence in Every Use" },
+  { icon: Percent, title: "0% Installment Plan", subtitle: "Up to 10 Months" },
+  { icon: Headset, title: "After-Sales Support", subtitle: "Support Throughout Your Usage" },
 ];
 
 // สุ่มหยิบสินค้ามา n ชิ้นจากที่มีทั้งหมด (ไม่แก้ array เดิม)
@@ -29,7 +29,7 @@ function HeroBanner() {
   return (
     <div className="hardware-surface flex h-72 items-center justify-center overflow-hidden">
       {slides.length === 0 ? (
-        <p className="text-sm text-neutral-400">ยังไม่มีข้อมูลแบนเนอร์</p>
+        <p className="text-sm text-neutral-400">no banner data available</p>
       ) : (
         slides.map((slide) => (
           <div key={slide.id}>{/* render banner slide */}</div>
@@ -47,7 +47,7 @@ function PromoCards() {
     <div className="flex flex-col gap-4">
       {cards.length === 0 ? (
         <div className="hardware-surface flex h-72 items-center justify-center">
-          <p className="text-sm text-neutral-400">ยังไม่มีข้อมูลโปรโมชัน</p>
+          <p className="text-sm text-neutral-400">no promotion data available</p>
         </div>
       ) : (
         cards.map((card) => (
@@ -96,7 +96,7 @@ function ProductSection({ title, products = [], isLoading, isError }) {
           to="/products"
           className="text-sm font-medium text-[#f97316] hover:text-orange-600"
         >
-          ดูสินค้าทั้งหมด &gt;
+          View All Products &gt;
         </Link>
       </div>
 
@@ -111,11 +111,11 @@ function ProductSection({ title, products = [], isLoading, isError }) {
         </div>
       ) : isError ? (
         <div className="hardware-surface flex h-40 items-center justify-center">
-          <p className="text-sm text-[#dc2626]">โหลดสินค้าไม่สำเร็จ</p>
+          <p className="text-sm text-[#dc2626]">Failed to load products</p>
         </div>
       ) : products.length === 0 ? (
         <div className="hardware-surface flex h-40 items-center justify-center">
-          <p className="text-sm text-neutral-400">ยังไม่มีข้อมูลสินค้า</p>
+          <p className="text-sm text-neutral-400">No product data available</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
@@ -135,18 +135,18 @@ function ArticleSection() {
   return (
     <div className="hardware-surface p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-neutral-900">บทความ / รีวิว</h2>
+        <h2 className="text-sm font-bold text-neutral-900">Articles / Reviews</h2>
         <Link
           to="/articles"
           className="text-xs font-medium text-[#f97316] hover:text-orange-600"
         >
-          ดูทั้งหมด &gt;
+          View All &gt;
         </Link>
       </div>
 
       {articles.length === 0 ? (
         <p className="py-6 text-center text-sm text-neutral-400">
-          ยังไม่มีบทความ
+          No articles available
         </p>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -178,13 +178,13 @@ export default function HomeStore() {
         <HeroBanner />
         <TrustBar />
         <ProductSection
-          title="สินค้าแนะนำ"
+          title="Recommended Products"
           products={featured}
           isLoading={isLoading}
           isError={isError}
         />
         <ProductSection
-          title="สินค้าใหม่ล่าสุด"
+          title="Latest Products"
           products={newest}
           isLoading={isLoading}
           isError={isError}

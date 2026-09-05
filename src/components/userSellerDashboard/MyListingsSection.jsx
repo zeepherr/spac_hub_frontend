@@ -13,7 +13,7 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
   const navigate = useNavigate();
   const { mutate: deleteListing, isPending: isDeleting } = useDeleteListing();
 
-  // State สำหรับ Modals
+  // State for Modals
   const [selectedListingForEdit, setSelectedListingForEdit] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -29,7 +29,7 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
   };
 
   const handleOpenDeleteModal = (e, item) => {
-    e.stopPropagation(); // กันไม่ให้ Event ทะลุไปเปิด Detail Modal
+    e.stopPropagation(); // Prevent opening the detail modal
     setSelectedListingForDelete(item);
     setIsDeleteModalOpen(true);
   };
@@ -45,26 +45,31 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
   };
 
   const handleOpenEdit = (e, item) => {
-    e.stopPropagation(); // กันไม่ให้ Event ทะลุไปเปิด Detail Modal
+    e.stopPropagation(); // Prevent opening the detail modal
     setSelectedListingForEdit(item);
     setIsEditModalOpen(true);
   };
 
   const renderStatusBadge = (status) => {
-    const baseClass = "badge text-xs sm:text-sm font-bold shrink-0 min-w-[90px] py-3 text-center border-none shadow-sm";
+    const baseClass = "badge text-xs sm:text-sm font-bold shrink-0 min-w-[90px] py-3 text-center border-none shadow-xs";
     switch (status) {
-      case "ACTIVE": return <span className={`${baseClass} badge-success text-white`}>กำลังขาย</span>;
-      case "RESERVED": return <span className={`${baseClass} badge-warning text-white`}>ถูกจอง</span>;
-      case "SOLD": return <span className={`${baseClass} badge-ghost`}>ขายแล้ว</span>;
-      case "DRAFT": return <span className={`${baseClass} badge-info text-white`}>แบบร่าง</span>;
-      case "ARCHIVED": return <span className={`${baseClass} badge-error text-white`}>ปิดประกาศ</span>;
-      default: return <span className={`${baseClass} badge-outline`}>{status || "ทั่วไป"}</span>;
+      case "ACTIVE": return <span className={`${baseClass} badge-success text-white`}>Active</span>;
+      case "RESERVED": return <span className={`${baseClass} badge-warning text-white`}>Reserved</span>;
+      case "SOLD": return <span className={`${baseClass} badge-ghost`}>Sold</span>;
+      case "DRAFT": return <span className={`${baseClass} badge-info text-white`}>Draft</span>;
+      case "ARCHIVED": return <span className={`${baseClass} badge-error text-white`}>Archived</span>;
+      default: return <span className={`${baseClass} badge-outline`}>{status || "General"}</span>;
     }
   };
 
   const formatCondition = (condition) => {
-    const map = { LIKE_NEW: "เหมือนใหม่", GOOD: "สภาพดี", FAIR: "สภาพปานกลาง", POOR: "สภาพใช้งาน" };
-    return map[condition] ? `สภาพ ${map[condition]}` : null;
+    const map = {
+      LIKE_NEW: "Like New",
+      GOOD: "Good Condition",
+      FAIR: "Fair Condition",
+      POOR: "Used / Worn",
+    };
+    return map[condition] ? `Condition: ${map[condition]}` : null;
   };
 
   if (isLoading) return <MyListingsSectionSkeleton />;
@@ -72,24 +77,28 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
   return (
     <>
       <div className="card hardware-surface p-6 space-y-4 h-[600px] flex flex-col">
+        {/* Section Header */}
         <div className="flex items-center justify-between border-b border-base-300/60 pb-4 shrink-0">
-          <h3 className="font-bold text-xl text-base-content">ประกาศขายของฉัน</h3>
+          <h3 className="font-bold text-xl text-base-content">My Listings</h3>
           <button
             type="button"
             onClick={() => navigate("/user/sell/listings")}
             className="text-sm text-base-content/70 hover:text-primary font-semibold flex items-center gap-1 transition-colors"
           >
-            ดูประกาศทั้งหมด <ChevronRight className="w-4 h-4" />
+            View All <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
+        {/* Listings List */}
         <div className="space-y-4 flex-1 pr-2 p-1.5 scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100 overflow-y-auto">
           {isError ? (
-            <div className="text-center py-8 text-sm text-error">ไม่สามารถโหลดข้อมูลประกาศได้</div>
+            <div className="text-center py-8 text-sm text-error">
+              Failed to load listings data.
+            </div>
           ) : !listings || listings.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-base-content/50 space-y-2">
               <PackageX className="w-12 h-12 stroke-1" />
-              <p className="text-base">ยังไม่มีรายการประกาศขาย</p>
+              <p className="text-base">No listings found</p>
             </div>
           ) : (
             listings.map((item) => {
@@ -113,10 +122,12 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
                 >
                   <div className="flex items-center gap-5 min-w-0 flex-1">
                     <div className="bg-base-300 rounded-xl overflow-hidden shrink-0 flex items-center justify-center border border-base-200 w-[110px] h-[110px]">
-                      <img src={imageUrl} alt={item.title || "สินค้า"} className="w-full h-full object-cover" />
+                      <img src={imageUrl} alt={item.title || "Product"} className="w-full h-full object-cover" />
                     </div>
                     <div className="min-w-0 space-y-2 flex-1">
-                      <p className="text-lg font-bold truncate text-base-content">{item.title || "ไม่มีชื่อสินค้า"}</p>
+                      <p className="text-lg font-bold truncate text-base-content">
+                        {item.title || "Untitled Product"}
+                      </p>
                       <p className="text-xl font-black text-primary">
                         {item.price ? `฿${Number(item.price).toLocaleString()}` : "-"}
                       </p>
@@ -141,7 +152,7 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
                       type="button"
                       onClick={(e) => handleOpenEdit(e, item)}
                       className="btn btn-ghost btn-circle btn-sm text-info hover:bg-info/10 transition-colors"
-                      title="แก้ไขประกาศ"
+                      title="Edit Listing"
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
@@ -150,7 +161,7 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
                       type="button"
                       onClick={(e) => handleOpenDeleteModal(e, item)}
                       className="btn btn-ghost btn-circle btn-sm text-error/70 hover:text-error hover:bg-error/10 transition-colors"
-                      title="ลบประกาศ"
+                      title="Delete Listing"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

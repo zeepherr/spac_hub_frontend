@@ -165,10 +165,10 @@ export function VerifyEmailForm({
             className="btn btn-accent w-full text-accent-content font-bold h-12 text-base"
           >
             {isSubmitting
-              ? "กำลังตรวจสอบ..."
+              ? "Verifying..."
               : verificationBlocked
-                ? "รหัสหมดอายุ"
-                : "ยืนยันตัวตน"}
+                ? "Code expired"
+                : " Submit Verify"}
           </button>
 
           <ResendCodeButton

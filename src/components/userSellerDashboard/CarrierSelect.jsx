@@ -20,7 +20,7 @@ export default function CarrierSelect({ value, onChange, disabled }) {
     const selected = e.target.value;
     if (selected === "OTHER") {
       setIsCustom(true);
-      onChange(""); // ล้างค่าเดิมเพื่อให้พิมพ์ใหม่
+      onChange(""); // Clear previous value for custom input
     } else {
       setIsCustom(false);
       onChange(selected);
@@ -30,10 +30,10 @@ export default function CarrierSelect({ value, onChange, disabled }) {
   return (
     <div className="space-y-2">
       <label className="label text-sm font-bold text-base-content p-0">
-        บริษัทขนส่ง <span className="text-error">*</span>
+        Courier / Shipping Company <span className="text-error">*</span>
       </label>
 
-      {/* Dropdown เลือกขนส่ง */}
+      {/* Carrier Select Dropdown */}
       <select
         className="select select-bordered w-full rounded-xl bg-base-100 focus:border-primary"
         value={isCustom ? "OTHER" : value}
@@ -41,21 +41,21 @@ export default function CarrierSelect({ value, onChange, disabled }) {
         disabled={disabled}
       >
         <option value="" disabled>
-          -- เลือกบริษัทขนส่ง --
+          -- Select Courier --
         </option>
         {THAI_CARRIERS.map((carrier) => (
           <option key={carrier} value={carrier}>
             {carrier}
           </option>
         ))}
-        <option value="OTHER">อื่นๆ (กรอกเอง)</option>
+        <option value="OTHER">Other (Specify manually)</option>
       </select>
 
-      {/* แสดงช่องให้พิมพ์ชื่อขนส่งเองหากเลือก "อื่นๆ" */}
+      {/* Custom Carrier Input Field */}
       {isCustom && (
         <input
           type="text"
-          placeholder="ระบุชื่อบริษัทขนส่ง"
+          placeholder="Specify courier name"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}

@@ -19,13 +19,13 @@ const menus = [
   },
   {
     id: "profile",
-    label: "โปรไฟล์",
+    label: "Profile",
     to: "/user/profile",
     icon: Tag,
   },
   {
     id: "favorites",
-    label: "Favorite",
+    label: "Favorites",
     to: "/user/favorites",
     icon: Heart,
   },
@@ -36,7 +36,7 @@ function ProfileLayout() {
   const displayName =
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
     user?.email ||
-    "ผู้ใช้งาน";
+    "User";
 
   return (
     <div className=" flex h-dvh overflow-hidden bg-base-100 text-base-content md:flex-row">
@@ -48,7 +48,7 @@ function ProfileLayout() {
             {user?.profileImageUrl ? (
               <img
                 src={user.profileImageUrl}
-                alt={`รูปโปรไฟล์ของ ${displayName}`}
+                alt={`Profile image of ${displayName}`}
                 className="size-full rounded-full object-cover"
               />
             ) : (
@@ -59,7 +59,7 @@ function ProfileLayout() {
                 aria-hidden="true"
               />
             )}
-            {/* ไฟ LED สัญลักษณ์ธีม Hardware */}
+            {/* LED Status Indicator (Hardware Theme) */}
             <span className="hardware-indicator absolute bottom-1 right-1" />
           </div>
 
@@ -68,7 +68,7 @@ function ProfileLayout() {
           </h2>
 
           <p className="mt-1 text-xs font-bold uppercase tracking-wider text-neutral/70">
-            บัญชี SPECHUB
+            SPECHUB Account
           </p>
         </div>
 
@@ -110,7 +110,7 @@ function ProfileLayout() {
         </nav>
         <div className="flex-1" />
 
-        {/* ปุ่ม Logout ด้านล่าง Sidebar */}
+        {/* Logout Button at bottom of Sidebar */}
         <div className="mt-auto border-t border-base-300 p-4">
           <LogoutButton />
         </div>

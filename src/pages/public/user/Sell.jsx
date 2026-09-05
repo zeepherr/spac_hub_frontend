@@ -20,7 +20,7 @@ export default function SellerDashboard() {
   const { data: listings, isLoading: isListingLoading, isError } = useMyListings();
 
   const user = profileData?.user || profileData?.data?.user || profileData?.data;
-  const userName = user?.firstName || user?.lastName ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : "ผู้ใช้งาน";
+  const userName = user?.firstName || user?.lastName ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : "USER";
 
   return (
     <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-6">

@@ -78,7 +78,7 @@ export default function ProductBasicForm({
       setIsAiSuccess(true);
     } catch (error) {
       console.error("AI Autofill Failed:", error);
-      notify("ไม่สามารถวิเคราะห์ข้อมูลจากรูปภาพได้ กรุณาลองใหม่อีกครั้ง", "error");
+      notify("Failed to extract data from image. Please try again.", "error");
     } finally {
       setIsAiLoading(false);
     }
@@ -120,7 +120,7 @@ export default function ProductBasicForm({
     <>
       <div className="hardware-surface p-6 rounded-box space-y-6 bg-base-100 border border-base-300 shadow-sm">
         <div className="border-b border-base-300 pb-3 flex items-center justify-between">
-          <h3 className="text-xl font-bold text-base-content tracking-tight">ข้อมูลเบื้องต้น</h3>
+          <h3 className="text-xl font-bold text-base-content tracking-tight">Basic Information</h3>
           <span className="hardware-indicator" />
         </div>
 
@@ -134,13 +134,13 @@ export default function ProductBasicForm({
                 </div>
                 <div>
                   <h4 className="text-base font-extrabold text-base-content flex items-center gap-2">
-                    ให้ AI ช่วยกรอกข้อมูลสินค้าอัตโนมัติ
+                    Auto-fill Product Details with AI
                     <span className="px-2 py-0.5 text-[11px] font-bold rounded-full bg-linear-to-r from-amber-500 to-orange-500 text-white">
-                      แนะนำ
+                      Recommended
                     </span>
                   </h4>
                   <p className="text-xs md:text-sm text-base-content/70 mt-1">
-                    เลือกรูปภาพสินค้าเพื่อดูพรีวิว จากนั้นกดยืนยันเพื่อให้ AI อ่านและเติมข้อมูลลงฟอร์ม
+                    Select a product image to preview, then click confirm for AI to scan and fill in the details automatically.
                   </p>
                 </div>
               </div>
@@ -148,7 +148,7 @@ export default function ProductBasicForm({
               {!aiImagePreview && (
                 <label className="btn border-none bg-linear-to-r from-[#f97316] to-[#ea580c] hover:from-[#ea580c] hover:to-[#c2410c] text-white font-bold rounded-xl shadow-md cursor-pointer">
                   <Upload className="w-4 h-4" />
-                  <span className="text-xs md:text-sm">เลือกรูปภาพสินค้า</span>
+                  <span className="text-xs md:text-sm">Select Product Image</span>
                   <input type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
                 </label>
               )}
@@ -165,22 +165,22 @@ export default function ProductBasicForm({
                   </div>
                   <div>
                     <span className="text-xs font-bold text-amber-600 flex items-center gap-1.5">
-                      <ImageIcon className="w-4 h-4" /> รูปภาพที่เลือก
+                      <ImageIcon className="w-4 h-4" /> Selected Image
                     </span>
                     <p className="text-xs md:text-sm text-base-content/70 mt-0.5">
-                      {isAiSuccess ? "✨ AI เติมข้อมูลลงในฟอร์มเรียบร้อยแล้ว!" : "ตรวจสอบความถูกต้อง แล้วกดยืนยันเพื่อสแกนข้อมูล"}
+                      {isAiSuccess ? "✨ AI successfully filled in the details!" : "Please verify accuracy and confirm to scan data."}
                     </p>
                   </div>
                 </div>
 
                 {isAiSuccess ? (
                   <div className="flex items-center gap-2 text-emerald-600 font-bold text-xs bg-emerald-500/10 px-4 py-2.5 rounded-xl border border-emerald-500/30">
-                    <CheckCircle2 className="w-4.5 h-4.5" /> วิเคราะห์ข้อมูลสำเร็จแล้ว
+                    <CheckCircle2 className="w-4.5 h-4.5" /> Analysis Complete
                   </div>
                 ) : (
                   <button type="button" onClick={handleConfirmAiAutofill} disabled={isAiLoading || loading} className="btn border-none bg-linear-to-r from-[#f97316] to-[#d97706] text-white font-extrabold rounded-xl">
                     {isAiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    <span>{isAiLoading ? "กำลังวิเคราะห์..." : "ยืนยันให้ AI อ่านข้อมูล"}</span>
+                    <span>{isAiLoading ? "Analyzing..." : "Confirm AI Scan"}</span>
                   </button>
                 )}
               </div>
@@ -194,7 +194,7 @@ export default function ProductBasicForm({
         {/* INPUT: ชื่อสินค้า */}
         <div className="form-control w-full">
           <label className="label py-1">
-            <span className="label-text font-bold text-base-content">ชื่อสินค้า <span className="text-error">*</span></span>
+            <span className="label-text font-bold text-base-content">Product Title <span className="text-error">*</span></span>
           </label>
           <input 
             type="text" 
@@ -202,7 +202,7 @@ export default function ProductBasicForm({
             disabled={isAiLoading || loading}
             value={formData.title || ""} 
             onChange={handleChange} 
-            placeholder="เช่น NVIDIA RTX 4090 Founders Edition" 
+            placeholder="e.g. NVIDIA RTX 4090 Founders Edition" 
             className={`input w-full rounded-field ${errors.title ? "border-error" : ""}`} 
           />
           {errors.title && <span className="text-xs text-error mt-1">{errors.title}</span>}
@@ -212,7 +212,7 @@ export default function ProductBasicForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="form-control w-full">
             <label className="label py-1">
-              <span className="label-text font-bold text-base-content">หมวดหมู่ <span className="text-error">*</span></span>
+              <span className="label-text font-bold text-base-content">Category <span className="text-error">*</span></span>
             </label>
             <button
               type="button"
@@ -223,7 +223,7 @@ export default function ProductBasicForm({
               <div className="flex items-center gap-2.5 overflow-hidden">
                 <Layers className="w-4 h-4 text-accent shrink-0" />
                 <span className={`text-sm truncate font-semibold ${selectedCategoryName ? "text-base-content font-bold" : "text-base-content/60"}`}>
-                  {selectedCategoryName || "คลิกเพื่อเลือกหมวดหมู่"}
+                  {selectedCategoryName || "Click to select category"}
                 </span>
               </div>
               <ChevronRight className="w-4 h-4 text-base-content/70 shrink-0" />
@@ -233,7 +233,7 @@ export default function ProductBasicForm({
 
           <div className="form-control w-full">
             <label className="label py-1">
-              <span className="label-text font-bold text-base-content">แบรนด์ <span className="text-error">*</span></span>
+              <span className="label-text font-bold text-base-content">Brand <span className="text-error">*</span></span>
             </label>
             <input 
               type="text" 
@@ -252,7 +252,7 @@ export default function ProductBasicForm({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="form-control w-full">
             <label className="label py-1">
-              <span className="label-text font-bold text-base-content">รุ่น (MODEL) <span className="text-error">*</span></span>
+              <span className="label-text font-bold text-base-content">Model <span className="text-error">*</span></span>
             </label>
             <input 
               type="text" 
@@ -268,7 +268,7 @@ export default function ProductBasicForm({
 
           <div className="form-control w-full">
             <label className="label py-1">
-              <span className="label-text font-bold text-base-content">ราคา (THB) <span className="text-error">*</span></span>
+              <span className="label-text font-bold text-base-content">Price (THB) <span className="text-error">*</span></span>
             </label>
             <div className="relative">
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold">฿</span>
@@ -291,7 +291,7 @@ export default function ProductBasicForm({
           <label className="label py-1">
             <span className="label-text font-bold text-base-content flex items-center gap-1.5">
               <MapPin className="w-4 h-4 text-accent" />
-              สถานที่จัดส่ง / จังหวัดนัดรับ <span className="text-error">*</span>
+              Shipping Location / Pickup Province <span className="text-error">*</span>
             </span>
           </label>
           <button
@@ -305,7 +305,7 @@ export default function ProductBasicForm({
             <div className="flex items-center gap-2.5 overflow-hidden">
               <MapPin className="w-4 h-4 text-accent shrink-0" />
               <span className={`text-sm truncate font-semibold ${formData.location ? "text-base-content font-bold" : "text-base-content/60"}`}>
-                {formData.location || "คลิกเพื่อเลือกจังหวัด"}
+                {formData.location || "Click to select province"}
               </span>
             </div>
             <ChevronRight className="w-4 h-4 text-base-content/70 shrink-0" />
@@ -316,7 +316,7 @@ export default function ProductBasicForm({
         {/* รายละเอียดเพิ่มเติม */}
         <div className="form-control w-full">
           <label className="label py-1">
-            <span className="label-text font-bold text-base-content">รายละเอียดเพิ่มเติม <span className="text-error">*</span></span>
+            <span className="label-text font-bold text-base-content">Additional Description <span className="text-error">*</span></span>
           </label>
           <textarea 
             name="description" 
@@ -324,7 +324,7 @@ export default function ProductBasicForm({
             disabled={isAiLoading || loading}
             value={formData.description || ""} 
             onChange={handleChange} 
-            placeholder="ระบุวันที่ซื้อ, การใช้งานที่ผ่านมาระบุเหตุผลที่ขาย..." 
+            placeholder="Specify purchase date, previous usage history, reason for selling..." 
             className={`textarea w-full rounded-field ${errors.description ? "border-error" : ""}`} 
           />
           {errors.description && <span className="text-xs text-error mt-1">{errors.description}</span>}
@@ -341,10 +341,10 @@ export default function ProductBasicForm({
             {loading || isAiLoading ? (
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>{isAiLoading ? "กำลังวิเคราะห์..." : "กำลังบันทึก..."}</span>
+                <span>{isAiLoading ? "Analyzing..." : "Saving..."}</span>
               </div>
             ) : (
-              <span>ถัดไป ➔</span>
+              <span>Next ➔</span>
             )}
           </button>
         </div>

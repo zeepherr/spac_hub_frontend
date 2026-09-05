@@ -74,7 +74,7 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
 
     const parsedPrice = Number(editForm.price);
     if (isNaN(parsedPrice) || parsedPrice <= 0) {
-      toast.error("กรุณากรอกราคาให้ถูกต้อง (ต้องเป็นตัวเลขที่มากกว่า 0)");
+      toast.error("Please enter a valid price (must be a number greater than 0)");
       return;
     }
 
@@ -88,13 +88,13 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
       { listingId: listingData.id, payload },
       {
         onSuccess: () => {
-          toast.success("แก้ไขประกาศเรียบร้อยแล้ว");
+          toast.success("Listing updated successfully");
           onClose();
         },
         onError: (error) => {
           console.error("Update Listing Error Payload:", payload);
           console.error("Backend Error Detail:", error?.response?.data);
-          toast.error(error?.response?.data?.message || "เกิดข้อผิดพลาดในการแก้ไขประกาศ");
+          toast.error(error?.response?.data?.message || "Failed to update listing");
         },
       }
     );
@@ -121,7 +121,7 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
         <div className="p-5 border-b border-base-300 flex items-center justify-between bg-base-200/50">
           <div className="flex items-center gap-2 text-base-content">
             <Edit3 className="w-5 h-5 text-primary" />
-            <h3 className="font-bold text-xl">แก้ไขข้อมูลประกาศขาย</h3>
+            <h3 className="font-bold text-xl">Edit Listing Details</h3>
           </div>
           <button
             type="button"
@@ -136,12 +136,12 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
         {/* Body */}
         <div className="p-6 overflow-y-auto space-y-8 flex-1">
           
-          {/* Section 1: รูปภาพสินค้า */}
+          {/* Section 1: Product Images */}
           {imageFiles.length > 0 && (
             <div className="space-y-3">
               <label className="font-bold text-base flex items-center gap-2">
                 <ImageIcon className="w-4 h-4 text-primary" />
-                รูปภาพสินค้า ({imageFiles.length} รูป)
+                Product Images ({imageFiles.length} {imageFiles.length === 1 ? 'image' : 'images'})
               </label>
 
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
@@ -163,17 +163,17 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
 
           <hr className="border-base-300" />
 
-          {/* Section 2: ฟอร์มแก้ไขข้อมูล */}
+          {/* Section 2: Edit Form */}
           <div className="space-y-4">
-            <h4 className="font-bold text-base text-primary">ข้อมูลประกาศขาย</h4>
+            <h4 className="font-bold text-base text-primary">Listing Information</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               
-              {/* 🔒 ชื่อสินค้า */}
+              {/* 🔒 Product Title */}
               <div className="form-control md:col-span-2">
                 <label className="label text-xs font-bold text-base-content flex items-center justify-between">
-                  <span>ชื่อสินค้า</span>
+                  <span>Product Title</span>
                   <span className="text-[10px] text-base-content/50 font-normal flex items-center gap-0.5">
-                    <Lock className="w-3 h-3" /> ไม่สามารถแก้ไขได้
+                    <Lock className="w-3 h-3" /> Cannot be edited
                   </span>
                 </label>
                 <div className="relative">
@@ -187,10 +187,10 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
                 </div>
               </div>
 
-              {/* ✏️ ราคา */}
+              {/* ✏️ Price */}
               <div className="form-control">
                 <label className="label text-xs font-bold text-base-content">
-                  ราคา (บาท) *
+                  Price (THB) *
                 </label>
                 <input
                   type="number"
@@ -201,34 +201,34 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
                 />
               </div>
 
-              {/* 🔒 หมวดหมู่สินค้า */}
+              {/* 🔒 Category */}
               <div className="form-control">
                 <label className="label text-xs font-bold text-base-content flex items-center justify-between">
                   <span className="flex items-center gap-1">
                     <Layers className="w-3.5 h-3.5 text-primary" />
-                    หมวดหมู่สินค้า
+                    Category
                   </span>
                   <span className="text-[10px] text-base-content/50 font-normal flex items-center gap-0.5">
-                    <Lock className="w-3 h-3" /> ไม่สามารถแก้ไขได้
+                    <Lock className="w-3 h-3" /> Cannot be edited
                   </span>
                 </label>
                 <div className="input input-bordered w-full text-sm font-semibold flex items-center justify-between text-left bg-base-200/70 text-base-content/60 cursor-not-allowed select-none">
                   <span className="font-bold">
-                    {selectedCategoryName || "ไม่ระบุหมวดหมู่"}
+                    {selectedCategoryName || "Unspecified Category"}
                   </span>
                   <Lock className="w-4 h-4 text-base-content/40" />
                 </div>
               </div>
 
-              {/* 🔒 แบรนด์ */}
+              {/* 🔒 Brand */}
               <div className="form-control">
                 <label className="label text-xs font-bold text-base-content flex items-center justify-between">
                   <span className="flex items-center gap-1">
                     <Tag className="w-3.5 h-3.5 text-primary" />
-                    แบรนด์
+                    Brand
                   </span>
                   <span className="text-[10px] text-base-content/50 font-normal flex items-center gap-0.5">
-                    <Lock className="w-3 h-3" /> ไม่สามารถแก้ไขได้
+                    <Lock className="w-3 h-3" /> Cannot be edited
                   </span>
                 </label>
                 <div className="relative">
@@ -242,15 +242,15 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
                 </div>
               </div>
 
-              {/* 🔒 รุ่น / Model */}
+              {/* 🔒 Model */}
               <div className="form-control">
                 <label className="label text-xs font-bold text-base-content flex items-center justify-between">
                   <span className="flex items-center gap-1">
                     <Package className="w-3.5 h-3.5 text-primary" />
-                    รุ่น / Model
+                    Model
                   </span>
                   <span className="text-[10px] text-base-content/50 font-normal flex items-center gap-0.5">
-                    <Lock className="w-3 h-3" /> ไม่สามารถแก้ไขได้
+                    <Lock className="w-3 h-3" /> Cannot be edited
                   </span>
                 </label>
                 <div className="relative">
@@ -264,17 +264,17 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
                 </div>
               </div>
 
-              {/* ✏️ เรียกใช้ ProvinceSelect Component ที่แยกมา */}
+              {/* ✏️ Province Select Component */}
               <ProvinceSelect
                 value={editForm.location}
                 onChange={(val) => handleInputChange("location", val)}
                 className="md:col-span-2"
               />
 
-              {/* ✏️ รายละเอียดเพิ่มเติม */}
+              {/* ✏️ Description */}
               <div className="form-control md:col-span-2">
                 <label className="label text-xs font-bold text-base-content">
-                  รายละเอียดเพิ่มเติม *
+                  Additional Description *
                 </label>
                 <textarea
                   rows={4}
@@ -283,7 +283,7 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
                     handleInputChange("description", e.target.value)
                   }
                   className="textarea textarea-bordered w-full text-sm font-semibold resize-none"
-                  placeholder="อธิบายรายละเอียดสินค้าเพิ่มเติม..."
+                  placeholder="Describe additional details about the item..."
                 />
               </div>
             </div>
@@ -297,10 +297,10 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-sm flex items-center gap-2 text-base-content">
                     <Sparkles className="w-4 h-4 text-warning" />
-                    ผลวิเคราะห์สภาพสินค้าโดย AI
+                    AI Condition Analysis
                   </span>
                   <span className="badge badge-warning font-black text-xs">
-                    {Number(listingData.estimatedScore).toFixed(1)} / 100 คะแนน
+                    {Number(listingData.estimatedScore).toFixed(1)} / 100 PTS
                   </span>
                 </div>
               </div>
@@ -317,7 +317,7 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
             disabled={isUpdating}
             className="btn btn-ghost font-bold text-sm"
           >
-            ยกเลิก
+            Cancel
           </button>
           <button
             type="button"
@@ -330,7 +330,7 @@ export default function EditListingModal({ isOpen, onClose, listingData }) {
             ) : (
               <>
                 <CheckCircle className="w-5 h-5" />
-                ยืนยันการแก้ไข
+                Confirm Edits
               </>
             )}
           </button>
