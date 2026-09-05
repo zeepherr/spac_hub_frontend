@@ -15,8 +15,8 @@ const FINISHED_ORDER_STATUSES = new Set([
 ]);
 
 /*
- * Mock เฉพาะข้อมูลที่ Backend ยังไม่มี API
- * เมื่อมี API แล้วค่อยลบและเปลี่ยนเป็น Query จริง
+ * Mock data for backend API endpoints not yet implemented.
+ * Remove and replace with actual queries when available.
  */
 
 const recentMessagesMock = [
@@ -24,25 +24,24 @@ const recentMessagesMock = [
     id: 1,
     senderName: "Tech Corner",
     senderImageUrl: "",
-    message: "สวัสดีครับ สินค้าพร้อมจัดส่งแล้วนะครับ",
-    timeText: "20 นาทีที่แล้ว",
+    message: "Hello! Your item is ready for shipment.",
+    timeText: "20 mins ago",
     isUnread: true,
   },
   {
     id: 2,
     senderName: "NextGen Gadget",
     senderImageUrl: "",
-    message: "ขอบคุณครับผม 🙏",
-    timeText: "2 ชั่วโมงที่แล้ว",
+    message: "Thank you! 🙏",
+    timeText: "2 hours ago",
     isUnread: true,
   },
 ];
 
-
 function mapOrderForDashboard(order) {
   const images = order.listing?.images ?? [];
 
-  const coverImage =images.find((image) => image.isCover) ??images[0];
+  const coverImage = images.find((image) => image.isCover) ?? images[0];
 
   return {
     id: order.id,
@@ -52,7 +51,7 @@ function mapOrderForDashboard(order) {
       [order.listing?.brand, order.listing?.model]
         .filter(Boolean)
         .join(" ") ||
-      "ไม่พบชื่อสินค้า",
+      "Untitled Item",
 
     productImageUrl:
       coverImage?.imageUrl ||
@@ -68,7 +67,7 @@ function mapOrderForDashboard(order) {
 function Buy() {
   const navigate = useNavigate();
 
-  const user = useAuthStore((state) => state.user,);
+  const user = useAuthStore((state) => state.user);
 
   const {
     data: buyingOrders = [],
@@ -76,121 +75,98 @@ function Buy() {
     isError,
     refetch,
   } = useBuyingOrders();
-console.log(buyingOrders)
-  const displayName = user?.firstName || user?.email || "ผู้ใช้งาน";
+  console.log(buyingOrders);
 
-  /*จำนวนคำสั่งซื้อทั้งหมด*/
+  const displayName = user?.firstName || user?.email || "User";
+
+  /* Total order count */
   const totalOrders = buyingOrders.length;
 
-  /*กำลังดำเนินการ: นับรายการที่ยังไม่อยู่ในสถานะสิ้นสุด */
+  /* In Progress: Count orders not in a finished state */
   const processingOrders =
     buyingOrders.filter(
-      (order) => !FINISHED_ORDER_STATUSES.has( order.status )).length;
+      (order) => !FINISHED_ORDER_STATUSES.has(order.status)
+    ).length;
 
-
-  /* กำลังจัดส่ง: ต้องมี deliveryShipment และยังไม่มีวันที่ส่งถึงผู้ซื้อ */
+  /* Shipping: Must have deliveryShipment and no delivery timestamp */
   const shippingOrders =
     buyingOrders.filter((order) => {
       const shipment = order.deliveryShipment;
 
-      return (
-        shipment && !shipment.deliveredAt);
+      return shipment && !shipment.deliveredAt;
     }).length;
 
-
-  /* หาคำสั่งซื้อที่สินค้าถึงแล้ว แต่ผู้ซื้อยังไม่ได้ยืนยันรับสินค้า*/
+  /* Find order where item has arrived but buyer hasn't confirmed receipt */
   const orderWaitingForReceipt =
     buyingOrders.find((order) => {
-      const shipment =
-        order.deliveryShipment;
+      const shipment = order.deliveryShipment;
 
-      return (
-        shipment?.deliveredAt && order.status !== "COMPLETED" );
+      return shipment?.deliveredAt && order.status !== "COMPLETED";
     });
 
-
-  /* แปลงข้อมูลสำหรับ PendingReceipt */
+  /* Map data for PendingReceipt */
   const pendingReceipt =
     orderWaitingForReceipt
       ? {
           id: orderWaitingForReceipt.id,
-          orderNumber:
-            orderWaitingForReceipt.orderNumber,
+          orderNumber: orderWaitingForReceipt.orderNumber,
           productName:
-            orderWaitingForReceipt.listing
-              ?.title ||
-            "สินค้าที่สั่งซื้อ",
+            orderWaitingForReceipt.listing?.title || "Ordered Item",
           message:
-            "สินค้าถูกจัดส่งถึงแล้ว กรุณายืนยันการรับสินค้า",
+            "Your order has arrived. Please confirm receipt.",
         }
       : null;
 
-  /* Backend เรียง createdAt desc มาแล้ว จึงเลือก 3 รายการแรกได้เลย */
+  /* Backend orders by createdAt desc; select top 3 */
   const recentOrders = buyingOrders
     .slice(0, 3)
     .map(mapOrderForDashboard);
 
-    
   const stats = [
     {
       id: "cart",
-      label: "สินค้าในตะกร้า",
+      label: "Cart Items",
       value: 0,
-      unit: "รายการ",
+      unit: "items",
       icon: ShoppingCart,
-      iconClassName:
-        "bg-emerald-50 text-emerald-600",
+      iconClassName: "bg-emerald-50 text-emerald-600",
       onClick: () => navigate("/cart"),
     },
     {
       id: "all-orders",
-      label: "คำสั่งซื้อทั้งหมด",
+      label: "Total Orders",
       value: totalOrders,
-      unit: "รายการ",
+      unit: "items",
       icon: ShoppingBag,
-      iconClassName:
-        "bg-orange-50 text-orange-600",
-      onClick: () =>
-        navigate("/user/orders"),
+      iconClassName: "bg-orange-50 text-orange-600",
+      onClick: () => navigate("/user/orders"),
     },
     {
       id: "processing",
-      label: "กำลังดำเนินการ",
+      label: "In Progress",
       value: processingOrders,
-      unit: "รายการ",
+      unit: "items",
       icon: Clock3,
-      iconClassName:
-        "bg-amber-50 text-amber-600",
-      onClick: () =>
-        navigate(
-          "/user/orders?status=processing",
-        ),
+      iconClassName: "bg-amber-50 text-amber-600",
+      onClick: () => navigate("/user/orders?status=processing"),
     },
     {
       id: "shipping",
-      label: "กำลังจัดส่ง",
+      label: "In Transit",
       value: shippingOrders,
-      unit: "รายการ",
+      unit: "items",
       icon: Truck,
-      iconClassName:
-        "bg-blue-50 text-blue-600",
-      onClick: () =>
-        navigate(
-          "/user/orders?status=shipping",
-        ),
+      iconClassName: "bg-blue-50 text-blue-600",
+      onClick: () => navigate("/user/orders?status=shipping"),
     },
   ];
 
   if (isPending) {
     return (
       <div className="flex min-h-96 items-center justify-center">
-        <Clock3
-          size={30}
-          className="animate-pulse text-orange-500"
-        />
-
+        <Clock3 size={30} className="animate-pulse text-orange-500" />
         <span className="ml-3 text-sm text-neutral-500">
-          กำลังโหลด Dashboard...
+          Loading Dashboard...
         </span>
       </div>
     );
@@ -200,7 +176,7 @@ console.log(buyingOrders)
     return (
       <div className="flex min-h-96 flex-col items-center justify-center gap-4">
         <p className="text-sm text-red-500">
-          ไม่สามารถโหลดข้อมูลคำสั่งซื้อได้
+          Unable to load order data.
         </p>
 
         <button
@@ -208,7 +184,7 @@ console.log(buyingOrders)
           onClick={() => refetch()}
           className="cursor-pointer rounded-xl border border-orange-500 px-5 py-2.5 text-sm font-semibold text-orange-500 transition hover:bg-orange-50"
         >
-          ลองอีกครั้ง
+          Try Again
         </button>
       </div>
     );
@@ -217,31 +193,29 @@ console.log(buyingOrders)
   return (
     <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
       <div className="mx-auto max-w-7xl">
-        {/* หัวข้อและปุ่มเลือกซื้อสินค้า */}
+        {/* Header & Shop Button */}
         <header className="mb-7 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-neutral-900">
-              สวัสดี, {displayName} 👋
+              Hello, {displayName} 👋
             </h1>
 
             <p className="mt-2 text-sm text-neutral-500">
-              ติดตามคำสั่งซื้อและกิจกรรมของคุณ
+              Track your orders and activity
             </p>
           </div>
 
           <button
             type="button"
-            onClick={() =>
-              navigate("/listings")
-            }
+            onClick={() => navigate("/listings")}
             className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-orange-600"
           >
             <ShoppingBag size={20} />
-            เลือกซื้อสินค้า
+            Shop Now
           </button>
         </header>
 
-        {/* การ์ดสรุป 4 ใบ */}
+        {/* 4 Summary Stat Cards */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat) => (
             <DashboardStatCard
@@ -250,49 +224,39 @@ console.log(buyingOrders)
               value={stat.value}
               unit={stat.unit}
               icon={stat.icon}
-              iconClassName={
-                stat.iconClassName
-              }
+              iconClassName={stat.iconClassName}
               onClick={stat.onClick}
             />
           ))}
         </div>
 
-        {/* สิ่งที่ต้องดำเนินการ + ข้อความล่าสุด */}
+        {/* Action Items + Recent Messages */}
         <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
           <PendingReceipt
             order={pendingReceipt}
             icon={PackageCheck}
             onConfirm={(orderId) => {
               /*
-               * ตอนนี้ Backend ยังไม่มี API ยืนยันรับสินค้า
-               * จึงเปิดหน้ารายละเอียดคำสั่งซื้อก่อน
+               * Confirmation API not implemented yet;
+               * redirect to order details page.
                */
-              navigate(
-                `/user/orders/${orderId}`,
-              );
+              navigate(`/user/orders/${orderId}`);
             }}
           />
 
           <RecentMessages
             messages={recentMessagesMock}
-            onViewAll={() =>
-              navigate("/messages")
-            }
+            onViewAll={() => navigate("/messages")}
           />
         </div>
 
-        {/* คำสั่งซื้อล่าสุด */}
+        {/* Recent Orders */}
         <div className="mt-5">
           <RecentOrders
             orders={recentOrders}
-            onViewAll={() =>
-              navigate("/user/orders")
-            }
+            onViewAll={() => navigate("/user/orders")}
             onSelectOrder={(orderId) =>
-              navigate(
-                `/user/orders/${orderId}`,
-              )
+              navigate(`/user/orders/${orderId}`)
             }
           />
         </div>

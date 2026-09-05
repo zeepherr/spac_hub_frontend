@@ -20,14 +20,14 @@ function CheckoutStep4({ sessionId }) {
 
           <div className="flex flex-col items-center gap-1.5">
             <span className="hardware-label text-[#f97316]">
-              ทำรายการสำเร็จ
+              Transaction Successful
             </span>
             <h2 className="text-xl font-bold text-neutral-900">
-              สั่งซื้อสำเร็จแล้ว
+              Order Placed Successfully
             </h2>
             <p className="max-w-sm text-sm text-neutral-500">
-              ขอบคุณสำหรับคำสั่งซื้อ
-              เราจะแจ้งความคืบหน้าการจัดส่งให้ทราบทางอีเมลและในหน้าคำสั่งซื้อของคุณ
+              Thank you for your order.
+              We’ll keep you updated on the delivery status via email and on your order page.
             </p>
           </div>
 
@@ -35,7 +35,7 @@ function CheckoutStep4({ sessionId }) {
             <>
               <div className="hardware-divider w-full" />
               <div className="flex w-full items-center justify-between gap-3 text-sm">
-                <span className="text-neutral-500">เลขอ้างอิงการชำระเงิน</span>
+                <span className="text-neutral-500">Payment Reference Number</span>
                 <span className="truncate font-mono text-xs font-medium text-neutral-900">
                   {sessionId}
                 </span>
@@ -48,7 +48,7 @@ function CheckoutStep4({ sessionId }) {
             onClick={() => navigate("/")}
             className="btn btn-accent mt-2 w-full gap-2 text-white"
           >
-            กลับสู่หน้าแรก
+            Back to Home
             <ArrowRight size={18} />
           </button>
         </div>

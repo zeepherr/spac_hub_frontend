@@ -7,7 +7,7 @@ function PendingReceipt({
     return (
         <section className="h-full rounded-2xl border border-base-300 bg-base-100 p-5 shadow-sm lg:p-6">
             <h2 className="text-lg font-bold text-base-content">
-                สิ่งที่ต้องดำเนินการ
+                Action Items
             </h2>
 
             {pendingReceipt ? (
@@ -23,7 +23,7 @@ function PendingReceipt({
 
                         <div className="min-w-0">
                             <h3 className="font-bold text-base-content">
-                                ยืนยันการรับสินค้า
+                                Confirm Receipt
                             </h3>
 
                             <p className="mt-1 text-sm text-base-content/55">
@@ -43,7 +43,7 @@ function PendingReceipt({
                         }
                         className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl border border-orange-500 px-5 py-2.5 text-sm font-bold text-orange-500 transition hover:bg-orange-50"
                     >
-                        ยืนยันการรับสินค้า
+                        Confirm Receipt
 
                         <ChevronRight
                             size={18}
@@ -54,7 +54,7 @@ function PendingReceipt({
             ) : (
                 <div className="mt-5 flex min-h-24 items-center justify-center rounded-xl bg-base-200/40">
                     <p className="text-sm text-base-content/50">
-                        ไม่มีรายการที่ต้องดำเนินการ
+                        No action items
                     </p>
                 </div>
             )}

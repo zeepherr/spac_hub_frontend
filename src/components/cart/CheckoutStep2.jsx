@@ -11,7 +11,7 @@ function CheckoutStep2({ includeAssembly, onToggleAssembly }) {
     <div className="hardware-surface p-6">
       <div className="mb-5 flex items-center gap-2">
         <h2 className="flex items-center gap-2 text-base font-bold text-neutral-900">
-          บริการเสริมและการคุ้มครอง
+          Additional Services & Protection
         </h2>
       </div>
 
@@ -29,12 +29,11 @@ function CheckoutStep2({ includeAssembly, onToggleAssembly }) {
                 SpecHub Escrow
               </span>
               <span className="hardware-label rounded-field bg-green-50 px-2 py-0.5 normal-case text-green-700">
-                รวมอยู่แล้ว
+                Included
               </span>
             </span>
             <span className="mt-1 block text-sm text-neutral-500">
-              เงินของคุณถูกพักไว้อย่างปลอดภัยจนกว่าจะได้รับและตรวจสอบสินค้าเรียบร้อย
-              รวมค่าตรวจสอบมาตรฐานแล้ว
+              Your payment is securely held until you receive and inspect the product. Standard inspection is included.
             </span>
           </span>
         </label>
@@ -49,14 +48,14 @@ function CheckoutStep2({ includeAssembly, onToggleAssembly }) {
           <span className="flex-1">
             <span className="flex items-center justify-between">
               <span className="font-semibold text-neutral-900">
-                บริการประกอบเครื่อง
+                PC Assembly Service
               </span>
               <span className="font-medium text-neutral-900">
                 +{formatPrice(ASSEMBLY_SERVICE_FEE)}
               </span>
             </span>
             <span className="mt-1 block text-sm text-neutral-500">
-              ประกอบโดยช่างมืออาชีพ + จัดสายไฟให้เรียบร้อย
+              Professional assembly + clean cable management
             </span>
           </span>
         </label>

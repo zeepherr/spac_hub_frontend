@@ -29,25 +29,25 @@ export default function ActionRequiredSection() {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-base-300/60 pb-3 shrink-0">
           <h3 className="font-bold text-base text-base-content">
-            รายการที่ต้องดำเนินการ
+            Action Required
           </h3>
           {pendingShipmentOrders.length > 0 && (
             <span className="badge badge-warning text-white text-xs font-bold">
-              {pendingShipmentOrders.length} รายการ
+              {pendingShipmentOrders.length} {pendingShipmentOrders.length === 1 ? 'item' : 'items'}
             </span>
           )}
         </div>
 
-        {/* List Container พร้อม Scrollbar */}
+        {/* List Container with Scrollbar */}
         <div className="space-y-3 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
           {isError ? (
             <div className="text-center py-6 text-xs text-error">
-              ไม่สามารถโหลดข้อมูลรายการที่ต้องดำเนินการได้
+              Unable to load action required items
             </div>
           ) : pendingShipmentOrders.length === 0 ? (
             <div className="flex items-center justify-center gap-2 py-8 text-base-content/50 text-xs">
               <PackageCheck className="w-5 h-5 stroke-1" />
-              <span>ไม่มีรายการที่ต้องจัดส่งในขณะนี้</span>
+              <span>No pending shipments at this time</span>
             </div>
           ) : (
             pendingShipmentOrders.map((order) => (

@@ -50,7 +50,7 @@ export default function ProvinceSelectModal({
         <div className="p-4 border-b border-base-300 flex items-center justify-between bg-base-200/50">
           <div className="flex items-center gap-2">
             <MapPin className="w-5 h-5 text-accent" />
-            <h3 className="font-bold text-lg text-base-content">เลือกจังหวัด / สถานที่จัดส่ง</h3>
+            <h3 className="font-bold text-lg text-base-content">Select Province</h3>
           </div>
           <button
             type="button"
@@ -69,7 +69,7 @@ export default function ProvinceSelectModal({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="ค้นหาชื่อจังหวัด..."
+              placeholder="Search province name..."
               className="input input-sm w-full pl-9 rounded-field bg-base-200/60 focus:bg-base-100 border-base-300 text-sm font-semibold"
             />
             {searchQuery && (
@@ -107,7 +107,7 @@ export default function ProvinceSelectModal({
             })
           ) : (
             <div className="text-center py-8 text-base-content/50 text-sm font-medium">
-              ไม่พบจังหวัดที่ตรงกับ "{searchQuery}"
+              No matching provinces found "{searchQuery}"
             </div>
           )}
         </div>
@@ -119,7 +119,7 @@ export default function ProvinceSelectModal({
             onClick={onClose}
             className="btn btn-sm btn-ghost font-bold text-xs"
           >
-            ปิดหน้าต่าง
+            Close
           </button>
         </div>
       </div>

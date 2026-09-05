@@ -6,7 +6,7 @@ function AllProduct() {
 
   return (
     <div>
-      <h1 className="mb-4 text-lg font-bold text-neutral-900">สินค้าทั้งหมด</h1>
+      <h1 className="mb-4 text-lg font-bold text-neutral-900">All Products</h1>
 
       {isLoading ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
@@ -19,11 +19,11 @@ function AllProduct() {
         </div>
       ) : isError ? (
         <div className="hardware-surface flex h-40 items-center justify-center">
-          <p className="text-sm text-[#dc2626]">โหลดสินค้าไม่สำเร็จ</p>
+          <p className="text-sm text-[#dc2626]">Failed to load products</p>
         </div>
       ) : listings.length === 0 ? (
         <div className="hardware-surface flex h-40 items-center justify-center">
-          <p className="text-sm text-neutral-400">ยังไม่มีข้อมูลสินค้า</p>
+          <p className="text-sm text-neutral-400">No product information available</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">

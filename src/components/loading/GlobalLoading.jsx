@@ -9,7 +9,7 @@ import { Cpu } from "lucide-react";
  *   - While checking auth session: {isCheckingSession ? <GlobalLoading label="กำลังตรวจสอบสิทธิ์..." /> : <App />}
  *   - During a route loader:       return isLoading ? <GlobalLoading /> : <Outlet />
  */
-export default function GlobalLoading({ label = "กำลังโหลดข้อมูล..." }) {
+export default function GlobalLoading({ label = "Loading data..." }) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 overflow-hidden bg-base-100/75">
       {/* พื้นหลังลาย circuit board บางๆ */}

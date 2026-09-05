@@ -52,7 +52,7 @@ export default function CreateProductPage() {
   const analyzeConditionMutation = useAnalyzeListingCondition();
   const publishListingMutation = usePublishListing();
 
-  // ดึงรายการหมวดหมู่ทั้งหมดเพื่อนำมา match หาชื่อหมวดหมู่จริงจาก categoryId
+  // Fetch all categories to match categoryId with category name
   const { categories: categoriesData } = useListingsByCategory();
   const categories = useMemo(() => {
     return Array.isArray(categoriesData)
@@ -60,7 +60,7 @@ export default function CreateProductPage() {
       : categoriesData?.data || [];
   }, [categoriesData]);
 
-  // หาชื่อหมวดหมู่จาก categoryId ปัจจุบัน
+  // Find category name from current categoryId
   const currentCategoryName = useMemo(() => {
     if (!formData.categoryId) return "";
     const found = categories.find(
@@ -236,7 +236,7 @@ export default function CreateProductPage() {
     if (parsedPrice > 99999999) return;
 
     try {
-      // 1. เซฟอัปเดตข้อมูลสินค้าล่าสุด
+      // 1. Save latest product details update
       const payload = {
         title: formData.title?.trim() || "",
         price: parsedPrice,
@@ -249,7 +249,7 @@ export default function CreateProductPage() {
 
       await updateListingMutation.mutateAsync({ listingId, payload });
 
-      // 2. เซฟอัปเดตคำตอบสภาพสินค้าล่าสุด
+      // 2. Save latest condition answers update
       if (Object.keys(answers).length > 0) {
         const formattedAnswers = Object.keys(answers).map((qId) => ({
           questionId: Number(qId),
@@ -262,7 +262,7 @@ export default function CreateProductPage() {
         });
       }
 
-      // 3. เรียก Publish
+      // 3. Call Publish
       await publishListingMutation.mutateAsync(listingId);
 
       setIsSummaryModalOpen(false);
@@ -289,7 +289,7 @@ export default function CreateProductPage() {
           
           <div className="xl:col-span-2 space-y-8">
             
-            {/* Step 1: ข้อมูลเบื้องต้น */}
+            {/* Step 1: Basic Info */}
             <div ref={step1Ref} className="relative">
               <ProductBasicForm
                 formData={formData}
@@ -300,7 +300,7 @@ export default function CreateProductPage() {
               />
             </div>
 
-            {/* Step 2: ตอบคำถามสภาพสินค้า */}
+            {/* Step 2: Answer Condition Questions */}
             <div className="relative">
               <ConditionFormSection
                 stepRef={step2Ref}
@@ -313,7 +313,7 @@ export default function CreateProductPage() {
               />
             </div>
 
-            {/* Step 3: อัปโหลดรูปภาพ */}
+            {/* Step 3: Upload Images */}
             <section
               ref={step3Ref}
               className={`bg-base-100 p-6 rounded-box border border-base-300 shadow-sm space-y-6 transition-all duration-300 ${
@@ -326,7 +326,7 @@ export default function CreateProductPage() {
                     3
                   </span>
                   <h2 className="text-xl font-bold text-base-content">
-                    อัปโหลดรูปภาพสินค้าจริง
+                    Upload Actual Product Images
                   </h2>
                 </div>
               </div>
@@ -347,7 +347,7 @@ export default function CreateProductPage() {
                       {uploadImagesMutation.isPending ? (
                         <span className="loading loading-spinner" />
                       ) : (
-                        "บันทึกรูปภาพ & ถัดไป"
+                        "Save Images & Next"
                       )}
                     </button>
                   )}

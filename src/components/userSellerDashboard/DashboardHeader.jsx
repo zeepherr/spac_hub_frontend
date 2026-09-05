@@ -3,7 +3,6 @@ import { Plus } from "lucide-react";
 import { useUserProfile } from "@/hook/user/useUserProfile"; // ปรับ path ตามโครงสร้างโปรเจกต์
 
 export default function DashboardHeader({ userName, onCreateClick }) {
-  // หากไม่ได้ส่ง userName ผ่าน props มา ให้ดึงจาก hook โดยตรง
   const { data: profileData, isLoading } = useUserProfile();
 
   if (isLoading && !userName) {
@@ -11,13 +10,13 @@ export default function DashboardHeader({ userName, onCreateClick }) {
   }
 
   const user = profileData?.user;
-  const displayName = userName || (user ? `${user.firstName} ${user.lastName}`.trim() : "ผู้ใช้งาน");
+  const displayName = userName || (user ? `${user.firstName} ${user.lastName}`.trim() : "User");
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 className="text-2xl font-bold text-base-content">ภาพรวมบัญชี</h1>
-        <p className="text-sm text-base-content/70">สวัสดี {displayName}</p>
+        <h1 className="text-2xl font-bold text-base-content">Account Overview</h1>
+        <p className="text-sm text-base-content/70">Welcome back, {displayName}</p>
       </div>
       <button
         type="button"
@@ -25,7 +24,7 @@ export default function DashboardHeader({ userName, onCreateClick }) {
         className="btn btn-primary gap-2 shadow-md hover:scale-[1.02] active:scale-95 transition-all"
       >
         <Plus className="w-5 h-5 text-accent" />
-        <span>สร้างรายการขายใหม่</span>
+        <span>Create New Listing</span>
       </button>
     </div>
   );

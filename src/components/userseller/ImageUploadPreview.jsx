@@ -24,9 +24,9 @@ export default function ImageUploadPreview({
     <div className="hardware-surface p-6 bg-base-100 border border-base-300 rounded-box space-y-4 shadow-sm">
       <div className="border-b border-base-300 pb-3 flex items-center justify-between">
         <h3 className="font-bold text-lg text-base-content">
-          รูปภาพสินค้า <span className="text-sm font-bold text-neutral/80">(สูงสุด 5 รูป)</span>
+          Product Images <span className="text-sm font-bold text-neutral/80">(Max 5 images)</span>
         </h3>
-        <span className="text-xs text-neutral/80 font-bold">อัปโหลดอย่างน้อย 1 รูป</span>
+        <span className="text-xs text-neutral/80 font-bold">Upload at least 1 image</span>
       </div>
 
       {/* Grid รูปภาพ */}
@@ -68,7 +68,7 @@ export default function ImageUploadPreview({
               <Camera className="w-5 h-5 text-base-content group-hover:text-[#f97316]" />
             </div>
             <span className="text-xs font-bold text-base-content group-hover:text-[#f97316]">
-              + เพิ่มรูป
+              + Add Image
             </span>
             <input
               type="file"
@@ -86,7 +86,7 @@ export default function ImageUploadPreview({
       {imageFiles.length < 5 && !disabled && (
         <label className="btn btn-outline border-base-300 hover:bg-base-200 w-full flex items-center justify-center gap-2 text-xs font-bold text-base-content cursor-pointer mt-2">
           <Upload className="w-4 h-4 text-[#f97316]" />
-          <span>เลือกรูปภาพจากเครื่องของคุณ</span>
+          <span>Upload images from your device</span>
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp"

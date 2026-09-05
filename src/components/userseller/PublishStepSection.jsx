@@ -19,7 +19,7 @@ export default function PublishStepSection({
           5
         </span>
         <h2 className="text-xl font-bold text-base-content">
-          ตรวจสอบและลงขายสินค้า
+          Review Product Details
         </h2>
       </div>
 
@@ -34,7 +34,7 @@ export default function PublishStepSection({
               <span className="loading loading-spinner" />
             ) : (
               <>
-                <FileText className="w-6 h-6" /> สรุปข้อมูล & ยืนยันการลงขาย
+                <FileText className="w-6 h-6" /> Summary & Confirm Listing
               </>
             )}
           </button>

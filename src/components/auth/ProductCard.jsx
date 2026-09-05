@@ -16,10 +16,10 @@ function getCoverImageUrl(listing) {
 // label ภาษาไทยของ estimatedCondition - เหมือนที่ทำไว้ใน ListingDetailPage.jsx / ProductCartCard.jsx
 // ยืนยันจริงแค่ "FAIR" ตัวเดียวจาก response ที่เคย log ดู ค่าอื่นเป็นการเดาตามรูปแบบทั่วไป
 const CONDITION_LABELS = {
-  LIKE_NEW: { label: "เหมือนใหม่", color: "text-green-600" },
-  GOOD: { label: "สภาพดี", color: "text-green-600" },
-  FAIR: { label: "สภาพปานกลาง", color: "text-[#f97316]" },
-  POOR: { label: "สภาพต้องซ่อมแซม", color: "text-[#dc2626]" },
+  LIKE_NEW: { label: "Like New", color: "text-green-600" },
+  GOOD: { label: "Good Condition", color: "text-green-600" },
+  FAIR: { label: "Fair Condition", color: "text-[#f97316]" },
+  POOR: { label: "Needs Repair", color: "text-[#dc2626]" },
 };
 
 function getConditionInfo(condition) {
@@ -131,7 +131,7 @@ function ProductCard({ product }) {
         )}
         <button
           type="button"
-          aria-label="เพิ่มลงตะกร้า"
+          aria-label="Add to Cart"
           onClick={handleAddToCart}
           disabled={user ? addCartItem.isPending : false}
           className="flex h-8 w-8 items-center justify-center rounded-field bg-[#f97316] text-white hover:bg-orange-600 disabled:opacity-50"

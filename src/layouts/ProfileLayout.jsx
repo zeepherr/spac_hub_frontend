@@ -25,13 +25,13 @@ const menus = [
   },
   {
     id: "profile",
-    label: "โปรไฟล์",
+    label: "Profile",
     to: "/user/profile",
     icon: Tag,
   },
   {
     id: "favorites",
-    label: "Favorite",
+    label: "Favorites",
     to: "/user/favorites",
     icon: Heart,
   },
@@ -42,20 +42,20 @@ function ProfileLayout() {
   const displayName =
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
     user?.email ||
-    "ผู้ใช้งาน";
+    "User";
 
   return (
     <div className="flex min-h-full flex-col bg-base-100 text-base-content md:flex-row">
-      {/* Sidebar - ปรับเป็น md:w-80 เพื่อให้สมส่วนและเต็มกรอบ */}
+      {/* Sidebar - set to md:w-80 for proportional layout */}
       <aside className="flex w-full shrink-0 flex-col border-b border-base-300 bg-base-200/50 md:w-80 md:border-b-0 md:border-r">
         
-        {/* ส่วนโปรไฟล์ - จัดกึ่งกลาง (flex flex-col items-center text-center) */}
+        {/* Profile Section - Centered */}
         <div className="flex flex-col items-center justify-center border-b border-base-300 px-6 py-8 text-center">
           <div className="relative mb-4 flex size-24 items-center justify-center rounded-full border border-base-300 bg-base-100 shadow-sm">
             {user?.profileImageUrl ? (
               <img
                 src={user.profileImageUrl}
-                alt={`รูปโปรไฟล์ของ ${displayName}`}
+                alt={`Profile image of ${displayName}`}
                 className="size-full rounded-full object-cover"
               />
             ) : (
@@ -66,7 +66,7 @@ function ProfileLayout() {
                 aria-hidden="true"
               />
             )}
-            {/* ไฟ LED สัญลักษณ์ธีม Hardware */}
+            {/* LED Status Indicator (Hardware Theme) */}
             <span className="hardware-indicator absolute bottom-1 right-1" />
           </div>
 
@@ -75,13 +75,15 @@ function ProfileLayout() {
           </h2>
 
           <p className="mt-1 text-xs font-bold uppercase tracking-wider text-neutral/70">
-            บัญชี SPECHUB
+            SPECHUB Account
           </p>
         </div>
 
-        {/* เมนูการใช้งาน */}
-        <nav aria-label="เมนูบัญชี" className="p-4">
-        <p className="mb-3 px-4 text-m font-bold uppercase tracking-wider text-neutral/70">บัญชีของฉัน</p>
+        {/* Navigation Menu */}
+        <nav aria-label="Account Menu" className="p-4">
+          <p className="mb-3 px-4 text-m font-bold uppercase tracking-wider text-neutral/70">
+            My Account
+          </p>
 
           <ul className="space-y-2">
             {menus.map((menu) => {
@@ -115,14 +117,14 @@ function ProfileLayout() {
         </nav>
         <div className="flex-1" />
 
-        {/* ปุ่ม Logout ด้านล่าง Sidebar */}
+        {/* Logout Button at bottom of Sidebar */}
         <div className="mt-auto border-t border-base-300 p-4">
           <LogoutButton />
         </div>
       </aside>
 
-      {/* เนื้อหาด้านขวา */}
-      <main aria-label="เนื้อหาบัญชี" className="min-w-0 flex-1 bg-base-100 ">
+      {/* Main Content Area */}
+      <main aria-label="Account Content" className="min-w-0 flex-1 bg-base-100 ">
         <Outlet />
       </main>
     </div>

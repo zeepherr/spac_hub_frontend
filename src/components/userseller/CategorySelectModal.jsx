@@ -35,7 +35,7 @@ export default function CategorySelectModal({
           <div className="flex items-center gap-2">
             <Layers className="w-5 h-5 text-[#f97316]" />
             <h3 className="text-lg font-bold text-base-content tracking-tight">
-              เลือกหมวดหมู่สินค้า
+              Select Category
             </h3>
           </div>
           <button
@@ -53,7 +53,7 @@ export default function CategorySelectModal({
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral/70" />
             <input
               type="text"
-              placeholder="ค้นหาหมวดหมู่ เช่น การ์ดจอ, ซีพียู..."
+              placeholder="Search categories e.g. GPU, CPU..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="input input-bordered w-full pl-9 rounded-field text-sm focus:border-[#f97316] bg-base-100 text-base-content"
@@ -66,7 +66,7 @@ export default function CategorySelectModal({
           {isPending ? (
             <div className="py-12 flex flex-col items-center justify-center gap-2 text-neutral">
               <span className="loading loading-spinner loading-md text-[#f97316]" />
-              <span className="text-sm font-medium">กำลังโหลดหมวดหมู่...</span>
+              <span className="text-sm font-medium">Loading categories...</span>
             </div>
           ) : error ? (
             <div className="py-8 text-center text-error text-sm font-medium">
@@ -74,7 +74,7 @@ export default function CategorySelectModal({
             </div>
           ) : filteredCategories.length === 0 ? (
             <div className="py-8 text-center text-neutral/70 text-sm">
-              ไม่พบหมวดหมู่ที่ค้นหา
+              No categories found
             </div>
           ) : (
             filteredCategories.map((cat) => {
@@ -108,7 +108,7 @@ export default function CategorySelectModal({
             onClick={onClose}
             className="btn btn-sm btn-outline border-base-300 text-base-content hover:bg-base-300"
           >
-            ยกเลิก
+            Cancel
           </button>
         </div>
 

@@ -9,7 +9,7 @@ function RecentMessages({
         <section className="h-full rounded-2xl border border-base-300 bg-base-100 p-5 shadow-sm lg:p-6">
             <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-base-content">
-                    ข้อความล่าสุด
+                    Recent Messages
                 </h2>
 
                 <button
@@ -17,7 +17,7 @@ function RecentMessages({
                     onClick={onViewAll}
                     className="cursor-pointer text-sm font-bold text-orange-500 hover:text-orange-600"
                 >
-                    ดูทั้งหมด
+                    See All
                 </button>
             </div>
 
@@ -50,7 +50,7 @@ function RecentMessages({
                                     {message.isUnread && (
                                         <span
                                             className="size-2 shrink-0 rounded-full bg-orange-500"
-                                            aria-label="ข้อความที่ยังไม่ได้อ่าน"
+                                            aria-label="Unread Messages"
                                         />
                                     )}
                                 </div>
@@ -78,7 +78,7 @@ function RecentMessages({
             ) : (
                 <div className="mt-4 flex min-h-28 items-center justify-center">
                     <p className="text-sm text-base-content/50">
-                        ยังไม่มีข้อความ
+                        No messages
                     </p>
                 </div>
             )}
@@ -92,7 +92,7 @@ function MessageAvatar({ imageUrl, name }) {
             {imageUrl ? (
                 <img
                     src={imageUrl}
-                    alt={`รูปของ ${name}`}
+                    alt={`image ${name}`}
                     className="size-full object-cover"
                 />
             ) : (
@@ -118,22 +118,22 @@ function formatRelativeTime(dateValue) {
     );
 
     if (minutes < 1) {
-        return "เมื่อสักครู่";
+        return "Just now";
     }
 
     if (minutes < 60) {
-        return `${minutes} นาทีที่แล้ว`;
+        return `${minutes} minutes ago`;
     }
 
     const hours = Math.floor(minutes / 60);
 
     if (hours < 24) {
-        return `${hours} ชั่วโมงที่แล้ว`;
+        return `${hours} hours ago`;
     }
 
     const days = Math.floor(hours / 24);
 
-    return `${days} วันที่แล้ว`;
+    return `${days} days ago`;
 }
 
 export default RecentMessages;

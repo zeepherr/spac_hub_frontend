@@ -17,14 +17,14 @@ const DEFAULT_IMAGE = "https://placehold.co/600x400?text=No+Image";
 export default function ListingDetailModal({ isOpen, onClose, listingId }) {
   const modalBodyRef = useRef(null);
 
-  // State และ Ref สำหรับระบบแว่นขยาย (Image Zoom)
+  // State and Ref for Image Zoom system
   const containerRef = useRef(null);
   const imgRef = useRef(null);
   const [isZoomEnabled, setIsZoomEnabled] = useState(true);
   const [zoomLevel, setZoomLevel] = useState(3);
   const [showZoom, setShowZoom] = useState(false);
 
-  // คำนวณพิกัดให้ปลายเมาส์ตรงจุดโฟกัส 100%
+  // Calculate coordinates to keep cursor at 100% focus point
   const [zoomData, setZoomData] = useState({
     lensX: 0,
     lensY: 0,
@@ -98,12 +98,12 @@ export default function ListingDetailModal({ isOpen, onClose, listingId }) {
 
   const formatCondition = (condition) => {
     const map = {
-      LIKE_NEW: "เหมือนใหม่",
-      GOOD: "สภาพดี",
-      FAIR: "สภาพปานกลาง",
-      POOR: "สภาพใช้งาน",
+      LIKE_NEW: "Like New",
+      GOOD: "Good Condition",
+      FAIR: "Fair Condition",
+      POOR: "Used / Worn",
     };
-    return map[condition] || condition || "ไม่ระบุ";
+    return map[condition] || condition || "Unspecified";
   };
 
   return (
@@ -114,7 +114,7 @@ export default function ListingDetailModal({ isOpen, onClose, listingId }) {
         <div className="p-5 border-b border-base-200 flex items-center justify-between bg-base-200/50">
           <div className="flex items-center gap-2 text-base-content">
             <ShoppingBag className="w-5 h-5 text-primary" />
-            <h3 className="font-bold text-lg">รายละเอียดประกาศ</h3>
+            <h3 className="font-bold text-lg">Listing Details</h3>
           </div>
           <button
             type="button"
@@ -136,14 +136,14 @@ export default function ListingDetailModal({ isOpen, onClose, listingId }) {
             </div>
           ) : !listing ? (
             <div className="text-center py-12 text-error space-y-2">
-              <p className="font-bold">ไม่สามารถโหลดข้อมูลสินค้าได้</p>
+              <p className="font-bold">Unable to load product details</p>
               <p className="text-xs text-base-content/60">
-                โปรดตรวจสอบการเชื่อมต่อแล้วลองใหม่อีกครั้ง
+                Please check your network connection and try again.
               </p>
             </div>
           ) : (
             <>
-              {/* 🔍 แถบเครื่องมือควบคุมแว่นขยาย (DaisyUI Toggle สไตล์มน สดใส) */}
+              {/* 🔍 Image Magnifier Control Toolbar */}
               <div className="flex flex-wrap items-center justify-between gap-3 p-3 bg-base-200/80 rounded-2xl border border-base-300/80 shadow-xs">
                 
                 {/* DaisyUI Toggle Controller */}
@@ -161,20 +161,20 @@ export default function ListingDetailModal({ isOpen, onClose, listingId }) {
                   <div className="flex items-center gap-2">
                     <ZoomIn className={`w-4 h-4 transition-colors ${isZoomEnabled ? "text-success" : "text-base-content/40"}`} />
                     <span className={`text-sm font-bold transition-colors ${isZoomEnabled ? "text-base-content" : "text-base-content/50"}`}>
-                      แว่นขยายส่องภาพ
+                      Image Magnifier
                     </span>
                     <span className={`badge badge-sm font-extrabold transition-all ${
                       isZoomEnabled ? "badge-success text-white shadow-xs" : "badge-ghost opacity-60"
                     }`}>
-                      {isZoomEnabled ? "เปิด" : "ปิด"}
+                      {isZoomEnabled ? "ON" : "OFF"}
                     </span>
                   </div>
                 </label>
 
-                {/* ปุ่มเลือกกำลังขยาย x3, x7, x10 */}
+                {/* Zoom Level Selectors x3, x7, x10 */}
                 {isZoomEnabled && (
                   <div className="flex items-center gap-1.5 bg-base-100 p-1 rounded-xl border border-base-300 shadow-inner animate-in fade-in duration-200">
-                    <span className="text-xs font-bold pl-2 pr-1 text-base-content/60">ขยาย:</span>
+                    <span className="text-xs font-bold pl-2 pr-1 text-base-content/60">Zoom:</span>
                     {[3, 7, 10].map((level) => (
                       <button
                         key={level}
@@ -193,7 +193,7 @@ export default function ListingDetailModal({ isOpen, onClose, listingId }) {
                 )}
               </div>
 
-              {/* 🔍 ส่วนแสดงรูปภาพหลัก */}
+              {/* 🔍 Main Image Container */}
               <div
                 ref={containerRef}
                 onMouseMove={handleMouseMove}
@@ -205,18 +205,18 @@ export default function ListingDetailModal({ isOpen, onClose, listingId }) {
                 <img
                   ref={imgRef}
                   src={mainImageUrl}
-                  alt={listing.title || "สินค้า"}
+                  alt={listing.title || "Product"}
                   className="max-h-full max-w-full object-contain p-2"
                 />
 
                 {isZoomEnabled && (
                   <div className="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2.5 py-1 rounded-full backdrop-blur-md flex items-center gap-1.5 opacity-80 group-hover:opacity-0 transition-opacity pointer-events-none">
                     <ZoomIn className="w-3.5 h-3.5" />
-                    <span>ชี้เมาส์ส่องขยาย x{zoomLevel}</span>
+                    <span>Hover to zoom x{zoomLevel}</span>
                   </div>
                 )}
 
-                {/* แว่นขยาย (พิกัดตรงเป๊ะตามปลายเมาส์) */}
+                {/* Lens */}
                 {isZoomEnabled && showZoom && (
                   <div
                     className="absolute rounded-full border-2 border-white pointer-events-none z-20 overflow-hidden"
@@ -235,10 +235,10 @@ export default function ListingDetailModal({ isOpen, onClose, listingId }) {
                 )}
               </div>
 
-              {/* หัวข้อและราคา */}
+              {/* Title & Price */}
               <div className="space-y-2 border-b border-base-200 pb-4">
                 <h2 className="text-2xl font-bold text-base-content">
-                  {listing.title || "ไม่มีชื่อสินค้า"}
+                  {listing.title || "Untitled Product"}
                 </h2>
                 <p className="text-3xl font-black text-primary">
                   {listing.price
@@ -247,11 +247,11 @@ export default function ListingDetailModal({ isOpen, onClose, listingId }) {
                 </p>
               </div>
 
-              {/* สเปก / คุณสมบัติสินค้า */}
+              {/* Product Specifications / Attributes */}
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="p-3 bg-base-200/60 rounded-xl space-y-1">
                   <span className="text-xs text-base-content/60 flex items-center gap-1 font-medium">
-                    <Tag className="w-3.5 h-3.5 text-primary" /> แบรนด์ / รุ่น
+                    <Tag className="w-3.5 h-3.5 text-primary" /> Brand / Model
                   </span>
                   <p className="font-bold text-base-content">
                     {listing.brand || "-"} {listing.model ? `/ ${listing.model}` : ""}
@@ -260,25 +260,25 @@ export default function ListingDetailModal({ isOpen, onClose, listingId }) {
 
                 <div className="p-3 bg-base-200/60 rounded-xl space-y-1">
                   <span className="text-xs text-base-content/60 flex items-center gap-1 font-medium">
-                    <Layers className="w-3.5 h-3.5 text-primary" /> หมวดหมู่
+                    <Layers className="w-3.5 h-3.5 text-primary" /> Category
                   </span>
                   <p className="font-bold text-base-content">
-                    {listing.category?.name || "ไม่ระบุ"}
+                    {listing.category?.name || "Unspecified"}
                   </p>
                 </div>
 
                 <div className="p-3 bg-base-200/60 rounded-xl space-y-1">
                   <span className="text-xs text-base-content/60 flex items-center gap-1 font-medium">
-                    <MapPin className="w-3.5 h-3.5 text-primary" /> สถานที่
+                    <MapPin className="w-3.5 h-3.5 text-primary" /> Location
                   </span>
                   <p className="font-bold text-base-content">
-                    {listing.location || "ไม่ระบุ"}
+                    {listing.location || "Unspecified"}
                   </p>
                 </div>
 
                 <div className="p-3 bg-base-200/60 rounded-xl space-y-1">
                   <span className="text-xs text-base-content/60 flex items-center gap-1 font-medium">
-                    <Calendar className="w-3.5 h-3.5 text-primary" /> สภาพสินค้า
+                    <Calendar className="w-3.5 h-3.5 text-primary" /> Condition
                   </span>
                   <p className="font-bold text-base-content">
                     {formatCondition(listing.estimatedCondition)}
@@ -291,21 +291,21 @@ export default function ListingDetailModal({ isOpen, onClose, listingId }) {
                 <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-between">
                   <span className="font-bold text-sm text-amber-600 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 fill-amber-500/20" />
-                    ผลวิเคราะห์สภาพสินค้าโดย AI
+                    AI Condition Analysis
                   </span>
                   <span className="badge badge-warning font-black text-xs">
-                    {Number(listing.estimatedScore).toFixed(1)} / 100 คะแนน
+                    {Number(listing.estimatedScore).toFixed(1)} / 100 PTS
                   </span>
                 </div>
               )}
 
-              {/* รายละเอียดเพิ่มเติม */}
+              {/* Description */}
               <div className="space-y-2">
                 <h4 className="font-bold text-sm text-base-content">
-                  รายละเอียดสินค้า
+                  Product Description
                 </h4>
                 <p className="text-sm text-base-content/80 whitespace-pre-line leading-relaxed bg-base-200/40 p-4 rounded-2xl border border-base-200">
-                  {listing.description || "ไม่มีรายละเอียดเพิ่มเติม"}
+                  {listing.description || "No additional description provided."}
                 </p>
               </div>
             </>
@@ -319,7 +319,7 @@ export default function ListingDetailModal({ isOpen, onClose, listingId }) {
             onClick={onClose}
             className="btn btn-ghost font-bold text-sm rounded-xl px-6"
           >
-            ปิด
+            Close
           </button>
         </div>
 

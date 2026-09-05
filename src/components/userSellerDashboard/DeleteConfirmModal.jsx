@@ -35,7 +35,7 @@ export default function DeleteConfirmModal({
               <AlertTriangle className="w-5 h-5 text-error" />
             </div>
             <h3 className="font-bold text-lg text-base-content">
-              ยืนยันการลบประกาศ
+              Confirm Delete Listing
             </h3>
           </div>
           <button
@@ -51,26 +51,25 @@ export default function DeleteConfirmModal({
         {/* Body */}
         <div className="p-6 space-y-4">
           <p className="text-sm text-base-content/80 text-center">
-            คุณแน่ใจหรือไม่ว่าต้องการลบประกาศรายการนี้? <br />
+            Are you sure you want to delete this listing? <br />
             <span className="text-xs text-error/80 font-medium">
-              (เมื่อลบแล้วจะไม่สามารถกู้คืนข้อมูลกลับมาได้)
+              (This action cannot be undone.)
             </span>
           </p>
 
-          {/* การ์ดสินค้าที่จะถูกลบ */}
+          {/* Product Card to be Deleted */}
           <div className="flex items-center gap-4 p-3.5 bg-base-200/60 border border-base-300 rounded-2xl">
             <div className="w-16 h-16 rounded-xl bg-base-300 overflow-hidden shrink-0 border border-base-200">
               <img
                 src={imageUrl}
-                alt={listingData.title || "สินค้า"}
+                alt={listingData.title || "Product"}
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="min-w-0 flex-1 space-y-1">
               <h4 className="font-bold text-sm text-base-content truncate">
-                {listingData.title || "ไม่มีชื่อสินค้า"}
+                {listingData.title || "Untitled Product"}
               </h4>
-              {/* 💡 แก้ไขจุดนี้: เปลี่ยนราคาเป็น text-primary เพื่อให้เห็นชัดเจน */}
               <p className="text-base font-black text-primary">
                 {listingData.price
                   ? `฿${Number(listingData.price).toLocaleString()}`
@@ -88,7 +87,7 @@ export default function DeleteConfirmModal({
             disabled={isDeleting}
             className="btn btn-ghost font-bold text-sm rounded-xl"
           >
-            ยกเลิก
+            Cancel
           </button>
           <button
             type="button"
@@ -101,7 +100,7 @@ export default function DeleteConfirmModal({
             ) : (
               <>
                 <Trash2 className="w-4 h-4" />
-                ยืนยันการลบ
+                Confirm Delete
               </>
             )}
           </button>

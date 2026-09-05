@@ -2,29 +2,29 @@ import {ChevronRight,Package,} from "lucide-react";
 
 const orderStatusConfig = {
     PENDING_PAYMENT: {
-        label: "รอชำระเงิน",
+        label: "Pending Payment",
         className:
             "bg-orange-50 text-orange-600",
     },
 
     PROCESSING: {
-        label: "กำลังดำเนินการ",
+        label: "Processing",
         className:
             "bg-amber-50 text-amber-600",
     },
 
     SHIPPING: {
-        label: "กำลังจัดส่ง",
+        label: "Shipping",
         className: "bg-blue-50 text-blue-600",
     },
 
     COMPLETED: {
-        label: "สำเร็จ",
+        label: "Completed",
         className: "bg-green-50 text-green-600",
     },
 
     CANCELLED: {
-        label: "ยกเลิก",
+        label: "Cancelled",
         className: "bg-red-50 text-red-600",
     },
 };
@@ -38,7 +38,7 @@ function RecentOrders({
         <section className="rounded-2xl border border-base-300 bg-base-100 p-5 shadow-sm lg:p-6">
             <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-base-content">
-                    คำสั่งซื้อล่าสุด
+                    Recent Orders
                 </h2>
 
                 <button
@@ -46,7 +46,7 @@ function RecentOrders({
                     onClick={onViewAll}
                     className="cursor-pointer text-sm font-bold text-orange-500 hover:text-orange-600"
                 >
-                    ดูทั้งหมด
+                    See All
                 </button>
             </div>
 
@@ -89,7 +89,7 @@ function RecentOrders({
                                         </p>
 
                                         <p className="mt-1 text-xs text-base-content/45">
-                                            สั่งซื้อเมื่อ{" "}
+                                            Ordered on{" "}
                                             {formatOrderDate(
                                                 order.createdAt,
                                             )}
@@ -124,7 +124,7 @@ function RecentOrders({
             ) : (
                 <div className="mt-4 flex min-h-32 items-center justify-center">
                     <p className="text-sm text-base-content/50">
-                        ยังไม่มีคำสั่งซื้อ
+                        No orders yet
                     </p>
                 </div>
             )}

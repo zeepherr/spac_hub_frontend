@@ -20,10 +20,10 @@ function getCoverImageUrl(listing) {
 // label ภาษาไทยของ estimatedCondition - เหมือนที่ทำไว้ใน ListingDetailPage.jsx
 // ยืนยันจริงแค่ "FAIR" ตัวเดียวจาก response ที่เคย log ดู ค่าอื่นเป็นการเดาตามรูปแบบทั่วไป
 const CONDITION_LABELS = {
-  LIKE_NEW: { label: "เหมือนใหม่", color: "text-green-600" },
-  GOOD: { label: "สภาพดี", color: "text-green-600" },
-  FAIR: { label: "สภาพปานกลาง", color: "text-[#f97316]" },
-  POOR: { label: "สภาพต้องซ่อมแซม", color: "text-[#dc2626]" },
+  LIKE_NEW: { label: "Like New", color: "text-green-600" },
+  GOOD: { label: "Good", color: "text-green-600" },
+  FAIR: { label: "Fair", color: "text-[#f97316]" },
+  POOR: { label: "Poor / Needs Repair", color: "text-[#dc2626]" },
 };
 
 function getConditionInfo(condition) {
@@ -85,7 +85,7 @@ function ProductCartCard({ item, selected, onToggleSelect }) {
           type="checkbox"
           checked={selected}
           onChange={onToggleSelect}
-          aria-label={`เลือก ${listing.title}`}
+          aria-label={`Select ${listing.title}`}
           className="checkbox checkbox-sm text-[#f97316] inset-shadow-sm/25 flex my-auto"
         />
       </div>
@@ -125,7 +125,7 @@ function ProductCartCard({ item, selected, onToggleSelect }) {
             </>
           )}
           <span className="hardware-label normal-case text-secondary">
-            • จำนวน: 1
+            • Quantity: 1
           </span>
         </div>
 
@@ -144,7 +144,7 @@ function ProductCartCard({ item, selected, onToggleSelect }) {
             className="flex items-center gap-1 text-xs font-medium text-neutral-500 hover:text-[#dc2626]"
           >
             <Trash2 size={14} />
-            ลบ
+            Remove
           </button>
           <span className="text-neutral-200">|</span>
           <button
@@ -152,7 +152,7 @@ function ProductCartCard({ item, selected, onToggleSelect }) {
             className="flex items-center gap-1 text-xs font-medium text-neutral-500 hover:text-[#f97316]"
           >
             <Heart size={14} />
-            บันทึกไว้ก่อน
+            Save for Later
           </button>
         </div>
       </div>

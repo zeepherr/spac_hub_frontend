@@ -41,7 +41,7 @@ export function OtpCountdown({ expiresAt, onExpired }) {
   return (
     <div className="w-full text-left mb-6 pl-1">
       <p className="text-xs font-medium text-[#171717] flex items-center gap-1.5">
-        <span>รหัสจะหมดอายุใน:</span>
+        <span>Code expires in:</span>
 
         <span className="font-mono font-bold text-[#f97316] bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
           {String(minutes).padStart(2, "0")}:

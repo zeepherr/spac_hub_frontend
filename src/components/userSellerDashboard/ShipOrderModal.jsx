@@ -13,7 +13,7 @@ export default function ShipOrderModal({ isOpen, onClose, order }) {
 
   const { mutate: shipOrder, isPending } = useShipOrderToAdmin();
 
-  // Reset ฟอร์มเมื่อเปิด Modal
+  // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
       setCarrier("");
@@ -23,10 +23,10 @@ export default function ShipOrderModal({ isOpen, onClose, order }) {
 
   if (!isOpen || !order) return null;
 
-  // ตรวจสอบว่าเป็น Order สถานะ "รอผู้ขายจัดส่ง" (PAID) หรือไม่
+  // Check if order status is "Awaiting Shipment" (PAID)
   const isReadyToShip = order.status === "PAID";
 
-  // ดึงรูปภาพ cover
+  // Get cover image
   const coverImage =
     order.listing?.images?.find((img) => img.isCover) ||
     order.listing?.images?.[0];
@@ -58,7 +58,7 @@ export default function ShipOrderModal({ isOpen, onClose, order }) {
       trackingNumber: trackingNumber.trim(),
     };
 
-    // ยิง Mutation อัปเดตสถานะและข้อมูลจัดส่ง
+    // Trigger mutation to update status and shipping info
     shipOrder(
       { orderId: order.id, payload },
       {
@@ -89,7 +89,7 @@ export default function ShipOrderModal({ isOpen, onClose, order }) {
           </div>
           <div>
             <h3 className="text-lg font-bold text-base-content">
-              แจ้งจัดส่งสินค้าไปที่คลัง (SPEC CHECK)
+              Notify Warehouse Shipment (SPEC CHECK)
             </h3>
             <p className="text-xs font-semibold text-base-content/60">
               Order ID: #{order.orderNumber || order.id}
@@ -97,14 +97,14 @@ export default function ShipOrderModal({ isOpen, onClose, order }) {
           </div>
         </div>
 
-        {/* Section 1: ข้อมูลสินค้าที่ต้องจัดส่ง */}
+        {/* Section 1: Item to Ship Information */}
         <div className="p-4 bg-base-100 rounded-2xl border border-base-200 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-base-content/60 flex items-center gap-1">
-              <Package className="w-4 h-4" /> สินค้าในคำสั่งซื้อ
+              <Package className="w-4 h-4" /> Ordered Item
             </span>
             <span className="badge badge-warning text-white text-xs font-bold py-2">
-              รอผู้ขายจัดส่ง
+              Awaiting Shipment
             </span>
           </div>
 
@@ -112,13 +112,13 @@ export default function ShipOrderModal({ isOpen, onClose, order }) {
             <div className="w-20 h-20 bg-base-300 rounded-xl overflow-hidden shrink-0 border border-base-200 flex items-center justify-center">
               <img
                 src={imageUrl}
-                alt={order.listing?.title || "สินค้า"}
+                alt={order.listing?.title || "Product"}
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="min-w-0 flex-1 space-y-1">
               <p className="text-sm font-bold truncate text-base-content">
-                {order.listing?.title || "ไม่มีชื่อสินค้า"}
+                {order.listing?.title || "Untitled Product"}
               </p>
               <p className="text-base font-black text-primary">
                 ฿{Number(order.agreedPrice || order.price || 0).toLocaleString()}
@@ -127,12 +127,12 @@ export default function ShipOrderModal({ isOpen, onClose, order }) {
           </div>
         </div>
 
-        {/* Section 2 (ด้านล่างสุด): ฟอร์มกรอกรายละเอียดการจัดส่ง */}
+        {/* Section 2: Shipping Details Form */}
         {isReadyToShip ? (
           <form onSubmit={handleSubmit} className="space-y-4 pt-2">
             <div className="p-4 bg-base-200/50 rounded-2xl border border-base-200 space-y-4">
               <p className="text-xs font-bold text-base-content/80 border-b border-base-200 pb-2">
-                รายละเอียดการจัดส่ง
+                Shipping Details
               </p>
 
               {/* Field 1: Carrier Dropdown */}
@@ -145,12 +145,11 @@ export default function ShipOrderModal({ isOpen, onClose, order }) {
               {/* Field 2: Tracking Number Input */}
               <div className="space-y-2">
                 <label className="label text-sm font-bold text-base-content p-0">
-                  หมายเลขติดตามพัสดุ (Tracking Number){" "}
-                  <span className="text-error">*</span>
+                  Tracking Number <span className="text-error">*</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="เช่น TH123456789"
+                  placeholder="e.g. TH123456789"
                   value={trackingNumber}
                   onChange={(e) => setTrackingNumber(e.target.value)}
                   disabled={isPending}
@@ -168,7 +167,7 @@ export default function ShipOrderModal({ isOpen, onClose, order }) {
                 disabled={isPending}
                 className="btn btn-ghost rounded-xl text-sm font-bold"
               >
-                ยกเลิก
+                Cancel
               </button>
               <button
                 type="submit"
@@ -178,14 +177,14 @@ export default function ShipOrderModal({ isOpen, onClose, order }) {
                 {isPending ? (
                   <span className="loading loading-spinner loading-xs" />
                 ) : (
-                  "ยืนยันการจัดส่ง"
+                  "Confirm Shipment"
                 )}
               </button>
             </div>
           </form>
         ) : (
           <div className="text-center py-4 text-xs font-semibold text-error">
-            รายการนี้ไม่อยู่ในสถานะที่สามารถจัดส่งได้
+            This order is not ready for shipment.
           </div>
         )}
       </div>

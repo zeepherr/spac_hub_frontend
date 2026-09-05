@@ -21,37 +21,37 @@ import { useConfirmOrderDelivery } from "@/hook/order/useConfirmOrderDelivery";
 
 const ORDER_STATUS = {
   AWAITING_PAYMENT: {
-    label: "รอชำระเงิน",
+    label: "Awaiting Payment",
     className:
       "bg-orange-50 text-orange-600",
   },
   PAID: {
-    label: "ชำระเงินแล้ว",
+    label: "Paid",
     className:
       "bg-emerald-50 text-emerald-600",
   },
   SELLER_SHIPPING: {
-    label: "ผู้ขายกำลังส่งสินค้าไปตรวจ",
+    label: "Seller Shipping to Inspection",
     className:
       "bg-amber-50 text-amber-600",
   },
   SHIPPING_TO_BUYER: {
-    label: "กำลังจัดส่งให้ผู้ซื้อ",
+    label: "Shipping to Buyer",
     className:
       "bg-blue-50 text-blue-600",
   },
   COMPLETED: {
-    label: "สำเร็จ",
+    label: "Completed",
     className:
       "bg-emerald-50 text-emerald-600",
   },
   CANCELLED: {
-    label: "ยกเลิกแล้ว",
+    label: "Cancelled",
     className:
       "bg-red-50 text-red-600",
   },
   REJECTED: {
-    label: "ไม่ผ่านการตรวจสอบ",
+    label: "Inspection Failed",
     className:
       "bg-red-50 text-red-600",
   },
@@ -88,7 +88,7 @@ function OrderDetail() {
         />
 
         <span className="text-sm text-neutral-500">
-          กำลังโหลดรายละเอียด...
+          Loading order details...
         </span>
       </div>
     );
@@ -99,7 +99,7 @@ function OrderDetail() {
       <div className="flex min-h-96 flex-col items-center justify-center gap-4">
         <p className="text-red-500">
           {error?.response?.data?.message ||
-            "ไม่สามารถโหลดรายละเอียดคำสั่งซื้อได้"}
+            "Unable to load order details"}
         </p>
 
         <button
@@ -107,7 +107,7 @@ function OrderDetail() {
           onClick={() => refetch()}
           className="rounded-xl border border-orange-500 px-5 py-2.5 font-semibold text-orange-500 hover:bg-orange-50"
         >
-          ลองอีกครั้ง
+          Try Again
         </button>
       </div>
     );
@@ -116,7 +116,7 @@ function OrderDetail() {
   if (!order) {
     return (
       <div className="flex min-h-96 items-center justify-center text-neutral-500">
-        ไม่พบคำสั่งซื้อ
+        Order not found
       </div>
     );
   }
@@ -129,8 +129,8 @@ function OrderDetail() {
   const inspection = order.inspection;
 
   /*
-   * Backend ใช้ toListingResponse()
-   * รูปจึงอยู่ใน imageUrl
+   * Backend uses toListingResponse()
+   * Image is located in imageUrl
    */
   const images = listing?.images ?? [];
   const coverImage =
@@ -145,7 +145,7 @@ function OrderDetail() {
     [listing?.brand, listing?.model]
       .filter(Boolean)
       .join(" ") ||
-    "ไม่พบชื่อสินค้า";
+    "Untitled Item";
 
   const sellerName =
     [
@@ -154,7 +154,7 @@ function OrderDetail() {
     ]
       .filter(Boolean)
       .join(" ") ||
-    "ไม่พบข้อมูลผู้ขาย";
+    "Unknown Seller";
 
   const status =
     ORDER_STATUS[order.status] ?? {
@@ -173,7 +173,7 @@ function OrderDetail() {
 
   function handleConfirmDelivery() {
     const confirmed = window.confirm(
-      "ยืนยันว่าคุณได้รับสินค้าแล้วใช่หรือไม่?",
+      "Confirm that you have received the item?",
     );
 
     if (!confirmed) return;
@@ -186,7 +186,7 @@ function OrderDetail() {
   return (
     <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
       <div className="mx-auto max-w-6xl">
-        {/* ย้อนกลับ */}
+        {/* Back Button */}
         <button
           type="button"
           onClick={() =>
@@ -195,10 +195,10 @@ function OrderDetail() {
           className="mb-6 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-neutral-500 hover:text-orange-500"
         >
           <ArrowLeft size={18} />
-          กลับไปคำสั่งซื้อของฉัน
+          Back to My Orders
         </button>
 
-        {/* หัวข้อ */}
+        {/* Header */}
         <header className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-wider text-orange-500">
@@ -206,7 +206,7 @@ function OrderDetail() {
             </p>
 
             <h1 className="mt-1 text-3xl font-bold text-neutral-900">
-              รายละเอียดคำสั่งซื้อ
+              Order Details
             </h1>
 
             <p className="mt-2 text-sm text-neutral-500">
@@ -222,12 +222,12 @@ function OrderDetail() {
         </header>
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
-          {/* ฝั่งซ้าย */}
+          {/* Left Column */}
           <div className="space-y-6">
-            {/* สินค้า */}
+            {/* Product Card */}
             <article className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
               <h2 className="mb-5 text-lg font-bold text-neutral-900">
-                ข้อมูลสินค้า
+                Item Information
               </h2>
 
               <div className="flex flex-col gap-5 sm:flex-row">
@@ -255,7 +255,7 @@ function OrderDetail() {
                     {[listing?.brand, listing?.model]
                       .filter(Boolean)
                       .join(" ") ||
-                      "ไม่พบข้อมูลยี่ห้อและรุ่น"}
+                      "Brand/Model details unavailable"}
                   </p>
 
                   {listing?.description && (
@@ -269,36 +269,36 @@ function OrderDetail() {
                     {Number(
                       order.agreedPrice ?? 0,
                     ).toLocaleString(
-                      "th-TH",
+                      "en-US",
                     )}
                   </p>
                 </div>
               </div>
             </article>
 
-            {/* การจัดส่ง */}
-            <Card title="ข้อมูลการจัดส่ง">
+            {/* Delivery Info */}
+            <Card title="Shipping Information">
               <InfoRow
                 icon={Truck}
-                label="บริษัทขนส่ง"
+                label="Carrier"
                 value={shipment?.carrier}
-                emptyText="ยังไม่มีข้อมูลบริษัทขนส่ง"
+                emptyText="Carrier info not available"
               />
 
               <InfoRow
                 icon={PackageCheck}
-                label="เลขติดตามพัสดุ"
+                label="Tracking Number"
                 value={
                   shipment?.trackingNumber
                 }
-                emptyText="ยังไม่มีเลขพัสดุ"
+                emptyText="No tracking number"
               />
 
               <InfoRow
                 icon={Box}
-                label="สถานะพัสดุ"
+                label="Shipment Status"
                 value={shipment?.status}
-                emptyText="ยังไม่มีข้อมูลการจัดส่ง"
+                emptyText="No shipping information"
               />
 
               {canConfirmDelivery && (
@@ -318,32 +318,32 @@ function OrderDetail() {
                         size={18}
                         className="animate-spin"
                       />
-                      กำลังยืนยัน...
+                      Confirming...
                     </>
                   ) : (
                     <>
                       <PackageCheck
                         size={18}
                       />
-                      ยืนยันการรับสินค้า
+                      Confirm Delivery
                     </>
                   )}
                 </button>
               )}
             </Card>
 
-            {/* ผลตรวจสินค้า */}
+            {/* Inspection Result */}
             {inspection && (
-              <Card title="ผลการตรวจสอบสินค้า">
+              <Card title="Inspection Results">
                 <InfoRow
                   icon={ClipboardCheck}
-                  label="ผลการตรวจ"
+                  label="Result"
                   value={inspection.result}
                 />
 
                 <InfoRow
                   icon={PackageCheck}
-                  label="สภาพที่ตรวจสอบได้"
+                  label="Verified Condition"
                   value={
                     inspection.verifiedCondition
                   }
@@ -351,7 +351,7 @@ function OrderDetail() {
 
                 <InfoRow
                   icon={CircleDollarSign}
-                  label="คะแนนสินค้า"
+                  label="Condition Score"
                   value={
                     inspection.verifiedScore !==
                       null &&
@@ -365,12 +365,12 @@ function OrderDetail() {
             )}
           </div>
 
-          {/* ฝั่งขวา */}
+          {/* Right Column */}
           <aside className="space-y-6">
-            <Card title="สรุปคำสั่งซื้อ">
+            <Card title="Order Summary">
               <InfoRow
                 icon={CalendarDays}
-                label="วันที่สั่งซื้อ"
+                label="Order Date"
                 value={formatDate(
                   order.createdAt,
                 )}
@@ -378,28 +378,28 @@ function OrderDetail() {
 
               <InfoRow
                 icon={CircleDollarSign}
-                label="การชำระเงิน"
+                label="Payment Status"
                 value={
                   order.checkout?.payment
                     ?.status ||
                   order.checkout?.status
                 }
-                emptyText="ยังไม่มีข้อมูลการชำระเงิน"
+                emptyText="No payment information"
               />
 
               <InfoRow
                 icon={Store}
-                label="ผู้ขาย"
+                label="Seller"
                 value={sellerName}
               />
             </Card>
 
-            <Card title="ที่อยู่จัดส่ง">
+            <Card title="Shipping Address">
               {address ? (
                 <>
                   <InfoRow
                     icon={MapPin}
-                    label="ชื่อผู้รับ"
+                    label="Recipient"
                     value={
                       address.recipientName
                     }
@@ -407,7 +407,7 @@ function OrderDetail() {
 
                   <InfoRow
                     icon={Phone}
-                    label="เบอร์โทรศัพท์"
+                    label="Phone Number"
                     value={address.phone}
                   />
 
@@ -417,7 +417,7 @@ function OrderDetail() {
                 </>
               ) : (
                 <p className="text-sm text-neutral-400">
-                  ยังไม่มีข้อมูลที่อยู่จัดส่ง
+                  No shipping address available
                 </p>
               )}
             </Card>
@@ -446,7 +446,7 @@ function InfoRow({
   icon: Icon,
   label,
   value,
-  emptyText = "ไม่พบข้อมูล",
+  emptyText = "No information",
 }) {
   const hasValue =
     value !== null &&
@@ -479,10 +479,10 @@ function InfoRow({
 }
 
 function formatDate(date) {
-  if (!date) return "ไม่พบข้อมูล";
+  if (!date) return "No information";
 
   return new Intl.DateTimeFormat(
-    "th-TH",
+    "en-US",
     {
       day: "numeric",
       month: "long",
