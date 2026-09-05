@@ -51,7 +51,9 @@ function RegisterPage() {
         replace: true,
       });
     } catch (err) {
-      toast.error(err.response?.data.message ?? "Register Error.");
+      toast.error(err.response?.data.message ?? "Register Error.", {
+        position: "top-center",
+      });
     }
   };
 
