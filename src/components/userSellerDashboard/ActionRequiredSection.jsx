@@ -1,51 +1,100 @@
-import React from "react";
-import { Truck, CheckCircle2, MessageCircle, ChevronRight } from "lucide-react";
+import React, { useState } from "react";
+import { PackageCheck } from "lucide-react";
+import { useSellingOrders } from "@/hook/order/useSellingOrder";
+import ShipOrderModal from "./ShipOrderModal";
+import { ActionRequiredItem } from "./ActionRequiredItem";
 
 export default function ActionRequiredSection() {
-  return (
-    <div className="card hardware-surface p-5 space-y-4">
-      <h3 className="font-bold text-base text-base-content border-b border-base-300/60 pb-3">
-        รายการที่ต้องดำเนินการ
-      </h3>
+  const { data: sellingOrders = [], isLoading, isError } = useSellingOrders();
 
-      <div className="space-y-3">
-        {/* Action 1 */}
-        <div className="flex items-center justify-between p-3 bg-base-200/40 rounded-xl border border-base-200 gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="p-2 rounded-lg bg-orange-500/10 text-accent shrink-0">
-              <Truck className="w-5 h-5" />
+  // State สำหรับจัดการ Modal จัดส่ง
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // กรองเฉพาะสถานะ "รอผู้ขายจัดส่ง" (PAID)
+  const pendingShipmentOrders = (sellingOrders || []).filter(
+    (order) => order.status === "PAID"
+  );
+
+  const handleOpenShipModal = (order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  if (isLoading) return <ActionRequiredSectionSkeleton />;
+
+  return (
+    <>
+      <div className="card hardware-surface p-5 space-y-4 max-h-[420px] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-base-300/60 pb-3 shrink-0">
+          <h3 className="font-bold text-base text-base-content">
+            รายการที่ต้องดำเนินการ
+          </h3>
+          {pendingShipmentOrders.length > 0 && (
+            <span className="badge badge-warning text-white text-xs font-bold">
+              {pendingShipmentOrders.length} รายการ
+            </span>
+          )}
+        </div>
+
+        {/* List Container พร้อม Scrollbar */}
+        <div className="space-y-3 flex-1 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100">
+          {isError ? (
+            <div className="text-center py-6 text-xs text-error">
+              ไม่สามารถโหลดข้อมูลรายการที่ต้องดำเนินการได้
             </div>
-            <div className="min-w-0">
-              <p className="text-xs font-bold text-base-content truncate">
-                ส่ง RTX 3060 Ti ให้ศูนย์ตรวจสอบ ภายใน 1 วัน
-              </p>
-              <p className="text-[11px] text-base-content/60">คำสั่งซื้อ #ORD-240501-0001</p>
+          ) : pendingShipmentOrders.length === 0 ? (
+            <div className="flex items-center justify-center gap-2 py-8 text-base-content/50 text-xs">
+              <PackageCheck className="w-5 h-5 stroke-1" />
+              <span>ไม่มีรายการที่ต้องจัดส่งในขณะนี้</span>
             </div>
-          </div>
-          <button type="button" className="btn btn-sm btn-outline text-xs font-bold shrink-0">
-            กรอกเลขพัสดุ <ChevronRight className="w-3.5 h-3.5 ml-1" />
-          </button>
+          ) : (
+            pendingShipmentOrders.map((order) => (
+              <ActionRequiredItem
+                key={order.id}
+                order={order}
+                onOpenModal={handleOpenShipModal}
+              />
+            ))
+          )}
         </div>
       </div>
-    </div>
+
+      {/* ShipOrderModal */}
+      <ShipOrderModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedOrder(null);
+        }}
+        order={selectedOrder}
+      />
+    </>
   );
 }
 
 export function ActionRequiredSectionSkeleton() {
   return (
-    <div className="card hardware-surface p-5 space-y-4">
-      <div className="skeleton h-5 w-40 border-b border-base-300 pb-3" />
+    <div className="card hardware-surface p-5 space-y-4 max-h-[420px]">
+      <div className="flex justify-between items-center border-b border-base-300 pb-3">
+        <div className="skeleton h-5 w-40" />
+        <div className="skeleton h-5 w-16 rounded-full" />
+      </div>
       <div className="space-y-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="flex items-center justify-between p-3 border border-base-200 rounded-xl">
+        {[1, 2].map((i) => (
+          <div
+            key={i}
+            className="flex items-center justify-between p-3 border border-base-200 rounded-2xl gap-3"
+          >
             <div className="flex items-center gap-3 w-full">
-              <div className="skeleton w-9 h-9 rounded-lg shrink-0" />
-              <div className="space-y-1.5 w-full">
-                <div className="skeleton h-3 w-3/4" />
-                <div className="skeleton h-3 w-1/3" />
+              <div className="skeleton w-12 h-12 rounded-xl shrink-0" />
+              <div className="space-y-2 w-full">
+                <div className="skeleton h-3.5 w-3/4" />
+                <div className="skeleton h-4 w-24 rounded-md" />
               </div>
             </div>
-            <div className="skeleton h-8 w-24 rounded-lg shrink-0" />
+            <div className="skeleton h-8 w-24 rounded-xl shrink-0" />
           </div>
         ))}
       </div>
