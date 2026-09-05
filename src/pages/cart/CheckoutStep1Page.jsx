@@ -1,4 +1,4 @@
-import { zodResolver } from "@hookform/resolvers/zod"; // ปรับตามที่โปรเจกต์คุณใช้จริง
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -248,7 +248,7 @@ export default function CheckoutStep1Page() {
     return (
       <div className="mx-auto max-w-6xl px-4 py-8">
         <CheckoutStepIndicator currentStep={1} />
-        <div className="mx-auto flex min-h-[60vh] w-full max-w-xl flex-col justify-center">
+        <div className="mx-auto flex min-h-[70vh] w-full max-w-xl flex-col justify-center">
           <CheckoutStep3 />
         </div>
       </div>
@@ -259,7 +259,7 @@ export default function CheckoutStep1Page() {
     return (
       <div className="mx-auto max-w-6xl px-4 py-8">
         <CheckoutStepIndicator currentStep={1} />
-        <div className="mx-auto flex min-h-[60vh] w-full max-w-xl flex-col justify-center">
+        <div className="mx-auto flex min-h-[70vh] w-full max-w-xl flex-col justify-center">
           <div className="hardware-surface flex flex-col items-center gap-3 p-10 text-center">
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
               <AlertTriangle className="h-7 w-7 text-red-500" />
