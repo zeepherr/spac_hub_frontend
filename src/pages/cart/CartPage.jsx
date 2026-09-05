@@ -3,11 +3,9 @@ import useAuthStore from "@/stores/auth.store";
 import { ArrowLeft, ArrowRight, Info, Lock, Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { toast } from "sonner";
 
-import { useMyCart } from "@/hook/cart/useMyCart";
-import { useRemoveCartItem } from "@/hook/cart/useRemoveCartItem"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
 import ProductCartCard from "@/components/cart/ProductCartCard";
+import { useMyCart } from "@/hook/cart/useMyCart";
 import { useCheckoutQuote } from "@/hook/checkout/useCheckoutQuote";
 
 // ค่าบริการประกอบเครื่องยังไม่มีใน feeLines ที่ backend ส่งมา (POST /api/checkouts/quote ตอนนี้มีแค่
@@ -81,7 +79,7 @@ function OrderSummary({
               </div>
             ))}
 
-          <label className="hardware-surface flex cursor-pointer items-start gap-3 !p-3">
+          <label className="hardware-surface flex cursor-pointer items-start gap-3 p-3!">
             <input
               type="checkbox"
               checked={includeAssembly}
@@ -156,79 +154,83 @@ export default function CartPage() {
     data: items = [],
     isLoading: isLoadingCart,
     isError: isErrorCart,
+    refetch: refetchCart,
   } = useMyCart();
-
-  const [includeAssembly, setIncludeAssembly] = useState(false);
 
   // เก็บเป็น "id ที่ถูกเอาออกจากตัวเลือก" แทนที่จะเก็บ "id ที่ถูกเลือก"
   // ข้อดีคือของใหม่ที่เพิ่งเพิ่มเข้าตะกร้าจะถูกเลือกไว้ให้อัตโนมัติโดยไม่ต้อง sync state ทุกครั้งที่ items เปลี่ยน
+  const [includeAssembly, setIncludeAssembly] = useState(false);
+
   const [deselectedIds, setDeselectedIds] = useState(() => new Set());
 
-  const isSelected = (id) => !deselectedIds.has(id);
+  // Only ACTIVE listings are available for checkout.
+  const isAvailable = (item) => item.listing?.status === "ACTIVE";
 
-  const toggleSelect = (id) => {
+  // Unavailable items stay in the cart but cannot be selected.
+  const isSelected = (item) => isAvailable(item) && !deselectedIds.has(item.id);
+
+  const toggleSelect = (item) => {
+    if (!isAvailable(item)) return;
+
     setDeselectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
+
+      if (next.has(item.id)) {
+        next.delete(item.id);
       } else {
-        next.add(id);
+        next.add(item.id);
       }
+
       return next;
     });
   };
 
+  const selectableItems = items.filter((item) => isAvailable(item));
+
   const allSelected =
-    items.length > 0 && items.every((item) => isSelected(item.id));
+    selectableItems.length > 0 &&
+    selectableItems.every((item) => isSelected(item));
 
   const toggleSelectAll = () => {
-    setDeselectedIds(
-      allSelected ? new Set(items.map((item) => item.id)) : new Set(),
-    );
+    setDeselectedIds((prev) => {
+      const next = new Set(prev);
+
+      for (const item of selectableItems) {
+        if (allSelected) {
+          next.add(item.id);
+        } else {
+          next.delete(item.id);
+        }
+      }
+
+      return next;
+    });
   };
 
-  const selectedItems = items.filter((item) => isSelected(item.id));
+  const selectedItems = items.filter((item) => isSelected(item));
 
-  // listingIds ของที่เลือกไว้ตอนนี้ - ใช้ useMemo กัน array reference เปลี่ยนใหม่ทุก render
-  // (ไม่งั้น useCheckoutQuote ที่ผูก listingIds เป็น query key จะยิง request ซ้ำรัวๆ ทั้งที่ตัวเลือกไม่ได้เปลี่ยน)
+  // Send only ACTIVE listings to the quote API.
   const listingIds = useMemo(
-    () => selectedItems.map((item) => item.listingId),
+    () =>
+      items
+        .filter(
+          (item) =>
+            item.listing?.status === "ACTIVE" && !deselectedIds.has(item.id),
+        )
+        .map((item) => item.listingId),
     [items, deselectedIds],
   );
 
-  // POST /api/checkouts/quote - เรียกตรงนี้ที่ระดับบนสุดของ component (ไม่ใช่ใน handleCheckout เหมือนเดิม
-  // ซึ่งผิดกฎ Rules of Hooks ห้ามเรียก hook ข้างใน event handler/callback)
-  // ตัวเลข subtotal/feeLines/feeTotal/grandTotal ที่โชว์ต้องมาจาก response นี้ตรงๆ ตาม contract ที่ backend ให้มา
-  // ห้ามคำนวณเองฝั่ง frontend มาแทน
-  // (useCheckoutQuote เช็คแล้วว่ามี enabled: listingIds.length > 0 กันไว้ในตัวอยู่แล้ว ไม่ยิง request ว่างออกไป)
   const quoteQuery = useCheckoutQuote(listingIds);
   const quote = quoteQuery.data;
 
-  const removeCartItem = useRemoveCartItem();
-
-  // ของบางชิ้นในตะกร้าอาจถูกคนอื่นซื้อไปแล้วระหว่างที่เรายังไม่ได้กดจ่าย (backend คืน 409 message รูปแบบ
-  // `"<title>" is no longer available.` ตอนคำนวณ quote) เจอแบบนี้เอาออกจากตะกร้าให้อัตโนมัติเลย ไม่ต้องรอผู้ใช้
-  // กดลบเอง เพราะยังไงก็ checkout ต่อไม่ได้อยู่ดีถ้ายังมีของชิ้นนี้ค้างอยู่ในรายการที่เลือก
+  // Another buyer may reserve a listing after this cart was loaded.
+  // Keep the item in the cart and refresh its latest status.
   useEffect(() => {
-    if (!quoteQuery.isError) return;
+    if (quoteQuery.error?.response?.status !== 409) return;
 
-    const message = quoteQuery.error?.response?.data?.message ?? "";
-    const match = message.match(/^"(.+)" is no longer available\.?$/);
-    if (!match) return;
-
-    const soldTitle = match[1];
-    const soldItem = items.find((item) => item.listing.title === soldTitle);
-    if (!soldItem) return;
-
-    removeCartItem.mutate(soldItem.listingId);
-    toast.error(
-      `"${soldTitle}" ถูกซื้อไปแล้ว ระบบเอาออกจากตะกร้าให้อัตโนมัติ`,
-      {
-        position: "top-right",
-      },
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quoteQuery.isError, quoteQuery.error]);
+    void refetchCart();
+  }, [quoteQuery.error, refetchCart]);
 
   const handleCheckout = () => {
     if (selectedItems.length === 0) return;
@@ -288,8 +290,10 @@ export default function CartPage() {
                   type="checkbox"
                   checked={allSelected}
                   onChange={toggleSelectAll}
-                  className="checkbox checkbox-sm text-[#f97316] inset-shadow-sm/25"
+                  disabled={selectableItems.length === 0}
+                  className="checkbox checkbox-sm text-[#f97316] inset-shadow-sm/25 disabled:cursor-not-allowed disabled:opacity-40"
                 />
+                เลือกทั้งหมด ({selectedItems.length}/{selectableItems.length})
                 เลือกทั้งหมด ({selectedItems.length}/{items.length})
               </label>
 
@@ -297,8 +301,8 @@ export default function CartPage() {
                 <ProductCartCard
                   key={item.id}
                   item={item}
-                  selected={isSelected(item.id)}
-                  onToggleSelect={() => toggleSelect(item.id)}
+                  selected={isSelected(item)}
+                  onToggleSelect={() => toggleSelect(item)}
                 />
               ))}
             </div>
