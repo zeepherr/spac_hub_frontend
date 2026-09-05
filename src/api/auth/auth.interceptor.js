@@ -1,4 +1,4 @@
-import { clearLogoutMarker } from "@/lib/clear.client.session";
+import { clearClientSession } from "@/lib/clear.client.session";
 import useAuthStore from "@/stores/auth.store";
 import { authApi } from "../axios";
 import { refreshAccessToken } from "./auth.session";
@@ -57,7 +57,11 @@ export function setupAuthInterceptors() {
 
         return authApi(originalRequest);
       } catch (refreshError) {
-        clearLogoutMarker();
+        const refreshStatus = refreshError.response?.status;
+
+        if (refreshStatus === 401 || refreshStatus === 403) {
+          await clearClientSession();
+        }
 
         return Promise.reject(refreshError);
       }

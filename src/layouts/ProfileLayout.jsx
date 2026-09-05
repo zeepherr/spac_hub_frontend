@@ -1,13 +1,7 @@
-import { NavLink, Outlet } from "react-router";
 import { LogoutButton } from "@/components/auth/LogoutButton";
-import {
-  LayoutDashboard,
-  Store,
-  Tag,
-  Heart,
-  UserRound,
-} from "lucide-react";
 import useAuthStore from "@/stores/auth.store";
+import { Heart, LayoutDashboard, Store, Tag, UserRound } from "lucide-react";
+import { NavLink, Outlet } from "react-router";
 
 const menus = [
   {
@@ -45,11 +39,10 @@ function ProfileLayout() {
     "User";
 
   return (
-    <div className="flex min-h-full flex-col bg-base-100 text-base-content md:flex-row">
-      {/* Sidebar - set to md:w-80 for proportional layout */}
-      <aside className="flex w-full shrink-0 flex-col border-b border-base-300 bg-base-200/50 md:w-80 md:border-b-0 md:border-r">
-        
-        {/* Profile Section - Centered */}
+    <div className=" flex h-dvh overflow-hidden bg-base-100 text-base-content md:flex-row">
+      {/* Sidebar - ปรับเป็น md:w-80 เพื่อให้สมส่วนและเต็มกรอบ */}
+      <aside className="flex h-full w-full shrink-0 flex-col border-b border-base-300 bg-base-200/50 md:w-80 md:border-b-0 md:border-r">
+        {/* ส่วนโปรไฟล์ - จัดกึ่งกลาง (flex flex-col items-center text-center) */}
         <div className="flex flex-col items-center justify-center border-b border-base-300 px-6 py-8 text-center">
           <div className="relative mb-4 flex size-24 items-center justify-center rounded-full border border-base-300 bg-base-100 shadow-sm">
             {user?.profileImageUrl ? (
@@ -79,10 +72,10 @@ function ProfileLayout() {
           </p>
         </div>
 
-        {/* Navigation Menu */}
-        <nav aria-label="Account Menu" className="p-4">
+        {/* เมนูการใช้งาน */}
+        <nav aria-label="เมนูบัญชี" className="p-4">
           <p className="mb-3 px-4 text-m font-bold uppercase tracking-wider text-neutral/70">
-            My Account
+            บัญชีของฉัน
           </p>
 
           <ul className="space-y-2">
@@ -123,8 +116,11 @@ function ProfileLayout() {
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main aria-label="Account Content" className="min-w-0 flex-1 bg-base-100 ">
+      {/* เนื้อหาด้านขวา */}
+      <main
+        aria-label="เนื้อหาบัญชี"
+        className="scrollbar-hide min-w-0 flex-1 overflow-y-auto bg-base-100 "
+      >
         <Outlet />
       </main>
     </div>
