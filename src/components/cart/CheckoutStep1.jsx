@@ -51,7 +51,7 @@ function CheckoutStep1({ register, errors = {} }) {
       <div className="mb-5 flex items-center gap-2">
         <h2 className="flex items-center gap-2 text-base font-bold text-neutral-900">
           <Truck size={18} className="text-[#f97316]" />
-          ข้อมูลการจัดส่ง
+          Shipping Information
         </h2>
       </div>
 
@@ -59,16 +59,16 @@ function CheckoutStep1({ register, errors = {} }) {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <FormInput
             id="firstName"
-            label="ชื่อ"
-            placeholder="กรอกชื่อ"
+            label="First Name"
+            placeholder="Enter your first name"
             error={errors.firstName?.message}
             inputProps={register("firstName")}
           />
 
           <FormInput
             id="lastName"
-            label="นามสกุล"
-            placeholder="กรอกนามสกุล"
+            label="Last Name"
+            placeholder="Enter your last name"
             error={errors.lastName?.message}
             inputProps={register("lastName")}
           />
@@ -76,7 +76,7 @@ function CheckoutStep1({ register, errors = {} }) {
 
         <FormInput
           id="phone"
-          label="เบอร์โทรศัพท์"
+          label="Phone Number"
           type="tel"
           placeholder="0812345678"
           error={errors.phone?.message}
@@ -88,13 +88,13 @@ function CheckoutStep1({ register, errors = {} }) {
             htmlFor="address"
             className="mb-2 block text-sm font-semibold text-neutral-800"
           >
-            ที่อยู่
+            Address
           </label>
 
           <textarea
             id="address"
             rows={5}
-            placeholder="กรอกที่อยู่สำหรับจัดส่ง"
+            placeholder="Enter your shipping address"
             className={`w-full resize-none rounded-xl border px-4 py-3 text-sm text-neutral-900 outline-none transition focus:ring-2 ${
               errors.address
                 ? "border-red-500 focus:ring-red-100"

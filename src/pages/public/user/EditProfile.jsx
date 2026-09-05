@@ -23,7 +23,7 @@ function EditProfile() {
         />
 
         <span className="ml-3 text-neutral-500">
-          กำลังโหลดข้อมูล...
+          Loading profile...
         </span>
       </div>
     );
@@ -32,7 +32,7 @@ function EditProfile() {
   if (isError) {
     return (
       <div className="flex min-h-80 items-center justify-center text-red-500">
-        ไม่สามารถโหลดข้อมูลผู้ใช้ได้
+        Unable to load profile data
       </div>
     );
   }
@@ -46,11 +46,11 @@ function EditProfile() {
           </p>
 
           <h1 className="mt-1 text-3xl font-bold text-neutral-900">
-            ข้อมูลส่วนตัว
+            Profile Information
           </h1>
 
           <p className="mt-2 text-sm text-neutral-500">
-            จัดการข้อมูลบัญชีและข้อมูลสำหรับติดต่อ
+            Manage your account details and contact information
           </p>
         </header>
 
@@ -59,13 +59,13 @@ function EditProfile() {
           className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm lg:p-8"
           noValidate
         >
-          {/* รูปโปรไฟล์ */}
+          {/* Profile Picture */}
           <div className="mb-8 flex items-center gap-5 border-b border-neutral-200 pb-8">
             <div className="flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200 bg-neutral-100">
               {imagePreview ? (
                 <img
                   src={imagePreview}
-                  alt="รูปโปรไฟล์"
+                  alt="Profile"
                   className="size-full object-cover"
                 />
               ) : (
@@ -82,7 +82,7 @@ function EditProfile() {
                 className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-orange-500 px-4 py-2 text-sm font-semibold text-orange-500 transition hover:bg-orange-50"
               >
                 <Camera size={18} />
-                เปลี่ยนรูปโปรไฟล์
+                Change Profile Picture
               </label>
 
               <input
@@ -94,7 +94,7 @@ function EditProfile() {
               />
 
               <p className="mt-2 text-xs text-neutral-400">
-                JPG, PNG หรือ WEBP ไม่เกิน 5 MB
+                JPG, PNG or WEBP (Max. 5 MB)
               </p>
             </div>
           </div>
@@ -102,21 +102,21 @@ function EditProfile() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <FormInput
               id="firstName"
-              label="ชื่อ"
-              placeholder="กรอกชื่อ"
+              label="First Name"
+              placeholder="Enter first name"
               error={errors.firstName?.message}
               inputProps={register("firstName", {
-                required: "กรุณากรอกชื่อ",
+                required: "First name is required",
               })}
             />
 
             <FormInput
               id="lastName"
-              label="นามสกุล"
-              placeholder="กรอกนามสกุล"
+              label="Last Name"
+              placeholder="Enter last name"
               error={errors.lastName?.message}
               inputProps={register("lastName", {
-                required: "กรุณากรอกนามสกุล",
+                required: "Last name is required",
               })}
             />
           </div>
@@ -124,29 +124,28 @@ function EditProfile() {
           <div className="mt-5">
             <FormInput
               id="email"
-              label="อีเมล"
+              label="Email Address"
               type="email"
               disabled
               inputProps={register("email")}
             />
 
             <p className="mt-2 text-xs text-neutral-400">
-              ไม่สามารถเปลี่ยนอีเมลจากหน้านี้ได้
+              Email address cannot be changed here
             </p>
           </div>
 
           <div className="mt-5">
             <FormInput
               id="phone"
-              label="เบอร์โทรศัพท์"
+              label="Phone Number"
               type="tel"
               placeholder="0812345678"
               error={errors.phone?.message}
               inputProps={register("phone", {
                 pattern: {
                   value: /^0[0-9]{8,9}$/,
-                  message:
-                    "เบอร์โทรศัพท์ไม่ถูกต้อง",
+                  message: "Invalid phone number format",
                 },
               })}
             />
@@ -157,13 +156,13 @@ function EditProfile() {
               htmlFor="address"
               className="mb-2 block text-sm font-semibold text-neutral-800"
             >
-              ที่อยู่
+              Address
             </label>
 
             <textarea
               id="address"
               rows={5}
-              placeholder="กรอกที่อยู่สำหรับติดต่อ"
+              placeholder="Enter your contact address"
               className={`w-full resize-none rounded-xl border px-4 py-3 text-sm text-neutral-900 outline-none transition focus:ring-2 ${
                 errors.address
                   ? "border-red-500 focus:ring-red-100"
@@ -172,8 +171,7 @@ function EditProfile() {
               {...register("address", {
                 maxLength: {
                   value: 500,
-                  message:
-                    "ที่อยู่ต้องไม่เกิน 500 ตัวอักษร",
+                  message: "Address cannot exceed 500 characters",
                 },
               })}
             />
@@ -197,12 +195,12 @@ function EditProfile() {
                     size={18}
                     className="animate-spin"
                   />
-                  กำลังบันทึก...
+                  Saving...
                 </>
               ) : (
                 <>
                   <Save size={18} />
-                  บันทึกข้อมูล
+                  Save Changes
                 </>
               )}
             </button>

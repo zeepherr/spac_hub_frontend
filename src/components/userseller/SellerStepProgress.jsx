@@ -3,11 +3,11 @@ import { Save, Check, Sparkles } from "lucide-react";
 
 export default function SellerStepProgress({ currentStep, onSaveDraft, savingDraft, listingId }) {
   const steps = [
-    { id: 1, label: "ข้อมูลพื้นฐาน", desc: "ชื่อ, หมวดหมู่, ราคา" },
-    { id: 2, label: "คำถามสภาพ", desc: "ตอบตามความเป็นจริง" },
-    { id: 3, label: "รูปภาพสินค้า", desc: "สูงสุด 5 รูป" },
-    { id: 4, label: "วิเคราะห์ AI", desc: "ประเมินเกรดอัตโนมัติ" },
-    { id: 5, label: "เผยแพร่", desc: "ตรวจสอบและลงขาย" },
+  { id: 1, label: "Basic Info", desc: "Title, category, price" },
+  { id: 2, label: "Condition QA", desc: "Answer accurately" },
+  { id: 3, label: "Product Images", desc: "Up to 5 photos" },
+  { id: 4, label: "AI Analysis", desc: "Auto grade assessment" },
+  { id: 5, label: "Publish", desc: "Review and list item" },
   ];
 
   return (
@@ -94,7 +94,7 @@ export default function SellerStepProgress({ currentStep, onSaveDraft, savingDra
             ) : (
               <Save className="size-4 stroke-2" />
             )}
-            <span>{savingDraft ? "กำลังบันทึก..." : "บันทึกแบบร่าง (Save Draft)"}</span>
+            <span>{savingDraft ? "Saving..." : "Save Draft"}</span>
           </button>
         </div>
 

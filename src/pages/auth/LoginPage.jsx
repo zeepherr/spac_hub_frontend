@@ -111,7 +111,7 @@ function LoginPage() {
   }
 
   if (isSubmitting || isGoogleSubmitting) {
-    return <GlobalLoading label="กำลังเข้าสู่ระบบ..." />;
+    return <GlobalLoading label="Logging in..." />;
   }
 
   const inputStyle =
@@ -130,7 +130,7 @@ function LoginPage() {
         </div>
 
         <h1 className="text-3xl font-bold text-center text-neutral-900 mb-8">
-          เข้าสู่ระบบ
+          Sign In
         </h1>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -139,7 +139,7 @@ function LoginPage() {
               htmlFor="email"
               className="block text-sm font-semibold text-neutral-800 mb-2"
             >
-              อีเมล
+              Email
             </label>
 
             <div className="relative">
@@ -151,7 +151,7 @@ function LoginPage() {
               <input
                 id="email"
                 type="email"
-                placeholder="กรอกอีเมลของคุณ"
+                placeholder="Enter your email"
                 className={`${inputStyle} ${
                   errors.email
                     ? "border-red-500 focus:border-red-500 focus:ring-red-100"
@@ -174,7 +174,7 @@ function LoginPage() {
               htmlFor="password"
               className="block text-sm font-semibold text-neutral-800 mb-2"
             >
-              รหัสผ่าน
+              Password
             </label>
 
             <div className="relative">
@@ -186,7 +186,7 @@ function LoginPage() {
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="กรอกรหัสผ่านของคุณ"
+                placeholder="Enter your password"
                 className={`${inputStyle} pr-12 ${
                   errors.password
                     ? "border-red-500 focus:border-red-500 focus:ring-red-100"
@@ -199,7 +199,7 @@ function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-900 cursor-pointer"
-                aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
               </button>
@@ -213,7 +213,7 @@ function LoginPage() {
 
             <div className="flex justify-end mt-3">
               <Link className="text-[#f97316] hover:underline hover:text-orange-600 text-sm font-medium">
-                ลืมรหัสผ่าน?
+                Forgot password?
               </Link>
             </div>
           </div>
@@ -223,12 +223,12 @@ function LoginPage() {
             disabled={isSubmitting || isGoogleSubmitting}
             className="w-full cursor-pointer rounded-lg bg-[#f97316] py-2.5 font-semibold text-white transition hover:bg-orange-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isSubmitting ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
+            {isSubmitting ? "Logging in..." : "Sign In"}
           </button>
 
           <div className="flex items-center gap-4 py-1">
             <div className="hardware-divider flex-1" />
-            <span className="text-sm text-neutral-400">หรือ</span>
+            <span className="text-sm text-neutral-400">OR</span>
             <div className="hardware-divider flex-1" />
           </div>
 
@@ -245,12 +245,12 @@ function LoginPage() {
         </form>
 
         <div className="mt-6 text-center text-sm text-neutral-700">
-          ยังไม่มีบัญชี?{" "}
+          Don't have an account?{" "}
           <Link
             to="/register"
             className="text-[#f97316] hover:underline hover:text-orange-600 font-semibold"
           >
-            สมัครสมาชิก
+            Sign Up
           </Link>
         </div>
       </div>

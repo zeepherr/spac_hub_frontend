@@ -9,14 +9,14 @@ function CheckoutStep3() {
         <Loader2 className="h-7 w-7 animate-spin text-[#f97316]" />
       </span>
       <h2 className="text-lg font-bold text-neutral-900">
-        กำลังนำคุณไปสู่หน้าชำระเงิน
+        Redirecting you to the payment page
       </h2>
       <p className="max-w-sm text-sm text-neutral-500">
-        กรุณารอสักครู่ ระบบกำลังพาคุณไปยังหน้าชำระเงินที่ปลอดภัยของ Stripe
+        Please wait a moment. We are redirecting you to Stripe's secure payment page.
       </p>
       <span className="flex items-center gap-1 text-xs text-secondary">
         <ShieldCheck size={14} className="text-green-600" />
-        เชื่อมต่อแบบเข้ารหัสปลอดภัย
+        Secure encrypted connection
       </span>
     </div>
   );

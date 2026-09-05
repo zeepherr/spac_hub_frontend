@@ -5,19 +5,17 @@ import { useBuyingOrders } from "@/hook/order/useBuyingOrders";
 import { useSellingOrders } from "@/hook/order/useSellingOrder";
 import { useNavigate } from "react-router";
 import ShipOrderModal from "./ShipOrderModal";
-// import { useBuyingOrders } from "@/hooks/useBuyingOrders"; // ปรับ path ให้ตรงตามโครงสร้างโปรเจกต์
-// import { useSellingOrders } from "@/hooks/useSellingOrders";
-// import { OrderItemCard } from "./OrderItemCard";
+
 export default function RecentOrdersSection() {
   const navigate = useNavigate();
   const { data: sellingOrders = [], isLoading, isError } = useSellingOrders();
 
-  // State สำหรับจัดการ Modal
+  // State for Modal Management
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 1. กรองเฉพาะ Order ที่มีการเปลี่ยนสถานะแล้ว (ข้ามสถานะเริ่มต้นอย่าง PENDING / AWAITING_PAYMENT)
-  // 2. จัดเรียงตามวันที่สร้าง/อัปเดตล่าสุด
+  // 1. Filter out orders in initial/unprocessed states (PENDING / AWAITING_PAYMENT)
+  // 2. Sort by latest updated/created date
   const activeSellingOrders = (sellingOrders || [])
     .filter(
       (order) =>
@@ -29,14 +27,14 @@ export default function RecentOrdersSection() {
         new Date(a.updatedAt || a.createdAt || 0)
     );
 
-  // Handle เมื่อคลิกการ์ดรายการขาย
+  // Handle clicking on a selling order card
   const handleCardClick = (order) => {
     if (order.status === "PAID") {
-      // ถ้าสถานะเป็น "รอผู้ขายจัดส่ง" ให้เปิด Modal
+      // If status is "PAID" (Awaiting Shipment), open the shipping modal
       setSelectedOrder(order);
       setIsModalOpen(true);
     } else {
-      // สถานะอื่นๆ นำทางไปหน้า Detail ตามปกติ
+      // Navigate to order details for other statuses
       navigate(`/user/sell/orders/${order.id}`);
     }
   };
@@ -45,18 +43,18 @@ export default function RecentOrdersSection() {
 
   return (
     <>
-      <div className="card hardware-surface p-6 space-y-4 h-[600px] flex flex-col">
+      <div className="card hardware-surface p-6 space-y-4 h-150 flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-base-300/60 pb-4 shrink-0">
           <h3 className="font-bold text-xl text-base-content">
-            สถานะรายการขายของฉัน
+            My Sales Status
           </h3>
           <button
             type="button"
             onClick={() => navigate("/user/sell/orders")}
             className="text-sm text-base-content/70 hover:text-primary font-semibold flex items-center gap-1 transition-colors"
           >
-            ดูรายการขายทั้งหมด <ChevronRight className="w-4 h-4" />
+            View All Sales <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
@@ -64,12 +62,12 @@ export default function RecentOrdersSection() {
         <div className="space-y-4 flex-1 pr-2 p-1.5 scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100 overflow-y-auto">
           {isError ? (
             <div className="text-center py-8 text-sm text-error">
-              ไม่สามารถโหลดข้อมูลคำสั่งซื้อได้
+              Unable to load order data.
             </div>
           ) : activeSellingOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-base-content/50 space-y-2">
               <PackageX className="w-12 h-12 stroke-1" />
-              <p className="text-base">ยังไม่มีรายการขายที่มีการอัปเดตสถานะ</p>
+              <p className="text-base">No active sales status updates found</p>
             </div>
           ) : (
             activeSellingOrders.map((order) => (
@@ -83,7 +81,7 @@ export default function RecentOrdersSection() {
         </div>
       </div>
 
-      {/* Modal สำหรับกรอกรายละเอียดขนส่ง */}
+      {/* Modal for entering shipping details */}
       <ShipOrderModal
         isOpen={isModalOpen}
         onClose={() => {

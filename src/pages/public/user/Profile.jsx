@@ -25,7 +25,7 @@ function Profile() {
         <LoaderCircle size={30} className="animate-spin text-orange-500" />
 
         <span className="ml-3 text-sm text-neutral-500">
-          กำลังโหลดข้อมูล...
+          Loading profile...
         </span>
       </div>
     );
@@ -34,14 +34,14 @@ function Profile() {
   if (profileQuery.isError || !user) {
     return (
       <div className="flex min-h-96 flex-col items-center justify-center gap-3">
-        <p className="text-red-500">ไม่สามารถโหลดข้อมูลผู้ใช้ได้</p>
+        <p className="text-red-500">Unable to load profile data</p>
 
         <button
           type="button"
           onClick={() => profileQuery.refetch()}
           className="cursor-pointer rounded-lg border border-orange-500 px-4 py-2 text-sm font-semibold text-orange-500 transition hover:bg-orange-50"
         >
-          ลองอีกครั้ง
+          Try Again
         </button>
       </div>
     );
@@ -49,38 +49,38 @@ function Profile() {
 
   const fullName =
     [user.firstName, user.lastName].filter(Boolean).join(" ") ||
-    "ยังไม่ได้ระบุชื่อ";
+    "Not specified";
 
   const roleLabel =
     user.role === "ADMIN"
-      ? "ผู้ดูแลระบบ"
+      ? "Administrator"
       : user.role === "SELLER"
-        ? "ผู้ขาย"
-        : "ผู้ใช้งานทั่วไป";
+        ? "Seller"
+        : "User";
 
   const createdAt = user.createdAt
-    ? new Intl.DateTimeFormat("th-TH", {
+    ? new Intl.DateTimeFormat("en-US", {
         day: "numeric",
         month: "long",
         year: "numeric",
       }).format(new Date(user.createdAt))
-    : "ไม่พบข้อมูล";
+    : "No data";
 
   return (
     <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
       <div className="mx-auto max-w-6xl">
-        {/* หัวข้อ */}
+        {/* Header */}
         <header className="mb-7">
-          <h1 className="text-3xl font-bold text-neutral-900">โปรไฟล์ของฉัน</h1>
+          <h1 className="text-3xl font-bold text-neutral-900">My Profile</h1>
 
           <p className="mt-2 text-sm text-neutral-500">
-            ดูข้อมูลบัญชีและรายละเอียดของคุณ
+            View your account details and profile information
           </p>
         </header>
 
-        {/* กล่องข้อมูลโปรไฟล์ */}
+        {/* Profile Card */}
         <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm lg:p-8">
-          {/* ข้อมูลด้านบน */}
+          {/* Header Info */}
           <div className="flex flex-col gap-6 border-b border-neutral-200 pb-7 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-5">
               <ProfileImage
@@ -100,7 +100,7 @@ function Profile() {
                         size={21}
                         className="fill-orange-500 text-white"
                       />
-                      ยืนยันตัวตนแล้ว
+                      Verified
                     </span>
                   )}
                 </div>
@@ -117,39 +117,39 @@ function Profile() {
               className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl border border-orange-500 px-5 py-3 font-semibold text-orange-500 transition hover:bg-orange-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300"
             >
               <Pencil size={19} />
-              แก้ไขโปรไฟล์
+              Edit Profile
             </button>
           </div>
 
-          {/* รายละเอียด */}
+          {/* Details */}
           <div className="mt-7 space-y-4">
             <ProfileRow
               icon={UserRound}
-              label="ชื่อ-นามสกุล"
+              label="Full Name"
               value={fullName}
             />
 
-            <ProfileRow icon={Mail} label="อีเมล" value={user.email} />
+            <ProfileRow icon={Mail} label="Email Address" value={user.email} />
 
             <ProfileRow
               icon={Phone}
-              label="เบอร์โทรศัพท์"
+              label="Phone Number"
               value={user.phone}
-              emptyText="ยังไม่ได้เพิ่มเบอร์โทรศัพท์"
+              emptyText="No phone number provided"
             />
 
             <ProfileRow
               icon={MapPin}
-              label="ที่อยู่"
+              label="Address"
               value={user.address}
-              emptyText="ยังไม่ได้เพิ่มที่อยู่"
+              emptyText="No address provided"
             />
 
-            <ProfileRow icon={Shield} label="บทบาทในระบบ" value={roleLabel} />
+            <ProfileRow icon={Shield} label="System Role" value={roleLabel} />
 
             <ProfileRow
               icon={CalendarDays}
-              label="วันที่สมัครสมาชิก"
+              label="Member Since"
               value={createdAt}
             />
           </div>
@@ -165,7 +165,7 @@ function ProfileImage({ imageUrl, fullName }) {
       {imageUrl ? (
         <img
           src={imageUrl}
-          alt={`รูปโปรไฟล์ของ ${fullName}`}
+          alt={`Profile picture of ${fullName}`}
           className="size-full object-cover"
         />
       ) : (
@@ -175,7 +175,7 @@ function ProfileImage({ imageUrl, fullName }) {
   );
 }
 
-function ProfileRow({ icon: Icon, label, value, emptyText = "ไม่พบข้อมูล" }) {
+function ProfileRow({ icon: Icon, label, value, emptyText = "No information" }) {
   const hasValue =
     value !== null && value !== undefined && String(value).trim() !== "";
 

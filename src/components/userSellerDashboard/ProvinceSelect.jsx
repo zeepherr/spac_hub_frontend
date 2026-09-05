@@ -20,7 +20,7 @@ export const THAI_PROVINCES = [
 export default function ProvinceSelect({
   value,
   onChange,
-  label = "สถานที่จัดส่ง / จังหวัดนัดรับ *",
+  label = "Shipping Location *",
   disabled = false,
   className = "",
 }) {
@@ -39,7 +39,7 @@ export default function ProvinceSelect({
         className="select select-bordered w-full text-sm font-semibold"
       >
         <option value="" disabled>
-          -- เลือกจังหวัด --
+          -- Select Province --
         </option>
         {THAI_PROVINCES.map((prov) => (
           <option key={prov} value={prov}>

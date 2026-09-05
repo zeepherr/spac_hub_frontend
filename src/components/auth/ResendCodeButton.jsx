@@ -92,7 +92,7 @@ export function ResendCodeButton({ email, resendAvailableAt, onResent }) {
 
   return (
     <div className="text-xs text-[#171717] pt-1">
-      <span>หากไม่ได้รับรหัส? </span>
+      <span>Didn't receive the code? </span>
 
       <button
         type="button"
@@ -105,10 +105,10 @@ export function ResendCodeButton({ email, resendAvailableAt, onResent }) {
         }`}
       >
         {isSending
-          ? "กำลังส่ง..."
+          ? "Sending..."
           : seconds > 0
-            ? `ส่งรหัสอีกครั้ง (${seconds}s)`
-            : "ส่งรหัสอีกครั้ง (Resend)"}
+            ? `Resend code (${seconds}s)`
+            : "Resend code (Resend)"}
       </button>
 
       {error && <p className="mt-2 text-xs text-error">{error}</p>}

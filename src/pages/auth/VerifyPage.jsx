@@ -36,7 +36,7 @@ export default function VerifyPage() {
     <div className="min-h-full flex items-center justify-center text-base-content">
       <div className="hardware-surface w-full max-w-md bg-white p-8 md:p-10 text-center flex flex-col items-center">
         {/* Icon */}
-        <div className="w-20 h-20 mb-6 rounded-2xl bg-base-200 border border-base-300 flex items-center justify-center relative">
+        <div className="w-20 h-20 mb-6 rounded-2xl bg-neutral text-neutral-content border border-neutral-focus flex items-center justify-center relative">
           <div className="hardware-indicator absolute top-2 right-2" />
 
           <svg
@@ -75,7 +75,7 @@ export default function VerifyPage() {
         </h1>
 
         <p className="text-xs md:text-sm text-[#171717] max-w-xs mb-6 leading-relaxed">
-          กรุณากรอกรหัสยืนยัน 6 หลักที่เราได้ส่งไปยังอีเมล:{" "}
+          Please enter the 6-digit verification code we sent to your email:{" "}
           <span className="font-bold text-[#f97316]">{pending.email}</span>
         </p>
 

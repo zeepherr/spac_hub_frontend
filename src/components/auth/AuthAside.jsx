@@ -3,18 +3,18 @@ import { ShieldCheck, Wallet, Users, CheckCircle2, Layers } from "lucide-react";
 const FEATURES = [
   {
     icon: ShieldCheck,
-    title: "ตรวจสอบสินค้าก่อนส่ง",
-    subtitle: "มั่นใจในคุณภาพทุกชิ้น",
+    title: "Products Checked Before Shipping",
+    subtitle: "Confidence in the quality of every item",
   },
   {
     icon: Wallet,
-    title: "พักเงินอย่างปลอดภัย",
-    subtitle: "โอนเงินเมื่อคุณได้รับสินค้า",
+    title: "Secure Payment Holding",
+    subtitle: "Your payment is transferred once you receive the product",
   },
   {
     icon: Users,
-    title: "ซื้อขายกับผู้ใช้จริง",
-    subtitle: "ชุมชนคนไอทีที่เชื่อถือได้",
+    title: "Buy and Sell with Real Users",
+    subtitle: "A trusted community for tech enthusiasts",
   },
 ];
 
@@ -53,7 +53,7 @@ export default function AuthAside() {
             <ShieldCheck className="h-12 w-12" />
             <div className="leading-tight">
               <p className="text-xl font-bold">SPEC CHECK</p>
-              <p className="text-[11px] opacity-90">ตรวจสอบแล้ว</p>
+              <p className="text-[11px] opacity-90">Verified</p>
             </div>
           </div>
         </div>

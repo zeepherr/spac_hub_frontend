@@ -87,7 +87,7 @@ export default function ProductSummaryModal({
           <div className="p-5 border-b border-base-300 flex items-center justify-between bg-base-200/50">
             <div className="flex items-center gap-2 text-base-content">
               <Edit3 className="w-5 h-5 text-primary" />
-              <h3 className="font-bold text-xl">สรุปและแก้ไขข้อมูลสินค้าก่อนลงขาย</h3>
+              <h3 className="font-bold text-xl">Review and Edit Details Before Listing</h3>
             </div>
             <button
               type="button"
@@ -105,7 +105,7 @@ export default function ProductSummaryModal({
             <div className="space-y-3">
               <label className="font-bold text-base flex items-center gap-2">
                 <ImageIcon className="w-4 h-4 text-primary" />
-                รูปภาพสินค้าที่อัปโหลด ({imageFiles.length} รูป)
+                Uploaded Product Images ({imageFiles.length} {imageFiles.length === 1 ? 'image' : 'images'})
               </label>
 
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
@@ -135,10 +135,10 @@ export default function ProductSummaryModal({
 
             {/* Section 2: ข้อมูลพื้นฐานสินค้า (Editable) */}
             <div className="space-y-4">
-              <h4 className="font-bold text-base text-primary">ข้อมูลพื้นฐาน</h4>
+              <h4 className="font-bold text-base text-primary">Basic Information</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="form-control md:col-span-2">
-                  <label className="label text-xs font-bold text-base-content">ชื่อสินค้า *</label>
+                  <label className="label text-xs font-bold text-base-content">Product Title *</label>
                   <input
                     type="text"
                     value={editForm.title || ""}
@@ -148,7 +148,7 @@ export default function ProductSummaryModal({
                 </div>
 
                 <div className="form-control">
-                  <label className="label text-xs font-bold text-base-content">ราคา (บาท) *</label>
+                  <label className="label text-xs font-bold text-base-content">Price (THB) *</label>
                   <input
                     type="number"
                     value={editForm.price || ""}
@@ -161,20 +161,20 @@ export default function ProductSummaryModal({
                 <div className="form-control">
                   <label className="label text-xs font-bold text-base-content flex items-center gap-1">
                     <Layers className="w-3.5 h-3.5 text-primary" />
-                    หมวดหมู่สินค้า *
+                    Product Category *
                   </label>
                   <div
                     className="input input-bordered w-full text-sm font-semibold flex items-center justify-between text-left bg-base-200/70 text-base-content/70 cursor-not-allowed select-none"
                   >
                     <span className="font-bold">
-                      {selectedCategoryName || "ไม่ระบุหมวดหมู่"}
+                      {selectedCategoryName || "Unspecified Category"}
                     </span>
                     <Lock className="w-4 h-4 text-base-content/40" />
                   </div>
                 </div>
 
                 <div className="form-control">
-                  <label className="label text-xs font-bold text-base-content">แบรนด์ *</label>
+                  <label className="label text-xs font-bold text-base-content">Brand *</label>
                   <input
                     type="text"
                     value={editForm.brand || ""}
@@ -184,7 +184,7 @@ export default function ProductSummaryModal({
                 </div>
 
                 <div className="form-control">
-                  <label className="label text-xs font-bold text-base-content">รุ่น / Model *</label>
+                  <label className="label text-xs font-bold text-base-content">Model *</label>
                   <input
                     type="text"
                     value={editForm.model || ""}
@@ -197,7 +197,7 @@ export default function ProductSummaryModal({
                 <div className="form-control md:col-span-2">
                   <label className="label text-xs font-bold text-base-content flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5 text-primary" />
-                    สถานที่จัดส่ง / จังหวัดนัดรับ *
+                    Shipping Location / Pickup Province *
                   </label>
                   <button
                     type="button"
@@ -205,14 +205,14 @@ export default function ProductSummaryModal({
                     className="input input-bordered w-full text-sm font-semibold flex items-center justify-between text-left hover:bg-base-200/50"
                   >
                     <span className={editForm.location ? "text-base-content" : "text-base-content/50"}>
-                      {editForm.location || "เลือกจังหวัด..."}
+                      {editForm.location || "Select province..."}
                     </span>
                     <ChevronRight className="w-4 h-4 text-base-content/60" />
                   </button>
                 </div>
 
                 <div className="form-control md:col-span-2">
-                  <label className="label text-xs font-bold text-base-content">รายละเอียดเพิ่มเติม *</label>
+                  <label className="label text-xs font-bold text-base-content">Additional Description *</label>
                   <textarea
                     rows={3}
                     value={editForm.description || ""}
@@ -230,10 +230,10 @@ export default function ProductSummaryModal({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h4 className="font-bold text-base text-primary flex items-center gap-2">
-                      ตอบคำถามสภาพสินค้า
+                      Item Condition Assessment
                     </h4>
                     <span className="text-xs text-base-content/50 flex items-center gap-1 bg-base-200 px-2 py-1 rounded-md">
-                      <Lock className="w-3 h-3" /> ไม่สามารถแก้ไขคำตอบได้
+                      <Lock className="w-3 h-3" /> Answers locked
                     </span>
                   </div>
 
@@ -255,7 +255,7 @@ export default function ProductSummaryModal({
                                 checked={editAnswers[q.id] === true}
                                 disabled
                               />
-                              <span>ใช่ / ทำงานปกติ (Yes)</span>
+                              <span>Yes / Fully Functional</span>
                             </label>
                             <label className="flex items-center gap-2 text-sm font-medium">
                               <input
@@ -265,7 +265,7 @@ export default function ProductSummaryModal({
                                 checked={editAnswers[q.id] === false}
                                 disabled
                               />
-                              <span>ไม่ใช่ / มีปัญหา (No)</span>
+                              <span>No / Defective</span>
                             </label>
                           </div>
                         )}
@@ -276,7 +276,7 @@ export default function ProductSummaryModal({
                             value={editAnswers[q.id] || ""}
                             disabled
                           >
-                            <option value="">-- โปรดเลือกคำตอบ --</option>
+                            <option value="">-- Please Select --</option>
                             {q.options?.map((opt, i) => (
                               <option key={i} value={opt}>
                                 {opt}
@@ -310,18 +310,18 @@ export default function ProductSummaryModal({
                         <Sparkles className="w-4 h-4 text-warning" />
                       )}
                       {isEditedByUser
-                        ? "ผลวิเคราะห์สภาพสินค้าโดย AI แก้ไขเพิ่มเติม โดย USER"
-                        : "ผลวิเคราะห์สภาพสินค้าโดย AI"}
+                        ? "AI Condition Analysis (Edited by User)"
+                        : "AI Condition Analysis"}
                     </span>
                     <span className="badge badge-warning font-black text-xs">
-                      {aiResult.estimatedScore ?? aiResult.score ?? "15"} / 100 คะแนน
+                      {aiResult.estimatedScore ?? aiResult.score ?? "15"} / 100 PTS
                     </span>
                   </div>
 
                   <div className="form-control">
                     <label className="label py-0 pb-1">
                       <span className="label-text-alt text-base-content/70 font-semibold">
-                        ข้อความสรุปวิเคราะห์สภาพ (สามารถแก้ไขได้)
+                        Condition Summary Note (Editable)
                       </span>
                     </label>
                     <textarea
@@ -345,7 +345,7 @@ export default function ProductSummaryModal({
               className="btn btn-ghost font-bold text-sm"
               disabled={isPublishing}
             >
-              ยกเลิก
+              Cancel
             </button>
             <button
               type="button"
@@ -357,7 +357,7 @@ export default function ProductSummaryModal({
                 <span className="loading loading-spinner" />
               ) : (
                 <>
-                  <CheckCircle className="w-5 h-5" /> ยืนยันการลงขาย
+                  <CheckCircle className="w-5 h-5" /> Confirm Listing
                 </>
               )}
             </button>
