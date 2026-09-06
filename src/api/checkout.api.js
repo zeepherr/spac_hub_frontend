@@ -2,11 +2,15 @@ import { authApi } from "./axios";
 
 // Calculates the authoritative Checkout price.
 // This does not create or reserve anything.
-export const getCheckoutQuote = async (listingIds) => {
+export const getCheckoutQuote = async (
+  listingIds,
+  setupServiceRequested = false,
+) => {
   const response = await authApi.post(
     "/checkouts/quote",
     {
       listingIds,
+      setupServiceRequested,
     },
     {
       globalLoading: false,
