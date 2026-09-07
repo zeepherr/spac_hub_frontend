@@ -39,6 +39,9 @@ import CheckoutStep2Page from "@/pages/cart/CheckoutStep2Page";
 import CheckoutStep3Page from "@/pages/cart/CheckoutStep3Page";
 
 import PaymentSuccessPage from "@/pages/auth/payments/PaymentSuccessPage";
+import MyListingsPage from "@/pages/seller/MyListingsPage";
+import SellingOrdersPage from "@/pages/seller/SellingOrdersPage";
+import SalesReportPage from "@/pages/seller/SalesReportPage";
 
 import BuildPcPage from "@/pages/build/BuildPcPage";
 
@@ -138,6 +141,21 @@ const router = createBrowserRouter([
                     path: "favorites",
                     element: null,
                   },
+                  {
+                    path: "sell/selling-orders",
+                    element: <SellingOrdersPage />,
+                  },
+                  {
+                    path: "sell/my-listings",
+                    element: <MyListingsPage />
+
+                  },
+                  {
+                    path: "sell/sales-report",
+                    element: <SalesReportPage />
+
+                  },
+                  
                   {
                     path: "*",
                     Component: NotFound,

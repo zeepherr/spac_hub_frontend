@@ -21,7 +21,7 @@ import { useListingConditionQuestions } from "@/hook/listing/useListingCondition
 import ProductSummaryModal from "@/components/userseller/ProductSummaryModal";
 import PublishStepSection from "@/components/userseller/PublishStepSection";
 import { useListingsByCategory } from "@/hook/listing/useListingByCategory";
-
+import ConfirmUploadModal from "@/components/userseller/ConfirmUploadModal";
 
 export default function CreateProductPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -41,7 +41,10 @@ export default function CreateProductPage() {
   const [answers, setAnswers] = useState({});
   const [imageFiles, setImageFiles] = useState([]);
   const [aiResult, setAiResult] = useState(null);
+  
+  // Modal States
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
+  const [isConfirmUploadOpen, setIsConfirmUploadOpen] = useState(false); // State สำหรับ Modal เตือนอัปโหลด
 
   // --- React Query Mutations & Queries ---
   const identifyProductMutation = useIdentifyProduct();
@@ -52,7 +55,7 @@ export default function CreateProductPage() {
   const analyzeConditionMutation = useAnalyzeListingCondition();
   const publishListingMutation = usePublishListing();
 
-  // Fetch all categories to match categoryId with category name
+  // Fetch all categories
   const { categories: categoriesData } = useListingsByCategory();
   const categories = useMemo(() => {
     return Array.isArray(categoriesData)
@@ -60,7 +63,7 @@ export default function CreateProductPage() {
       : categoriesData?.data || [];
   }, [categoriesData]);
 
-  // Find category name from current categoryId
+  // Find category name
   const currentCategoryName = useMemo(() => {
     if (!formData.categoryId) return "";
     const found = categories.find(
@@ -201,14 +204,22 @@ export default function CreateProductPage() {
     );
   };
 
-  // --- STEP 3 SUBMIT ---
-  const handleStep3Submit = () => {
-    if (imageFiles.length === 0) return;
+  // --- STEP 3 HANDLER: กดเปิด Modal ยืนยันก่อนอัปโหลด ---
+  const handleOpenUploadConfirm = () => {
+    if (imageFiles.length === 0) {
+      toast.error("กรุณาเลือกรูปภาพสินค้าอย่างน้อย 1 รูป");
+      return;
+    }
+    setIsConfirmUploadOpen(true);
+  };
 
+  // --- STEP 3 SUBMIT: กดยืนยันใน Modal แล้วค่อยทำการอัปโหลดภาพจริง ---
+  const handleStep3Submit = () => {
     uploadImagesMutation.mutate(
       { listingId, images: imageFiles },
       {
         onSuccess: () => {
+          setIsConfirmUploadOpen(false);
           setCurrentStep(4);
           scrollToSection(step4Ref);
         },
@@ -236,7 +247,6 @@ export default function CreateProductPage() {
     if (parsedPrice > 99999999) return;
 
     try {
-      // 1. Save latest product details update
       const payload = {
         title: formData.title?.trim() || "",
         price: parsedPrice,
@@ -249,7 +259,6 @@ export default function CreateProductPage() {
 
       await updateListingMutation.mutateAsync({ listingId, payload });
 
-      // 2. Save latest condition answers update
       if (Object.keys(answers).length > 0) {
         const formattedAnswers = Object.keys(answers).map((qId) => ({
           questionId: Number(qId),
@@ -262,7 +271,6 @@ export default function CreateProductPage() {
         });
       }
 
-      // 3. Call Publish
       await publishListingMutation.mutateAsync(listingId);
 
       setIsSummaryModalOpen(false);
@@ -336,19 +344,15 @@ export default function CreateProductPage() {
                   <ImageUploadPreview
                     imageFiles={imageFiles}
                     setImageFiles={setImageFiles}
-                    disabled={false}
+                    disabled={currentStep > 3}
                   />
                   {currentStep === 3 && (
                     <button
-                      onClick={handleStep3Submit}
+                      onClick={handleOpenUploadConfirm}
                       disabled={isGlobalLoading}
                       className="btn btn-primary text-white w-full rounded-field font-bold"
                     >
-                      {uploadImagesMutation.isPending ? (
-                        <span className="loading loading-spinner" />
-                      ) : (
-                        "Save Images & Next"
-                      )}
+                      บันทึกรูปภาพและไปขั้นตอนถัดไป
                     </button>
                   )}
                 </div>
@@ -380,6 +384,15 @@ export default function CreateProductPage() {
         </div>
       </div>
 
+      {/* Modal ยืนยันการอัปโหลดภาพก่อนไปขั้นตอนถัดไป */}
+      <ConfirmUploadModal
+        isOpen={isConfirmUploadOpen}
+        onClose={() => setIsConfirmUploadOpen(false)}
+        onConfirm={handleStep3Submit}
+        loading={uploadImagesMutation.isPending}
+      />
+
+      {/* Summary Modal */}
       <ProductSummaryModal
         isOpen={isSummaryModalOpen}
         onClose={() => setIsSummaryModalOpen(false)}

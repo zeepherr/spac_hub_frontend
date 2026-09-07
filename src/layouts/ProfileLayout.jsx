@@ -75,7 +75,7 @@ function ProfileLayout() {
         {/* เมนูการใช้งาน */}
         <nav aria-label="เมนูบัญชี" className="p-4">
           <p className="mb-3 px-4 text-m font-bold uppercase tracking-wider text-neutral/70">
-            บัญชีของฉัน
+            My Profile
           </p>
 
           <ul className="space-y-2">
