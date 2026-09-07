@@ -5,7 +5,7 @@ import { listingKeys } from "./listingKeys";
 export const useListings = () => {
   return useQuery({
     queryKey: listingKeys.active(),
-    queryFn: getActiveListings,
+    queryFn: () => getActiveListings(),
     staleTime: 5 * 60 * 1000,
     retry: false,
   });
