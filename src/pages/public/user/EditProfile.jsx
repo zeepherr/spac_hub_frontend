@@ -1,5 +1,6 @@
 import {Camera,LoaderCircle,Save,UserRound,} from "lucide-react";
 import { useProfileForm } from "@/components/user/useProfileForm";
+import BackButton from "./BackButton";
 
 function EditProfile() {
   const {
@@ -40,6 +41,7 @@ function EditProfile() {
   return (
     <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
       <div className="mx-auto max-w-5xl">
+        <BackButton />
         <header className="mb-7">
           <p className="text-sm font-semibold uppercase tracking-wider text-orange-500">
             Account settings
