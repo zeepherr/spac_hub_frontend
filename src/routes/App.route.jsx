@@ -41,6 +41,7 @@ import CheckoutStep3Page from "@/pages/cart/CheckoutStep3Page";
 import PaymentSuccessPage from "@/pages/auth/payments/PaymentSuccessPage";
 import MyListingsPage from "@/pages/seller/MyListingsPage";
 import SellingOrdersPage from "@/pages/seller/SellingOrdersPage";
+import SalesReportPage from "@/pages/seller/SalesReportPage";
 
 const router = createBrowserRouter([
   {
@@ -138,6 +139,12 @@ const router = createBrowserRouter([
                     element: <MyListingsPage />
 
                   },
+                  {
+                    path: "sell/sales-report",
+                    element: <SalesReportPage />
+
+                  },
+                  
                   {
                     path: "*",
                     Component: NotFound,

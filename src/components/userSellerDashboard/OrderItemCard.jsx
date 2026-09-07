@@ -1,5 +1,5 @@
 import React from "react";
-import { XCircle } from "lucide-react";
+import { XCircle, CheckCircle } from "lucide-react";
 
 const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || "";
 const DEFAULT_IMAGE = "https://placehold.co/150x150?text=No+Image";
@@ -25,8 +25,9 @@ const getStepIndex = (status) => {
     case "VERIFIED":
       return 2;
     case "SHIPPING_TO_BUYER":
-    case "COMPLETED":
       return 3;
+    case "COMPLETED":
+      return 4; // Return 4 so all previous steps marked as completed if stepper is rendered
     case "REJECTED":
     case "CANCELLED":
       return -2;
@@ -108,6 +109,7 @@ const getStatusBadge = (status) => {
 export function OrderItemCard({ order, onClick }) {
   const currentStepIndex = getStepIndex(order.status);
   const isFailedOrCancelled = ["REJECTED", "CANCELLED"].includes(order.status);
+  const isCompleted = order.status === "COMPLETED";
 
   // Extract and format cover image URL
   const coverImage =
@@ -160,8 +162,13 @@ export function OrderItemCard({ order, onClick }) {
         </div>
       </div>
 
-      {/* Stepper Tracking */}
-      {!isFailedOrCancelled ? (
+      {/* Stepper Tracking / Status Message */}
+      {isCompleted ? (
+        <div className="pt-3 border-t border-base-200 flex items-center justify-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+          <CheckCircle className="w-4 h-4" />
+          <span>The buyer has confirmed receipt of the item.</span>
+        </div>
+      ) : !isFailedOrCancelled ? (
         <div className="grid grid-cols-4 gap-1 text-center text-[11px] font-semibold pt-3 border-t border-base-200 text-base-content/60">
           {ORDER_STEPS.map((step, idx) => {
             const isPassed = idx < currentStepIndex;

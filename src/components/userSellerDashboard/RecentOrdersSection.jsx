@@ -21,7 +21,7 @@ const DEFAULT_IMAGE = "https://placehold.co/150x150?text=No+Image";
 export default function RecentOrdersSection() {
   const navigate = useNavigate();
   const { data: sellingOrders = [], isLoading, isError } = useSellingOrders();
-
+console.log('sellingOrders', sellingOrders)
   // State for Modal Management
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isShipModalOpen, setIsShipModalOpen] = useState(false);
