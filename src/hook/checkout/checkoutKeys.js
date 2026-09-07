@@ -3,5 +3,9 @@ export const checkoutKeys = {
 
   quotes: () => [...checkoutKeys.all, "quote"],
 
-  quote: (listingIds) => [...checkoutKeys.quotes(), [...listingIds].sort()],
+  quote: (listingIds, setupServiceRequested = false) => [
+    ...checkoutKeys.quotes(),
+    [...listingIds].sort(),
+    setupServiceRequested,
+  ],
 };
