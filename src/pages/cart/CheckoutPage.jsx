@@ -1,16 +1,16 @@
+import CheckoutStep1 from "@/components/cart/CheckoutStep1";
+import CheckoutStep3 from "@/components/cart/CheckoutStep3";
+import { useCheckoutQuote } from "@/hook/checkout/useCheckoutQuote"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
+import { useCreateCheckout } from "@/hook/checkout/useCreateCheckout"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
+import { useCreatePaymentCheckout } from "@/hook/payment/useCreatePaymentCheckout"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
+import { useUpdateUserProfile } from "@/hook/user/useUpdateUserProfile"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
+import useAuthStore from "@/stores/auth.store"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
 import { zodResolver } from "@hookform/resolvers/zod"; // ปรับตามที่โปรเจกต์คุณใช้จริง
 import { ArrowLeft, ArrowRight, Lock, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router";
 import { z } from "zod";
-import useAuthStore from "@/stores/auth.store"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { useUpdateUserProfile } from "@/hook/user/useUpdateUserProfile"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { useCheckoutQuote } from "@/hook/checkout/useCheckoutQuote"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { useCreateCheckout } from "@/hook/checkout/useCreateCheckout"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { useCreatePaymentCheckout } from "@/hook/payment/useCreatePaymentCheckout"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import CheckoutStep3 from "@/components/cart/CheckoutStep3";
-import CheckoutStep1 from "@/components/cart/CheckoutStep1";
 
 // รีแฟกเตอร์ตามที่เลือก "ยุบเหลือแค่ 2 หน้าจริง": หน้านี้เหลือแค่ step กรอกที่อยู่จัดส่งเสมอ
 // (ไม่มี internal state machine เปลี่ยนหน้าในตัวเองอีกแล้ว) ระหว่างที่กำลังสร้าง checkout/payment
@@ -187,7 +187,7 @@ function OrderSummary({
       <button
         type="button"
         onClick={onContinue}
-        disabled={submitting}
+        disabled={submitting || !hasItems || isPending || isQuoteError}
         className="btn btn-accent w-full gap-2 text-white disabled:opacity-50"
       >
         ดำเนินการชำระเงิน
