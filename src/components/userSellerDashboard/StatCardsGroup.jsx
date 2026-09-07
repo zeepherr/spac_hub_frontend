@@ -1,46 +1,95 @@
 import React from "react";
-import { ShoppingBag, Tag, ShieldCheck, MessageSquare, ChevronRight } from "lucide-react";
-
-const stats = [
-  {
-    label: "Buying",
-    value: "2",
-    icon: ShoppingBag,
-    color: "text-blue-500 dark:text-blue-400",
-    bgColor: "bg-blue-500/10",
-    borderColor: "group-hover:border-blue-500/40",
-    glowColor: "group-hover:shadow-blue-500/10",
-  },
-  {
-    label: "Selling",
-    value: "3",
-    icon: Tag,
-    color: "text-emerald-500 dark:text-emerald-400",
-    bgColor: "bg-emerald-500/10",
-    borderColor: "group-hover:border-emerald-500/40",
-    glowColor: "group-hover:shadow-emerald-500/10",
-  },
-  {
-    label: "Pending Verification",
-    value: "1",
-    icon: ShieldCheck,
-    color: "text-amber-500 dark:text-amber-400",
-    bgColor: "bg-amber-500/10",
-    borderColor: "group-hover:border-amber-500/40",
-    glowColor: "group-hover:shadow-amber-500/10",
-  },
-  {
-    label: "New Messages",
-    value: "4",
-    icon: MessageSquare,
-    color: "text-indigo-500 dark:text-indigo-400",
-    bgColor: "bg-indigo-500/10",
-    borderColor: "group-hover:border-indigo-500/40",
-    glowColor: "group-hover:shadow-indigo-500/10",
-  },
-];
+import {
+  ShoppingBag,
+  Tag,
+  ShieldCheck,
+  XCircle,
+  ChevronRight,
+} from "lucide-react";
+import { useBuyingOrders } from "@/hook/order/useBuyingOrders";
+import { useSellingOrders } from "@/hook/order/useSellingOrder";
+import { useNavigate } from "react-router";
 
 export default function StatCardsGroup() {
+  const navigate = useNavigate();
+  const { data: buyingOrders = [], isLoading: isLoadingBuying } = useBuyingOrders();
+  const { data: sellingOrders = [], isLoading: isLoadingSelling } = useSellingOrders();
+
+  // 1. Buying: แก้ไขให้ดึงจาก buyingOrders จริง และรองรับสถานะสำเร็จ
+  const buyingCount = sellingOrders.filter((order) => {
+    const status = String(order.status || "").toUpperCase();
+    return ["COMPLETED", "DELIVERED", "RECEIVED", "SUCCESS"].includes(status);
+  }).length;
+
+  // 2. Selling: ออเดอร์ฝั่งขายที่ยังดำเนินอยู่ (ไม่ยกเลิก/ไม่โดนปฏิเสธ)
+  const sellingCount = sellingOrders.filter((order) => {
+    const status = String(order.status || "").toUpperCase();
+    return status !== "CANCELLED" && status !== "REJECTED";
+  }).length;
+
+  // 3. Pending Verification: สินค้าฝั่งขายที่อยู่ระหว่างตรวจ SPEC
+  const pendingVerificationCount = sellingOrders.filter((order) => {
+    const status = String(order.status || "").toUpperCase();
+    return ["INSPECTION_PENDING", "INSPECTING", "NEEDS_REVIEW"].includes(status);
+  }).length;
+
+  // 4. Rejected: รายการที่โดน Reject
+  const rejectedCount = sellingOrders.filter((order) => {
+    const status = String(order.status || "").toUpperCase();
+    return status === "REJECTED";
+  }).length;
+
+  const stats = [
+    {
+      label: "Buying",
+      value: buyingCount,
+      icon: ShoppingBag,
+      color: "text-blue-500 dark:text-blue-400",
+      bgColor: "bg-blue-500/10",
+      borderColor: "group-hover:border-blue-500/40",
+      glowColor: "group-hover:shadow-blue-500/10",
+      path: "/user/sell/selling-orders",
+      filterTab: "COMPLETED", // ส่ง Tab state ปลายทาง
+    },
+    {
+      label: "Selling",
+      value: sellingCount,
+      icon: Tag,
+      color: "text-emerald-500 dark:text-emerald-400",
+      bgColor: "bg-emerald-500/10",
+      borderColor: "group-hover:border-emerald-500/40",
+      glowColor: "group-hover:shadow-emerald-500/10",
+      path: "/user/sell/selling-orders",
+      filterTab: "ALL",
+    },
+    {
+      label: "Pending Verification",
+      value: pendingVerificationCount,
+      icon: ShieldCheck,
+      color: "text-amber-500 dark:text-amber-400",
+      bgColor: "bg-amber-500/10",
+      borderColor: "group-hover:border-amber-500/40",
+      glowColor: "group-hover:shadow-amber-500/10",
+      path: "/user/sell/selling-orders",
+      filterTab: "INSPECTION",
+    },
+    {
+      label: "Rejected Items",
+      value: rejectedCount,
+      icon: XCircle,
+      color: "text-rose-500 dark:text-rose-400",
+      bgColor: "bg-rose-500/10",
+      borderColor: "group-hover:border-rose-500/40",
+      glowColor: "group-hover:shadow-rose-500/10",
+      path: "/user/sell/selling-orders",
+      filterTab: "CANCELLED",
+    },
+  ];
+
+  if (isLoadingBuying || isLoadingSelling) {
+    return <StatCardsGroupSkeleton />;
+  }
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
       {stats.map((item, idx) => {
@@ -48,9 +97,12 @@ export default function StatCardsGroup() {
         return (
           <div
             key={idx}
+            onClick={() =>
+              navigate(item.path, { state: { activeTab: item.filterTab } })
+            }
             className={`group relative card bg-base-100 border border-base-200/80 p-4 rounded-2xl flex flex-row items-center justify-between cursor-pointer shadow-sm hover:shadow-xl ${item.glowColor} ${item.borderColor} transition-all duration-300 hover:-translate-y-0.5 overflow-hidden`}
           >
-            {/* Soft Glow Background Effect */}
+            {/* Background Glow */}
             <div
               className={`absolute -right-6 -bottom-6 w-20 h-20 ${item.bgColor} rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}
             />

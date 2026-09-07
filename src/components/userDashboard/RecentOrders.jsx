@@ -30,9 +30,9 @@ const orderStatusConfig = {
 };
 
 function RecentOrders({
-    orders,
+    orders = [],
     onViewAll,
-    onOpenOrder,
+    onSelectOrder,
 }) {
     return (
         <section className="rounded-2xl border border-base-300 bg-base-100 p-5 shadow-sm lg:p-6">
@@ -65,7 +65,7 @@ function RecentOrders({
                                 key={order.id}
                                 type="button"
                                 onClick={() =>
-                                    onOpenOrder(order.id)
+                                    onSelectOrder(order.id)
                                 }
                                 className="grid w-full cursor-pointer grid-cols-1 gap-4 py-4 text-left transition first:pt-2 hover:bg-base-200/30 md:grid-cols-[minmax(0,1fr)_130px_150px_24px] md:items-center"
                             >

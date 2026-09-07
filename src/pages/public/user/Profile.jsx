@@ -12,6 +12,7 @@ import {
 import { useNavigate } from "react-router";
 
 import { useUserProfile } from "@/hook/user/useUserProfile";
+import BackButton from "./BackButton";
 
 function Profile() {
   const navigate = useNavigate();
@@ -69,6 +70,7 @@ function Profile() {
   return (
     <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
       <div className="mx-auto max-w-6xl">
+       
         {/* Header */}
         <header className="mb-7">
           <h1 className="text-3xl font-bold text-neutral-900">My Profile</h1>
