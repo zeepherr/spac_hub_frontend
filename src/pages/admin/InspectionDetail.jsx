@@ -415,10 +415,6 @@ function InspectionDetail() {
                 <option value="FAILED">
                   ไม่ผ่านการตรวจ
                 </option>
-
-                <option value="NEEDS_REVIEW">
-                  ต้องตรวจสอบเพิ่มเติม
-                </option>
               </select>
             </div>
 
