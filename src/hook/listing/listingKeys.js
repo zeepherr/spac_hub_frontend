@@ -4,7 +4,7 @@ export const listingKeys = {
   public: () => [...listingKeys.all, "public"],
 
   active: () => [...listingKeys.public(), "active"],
-
+  search: (search) => [...listingKeys.active(), "search", search],
   byCategory: (categoryId) => [...listingKeys.public(), "category", categoryId],
 
   mine: () => [...listingKeys.all, "mine"],
