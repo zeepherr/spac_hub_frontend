@@ -1,4 +1,6 @@
 import { useMyCart } from "@/hook/cart/useMyCart";
+import { useDebounce } from "@/hook/listing/useBounce";
+import { useListingSearch } from "@/hook/listing/useListingSearch";
 import useAuthStore from "@/stores/auth.store";
 import {
   Cpu,
@@ -7,8 +9,10 @@ import {
   Search,
   ShoppingCart,
   User,
+  X,
 } from "lucide-react";
-import { Link, NavLink, useLocation } from "react-router";
+import { useEffect, useRef, useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router";
 
 function Logo() {
   return (
@@ -26,22 +30,185 @@ function Logo() {
   );
 }
 
+function getCoverImageUrl(listing) {
+  const images = listing?.images ?? [];
+  const cover = images.find((image) => image.isCover) ?? images[0];
+
+  return cover?.imageUrl;
+}
+
 function SearchForm() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+
+  const searchContainerRef = useRef(null);
+  const navigate = useNavigate();
+
+  const debouncedSearch = useDebounce(searchTerm, 300);
+
+  const {
+    data: results = [],
+    isFetching,
+    isError,
+  } = useListingSearch(debouncedSearch);
+
+  const canShowDropdown = isOpen && searchTerm.trim().length >= 2;
+
+  useEffect(() => {
+    const handlePointerDown = (event) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, []);
+
+  const handleSearchChange = (event) => {
+    const value = event.target.value;
+
+    setSearchTerm(value);
+    setIsOpen(value.trim().length >= 2);
+  };
+
+  const handleSelectListing = (listingId) => {
+    setSearchTerm("");
+    setIsOpen(false);
+
+    navigate(`/products/${listingId}`);
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    setIsOpen(false);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (results.length > 0) {
+      handleSelectListing(results[0].id);
+    }
+  };
+
   return (
-    <form className="flex w-full max-w-2xl overflow-hidden rounded-full border border-neutral-200 bg-neutral-50">
-      <input
-        type="text"
-        placeholder="Search products, brands, models..."
-        className="w-full bg-transparent px-5 py-3 text-sm text-neutral-800 outline-none placeholder:text-neutral-400"
-      />
-      <button
-        type="submit"
-        aria-label="ค้นหา"
-        className="flex w-14 shrink-0 items-center justify-center bg-[#f97316] text-white transition hover:bg-orange-600"
+    <div ref={searchContainerRef} className="relative w-full max-w-2xl">
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full overflow-hidden rounded-full border border-neutral-200 bg-neutral-50"
       >
-        <Search size={20} />
-      </button>
-    </form>
+        <div className="relative min-w-0 flex-1">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            onFocus={() => {
+              if (searchTerm.trim().length >= 2) {
+                setIsOpen(true);
+              }
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setIsOpen(false);
+              }
+            }}
+            placeholder="Search products, brands, models..."
+            autoComplete="off"
+            className="w-full bg-transparent px-5 py-3 pr-10 text-sm text-neutral-800 outline-none placeholder:text-neutral-400"
+          />
+
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              aria-label="Clear search"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700"
+            >
+              <X size={17} />
+            </button>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          aria-label="Search"
+          className="flex w-14 shrink-0 items-center justify-center bg-[#f97316] text-white transition hover:bg-orange-600"
+        >
+          <Search size={20} />
+        </button>
+      </form>
+
+      {canShowDropdown && (
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-xl border border-neutral-200 bg-white p-2 shadow-xl">
+          {isFetching ? (
+            <p className="px-3 py-4 text-sm text-neutral-500">Searching...</p>
+          ) : isError ? (
+            <p className="px-3 py-4 text-sm text-red-600">
+              Search failed. Please try again.
+            </p>
+          ) : results.length === 0 ? (
+            <p className="px-3 py-4 text-sm text-neutral-500">
+              No products found.
+            </p>
+          ) : (
+            results.map((listing) => {
+              const imageUrl = getCoverImageUrl(listing);
+              const price = Number(listing.price);
+
+              return (
+                <button
+                  key={listing.id}
+                  type="button"
+                  onClick={() => handleSelectListing(listing.id)}
+                  className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition hover:bg-orange-50"
+                >
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-neutral-100">
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={listing.title}
+                        className="h-full w-full object-contain"
+                      />
+                    ) : (
+                      <Cpu size={28} className="text-neutral-300" />
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-neutral-900">
+                      {listing.title}
+                    </p>
+
+                    <p className="truncate text-xs text-neutral-500">
+                      {[listing.brand, listing.model]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+
+                    {listing.category?.name && (
+                      <p className="mt-1 truncate text-xs text-neutral-400">
+                        {listing.category.name}
+                      </p>
+                    )}
+                  </div>
+
+                  <p className="shrink-0 text-sm font-bold text-[#f97316]">
+                    ฿{price.toLocaleString()}
+                  </p>
+                </button>
+              );
+            })
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -58,7 +225,7 @@ function AuthLinks() {
     <div className="flex items-center gap-1.5 text-neutral-700">
       <User size={18} />
       <NavLink to="/login" className={navLinkClass}>
-       Register
+        Register
       </NavLink>
       <span> / </span>
       <NavLink to="/register" className={navLinkClass}>

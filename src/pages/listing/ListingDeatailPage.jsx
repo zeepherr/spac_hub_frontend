@@ -158,7 +158,7 @@ export default function ListingDetailPage() {
           <>
             <ChevronRight size={14} />
             <Link
-              to={`/categories/${listing.category.id}`}
+              to={`/products/categories/${listing.category.id}`}
               className="hover:text-[#f97316]"
             >
               {listing.category.name}
