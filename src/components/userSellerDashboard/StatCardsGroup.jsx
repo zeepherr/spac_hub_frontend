@@ -8,41 +8,36 @@ import {
 } from "lucide-react";
 import { useBuyingOrders } from "@/hook/order/useBuyingOrders";
 import { useSellingOrders } from "@/hook/order/useSellingOrder";
-// import { useMyListings } from "@/hook/listing/useMyListings"; // Import hook สำหรับดึงรายการสินค้าที่ขาย (ถ้ามี)
+import { useNavigate } from "react-router";
 
 export default function StatCardsGroup() {
+  const navigate = useNavigate();
   const { data: buyingOrders = [], isLoading: isLoadingBuying } = useBuyingOrders();
   const { data: sellingOrders = [], isLoading: isLoadingSelling } = useSellingOrders();
-  // const { data: myListings = [] } = useMyListings(); // หรือดึงรายการประกาศขายจาก hook ของคุณ
 
-  // 1. Buying: จำนวนรายการคำสั่งซื้อของฉันที่มีคนกดซื้อและอยู่ระหว่างดำเนินการ/ชำระเงินแล้ว
-  const buyingCount = buyingOrders.filter((order) =>
-    [
-      "PAID",
-      "SELLER_SHIPPING",
-      "INSPECTION_PENDING",
-      "INSPECTING",
-      "NEEDS_REVIEW",
-      "VERIFIED",
-      "SHIPPING_TO_BUYER",
-      "COMPLETED",
-    ].includes(order.status)
-  ).length;
+  // 1. Buying: แก้ไขให้ดึงจาก buyingOrders จริง และรองรับสถานะสำเร็จ
+  const buyingCount = sellingOrders.filter((order) => {
+    const status = String(order.status || "").toUpperCase();
+    return ["COMPLETED", "DELIVERED", "RECEIVED", "SUCCESS"].includes(status);
+  }).length;
 
-  // 2. Selling: รายการของทั้งหมดที่ฉันขาย (นับจากคำสั่งซื้อขายที่ดำเนินการอยู่ หรือจำนวนประกาศขาย)
-  const sellingCount = sellingOrders.filter(
-    (order) => order.status !== "CANCELLED" && order.status !== "REJECTED"
-  ).length;
+  // 2. Selling: ออเดอร์ฝั่งขายที่ยังดำเนินอยู่ (ไม่ยกเลิก/ไม่โดนปฏิเสธ)
+  const sellingCount = sellingOrders.filter((order) => {
+    const status = String(order.status || "").toUpperCase();
+    return status !== "CANCELLED" && status !== "REJECTED";
+  }).length;
 
-  // 3. Pending Verification: รายการที่สินค้ายังอยู่กับ Admin เพื่อตรวจ SPEC
-  const pendingVerificationCount = sellingOrders.filter((order) =>
-    ["INSPECTION_PENDING", "INSPECTING", "NEEDS_REVIEW"].includes(order.status)
-  ).length;
+  // 3. Pending Verification: สินค้าฝั่งขายที่อยู่ระหว่างตรวจ SPEC
+  const pendingVerificationCount = sellingOrders.filter((order) => {
+    const status = String(order.status || "").toUpperCase();
+    return ["INSPECTION_PENDING", "INSPECTING", "NEEDS_REVIEW"].includes(status);
+  }).length;
 
-  // 4. Rejected: สินค้าที่โดน Reject กลับ (Logic กรองคำสั่งซื้อที่ถูกปฏิเสธ)
-  const rejectedCount = sellingOrders.filter(
-    (order) => order.status === "REJECTED"
-  ).length;
+  // 4. Rejected: รายการที่โดน Reject
+  const rejectedCount = sellingOrders.filter((order) => {
+    const status = String(order.status || "").toUpperCase();
+    return status === "REJECTED";
+  }).length;
 
   const stats = [
     {
@@ -53,6 +48,8 @@ export default function StatCardsGroup() {
       bgColor: "bg-blue-500/10",
       borderColor: "group-hover:border-blue-500/40",
       glowColor: "group-hover:shadow-blue-500/10",
+      path: "/user/sell/selling-orders",
+      filterTab: "COMPLETED", // ส่ง Tab state ปลายทาง
     },
     {
       label: "Selling",
@@ -62,6 +59,8 @@ export default function StatCardsGroup() {
       bgColor: "bg-emerald-500/10",
       borderColor: "group-hover:border-emerald-500/40",
       glowColor: "group-hover:shadow-emerald-500/10",
+      path: "/user/sell/selling-orders",
+      filterTab: "ALL",
     },
     {
       label: "Pending Verification",
@@ -71,6 +70,8 @@ export default function StatCardsGroup() {
       bgColor: "bg-amber-500/10",
       borderColor: "group-hover:border-amber-500/40",
       glowColor: "group-hover:shadow-amber-500/10",
+      path: "/user/sell/selling-orders",
+      filterTab: "INSPECTION",
     },
     {
       label: "Rejected Items",
@@ -80,6 +81,8 @@ export default function StatCardsGroup() {
       bgColor: "bg-rose-500/10",
       borderColor: "group-hover:border-rose-500/40",
       glowColor: "group-hover:shadow-rose-500/10",
+      path: "/user/sell/selling-orders",
+      filterTab: "CANCELLED",
     },
   ];
 
@@ -94,9 +97,12 @@ export default function StatCardsGroup() {
         return (
           <div
             key={idx}
+            onClick={() =>
+              navigate(item.path, { state: { activeTab: item.filterTab } })
+            }
             className={`group relative card bg-base-100 border border-base-200/80 p-4 rounded-2xl flex flex-row items-center justify-between cursor-pointer shadow-sm hover:shadow-xl ${item.glowColor} ${item.borderColor} transition-all duration-300 hover:-translate-y-0.5 overflow-hidden`}
           >
-            {/* Soft Glow Background Effect */}
+            {/* Background Glow */}
             <div
               className={`absolute -right-6 -bottom-6 w-20 h-20 ${item.bgColor} rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}
             />
