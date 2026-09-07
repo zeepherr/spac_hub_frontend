@@ -1,5 +1,5 @@
 import {
-  ArrowLeft,
+  AlertTriangle,
   Box,
   CalendarDays,
   CircleDollarSign,
@@ -10,64 +10,88 @@ import {
   Phone,
   Store,
   Truck,
+  X,
 } from "lucide-react";
-import {
-  useNavigate,
-  useParams,
-} from "react-router";
+import { useState } from "react";
+import { useParams } from "react-router";
 
-import { useOrderById } from "@/hook/order/useOrderById";
 import { useConfirmOrderDelivery } from "@/hook/order/useConfirmOrderDelivery";
+import { useOrderById } from "@/hook/order/useOrderById";
+import BackButton from "./BackButton";
 
 const ORDER_STATUS = {
   AWAITING_PAYMENT: {
     label: "Awaiting Payment",
-    className:
-      "bg-orange-50 text-orange-600",
+    className: "bg-orange-50 text-orange-600",
   },
+
   PAID: {
     label: "Paid",
-    className:
-      "bg-emerald-50 text-emerald-600",
+    className: "bg-emerald-50 text-emerald-600",
   },
+
   SELLER_SHIPPING: {
     label: "Seller Shipping to Inspection",
-    className:
-      "bg-amber-50 text-amber-600",
+    className: "bg-amber-50 text-amber-600",
   },
+
+  SHIPPING_TO_ADMIN: {
+    label: "Shipping to Admin",
+    className: "bg-amber-50 text-amber-600",
+  },
+
+  RECEIVED_BY_ADMIN: {
+    label: "Received by Admin",
+    className: "bg-violet-50 text-violet-600",
+  },
+
+  INSPECTING: {
+    label: "Inspecting",
+    className: "bg-purple-50 text-purple-600",
+  },
+
+  INSPECTION_PASSED: {
+    label: "Inspection Passed",
+    className: "bg-teal-50 text-teal-600",
+  },
+
   SHIPPING_TO_BUYER: {
     label: "Shipping to Buyer",
-    className:
-      "bg-blue-50 text-blue-600",
+    className: "bg-blue-50 text-blue-600",
   },
+
   COMPLETED: {
     label: "Completed",
-    className:
-      "bg-emerald-50 text-emerald-600",
+    className: "bg-emerald-50 text-emerald-600",
   },
+
   CANCELLED: {
     label: "Cancelled",
-    className:
-      "bg-red-50 text-red-600",
+    className: "bg-red-50 text-red-600",
   },
+
   REJECTED: {
     label: "Inspection Failed",
-    className:
-      "bg-red-50 text-red-600",
+    className: "bg-red-50 text-red-600",
+  },
+
+  REFUNDED: {
+    label: "Refunded",
+    className: "bg-neutral-100 text-neutral-600",
   },
 };
 
-const CONFIRMABLE_SHIPMENT_STATUSES =
-  new Set([
-    "SHIPPED",
-    "IN_TRANSIT",
-    "DELIVERED",
-  ]);
+const CONFIRMABLE_SHIPMENT_STATUSES = new Set([
+  "SHIPPED",
+  "IN_TRANSIT",
+  "DELIVERED",
+]);
 
 function OrderDetail() {
-  const navigate = useNavigate();
   const { orderId } = useParams();
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
+  /* ดึงรายละเอียด Order จาก Backend*/
   const {
     data: order,
     isPending,
@@ -76,9 +100,7 @@ function OrderDetail() {
     refetch,
   } = useOrderById(orderId);
 
-  const confirmDeliveryMutation =
-    useConfirmOrderDelivery();
-
+  const confirmDeliveryMutation = useConfirmOrderDelivery();
   if (isPending) {
     return (
       <div className="flex min-h-96 items-center justify-center gap-3">
@@ -87,13 +109,12 @@ function OrderDetail() {
           className="animate-spin text-orange-500"
         />
 
-        <span className="text-sm text-neutral-500">
-          Loading order details...
-        </span>
+        <span className="text-sm text-neutral-500">Loading order details...</span>
       </div>
     );
   }
 
+  /* โหลดข้อมูลไม่สำเร็จ*/
   if (isError) {
     return (
       <div className="flex min-h-96 flex-col items-center justify-center gap-4">
@@ -105,41 +126,37 @@ function OrderDetail() {
         <button
           type="button"
           onClick={() => refetch()}
-          className="rounded-xl border border-orange-500 px-5 py-2.5 font-semibold text-orange-500 hover:bg-orange-50"
-        >
-          Try Again
-        </button>
+          className="cursor-pointer rounded-xl border border-orange-500 px-5 py-2.5 font-semibold text-orange-500 transition hover:bg-orange-50"
+        >Try Again</button>
       </div>
     );
   }
 
+  /* Backend ไม่ส่งข้อมูล Order กลับมา */
   if (!order) {
     return (
-      <div className="flex min-h-96 items-center justify-center text-neutral-500">
-        Order not found
-      </div>
+      <div className="flex min-h-96 items-center justify-center text-neutral-500">Order not found</div>
     );
   }
 
+  /* แยกข้อมูลออกมาเพื่อเรียกใช้ง่ายขึ้น */
   const listing = order.listing;
-  const shipment =
-    order.deliveryShipment;
-  const address =
-    order.deliveryAddress;
+  const shipment = order.deliveryShipment;
+  const address = order.deliveryAddress;
   const inspection = order.inspection;
 
-  /*
-   * Backend uses toListingResponse()
-   * Image is located in imageUrl
-   */
+  /* หารูปปกสินค้าถ้าไม่มีรูปปกให้ใช้รูปแรก */
   const images = listing?.images ?? [];
   const coverImage =
     images.find((image) => image.isCover) ??
     images[0];
 
   const imageUrl =
-    coverImage?.imageUrl || "";
+    coverImage?.imageUrl ||
+    coverImage?.url ||
+    "";
 
+  /*หาชื่อสินค้า */
   const productName =
     listing?.title ||
     [listing?.brand, listing?.model]
@@ -147,6 +164,7 @@ function OrderDetail() {
       .join(" ") ||
     "Untitled Item";
 
+  /* รวมชื่อและนามสกุลผู้ขาย */
   const sellerName =
     [
       order.seller?.firstName,
@@ -156,59 +174,58 @@ function OrderDetail() {
       .join(" ") ||
     "Unknown Seller";
 
-  const status =
-    ORDER_STATUS[order.status] ?? {
-      label: order.status,
-      className:
-        "bg-neutral-100 text-neutral-600",
-    };
+  /* เลือกข้อความและสีตามสถานะ Order */
+  const status = ORDER_STATUS[order.status] ?? {
+    label: order.status || "Unknown",
+    className: "bg-neutral-100 text-neutral-600",
+  };
 
+  /*
+   * ปุ่ม Confirm Delivery จะแสดงเมื่อ:  1. Order กำลังส่งให้ผู้ซื้อ  2. มี deliveryShipment 3. Shipment เป็น SHIPPED, IN_TRANSIT หรือ DELIVERED */
   const canConfirmDelivery =
-    order.status ===
-      "SHIPPING_TO_BUYER" &&
-    shipment &&
-    CONFIRMABLE_SHIPMENT_STATUSES.has(
+    order.status === "SHIPPING_TO_BUYER" &&
+    Boolean(shipment) && CONFIRMABLE_SHIPMENT_STATUSES.has(
       shipment.status,
     );
 
+  /* เปิด Modal */
+  function handleOpenConfirmModal() {
+    setIsConfirmModalOpen(true);
+  }
+
+  /*ปิด Modal ถ้ากำลังเรียก API อยู่ จะไม่อนุญาตให้ปิด */
+  function handleCloseConfirmModal() {
+    if (confirmDeliveryMutation.isPending) {
+      return;
+    }
+    setIsConfirmModalOpen(false);
+  }
+
+  /* เรียก API ยืนยันรับสินค้า */
   function handleConfirmDelivery() {
-    const confirmed = window.confirm(
-      "Confirm that you have received the item?",
+    confirmDeliveryMutation.mutate(
+      {
+        orderId: order.id,
+      },
+      {
+        
+        onSuccess: () => {
+          setIsConfirmModalOpen(false);
+        },
+      },
     );
-
-    if (!confirmed) return;
-
-    confirmDeliveryMutation.mutate({
-      orderId: order.id,
-    });
   }
 
   return (
     <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
       <div className="mx-auto max-w-6xl">
-        {/* Back Button */}
-        <button
-          type="button"
-          onClick={() =>
-            navigate("/user/orders")
-          }
-          className="mb-6 inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-neutral-500 hover:text-orange-500"
-        >
-          <ArrowLeft size={18} />
-          Back to My Orders
-        </button>
+        <BackButton fallbackPath="/user/orders" />
 
-        {/* Header */}
         <header className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-orange-500">
-              Order detail
-            </p>
+            <p className="text-sm font-semibold uppercase tracking-wider text-orange-500">Order detail</p>
 
-            <h1 className="mt-1 text-3xl font-bold text-neutral-900">
-              Order Details
-            </h1>
-
+            <h1 className="mt-1 text-3xl font-bold text-neutral-900">Order Details</h1>
             <p className="mt-2 text-sm text-neutral-500">
               {order.orderNumber}
             </p>
@@ -216,21 +233,18 @@ function OrderDetail() {
 
           <span
             className={`w-fit rounded-full px-4 py-2 text-sm font-semibold ${status.className}`}
-          >
-            {status.label}
-          </span>
+          >{status.label}</span>
         </header>
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
-          {/* Left Column */}
+          {/* คอลัมน์ด้านซ้าย */}
           <div className="space-y-6">
-            {/* Product Card */}
+            {/* ข้อมูลสินค้า */}
             <article className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-5 text-lg font-bold text-neutral-900">
-                Item Information
-              </h2>
+              <h2 className="mb-5 text-lg font-bold text-neutral-900">Item Information</h2>
 
               <div className="flex flex-col gap-5 sm:flex-row">
+                {/* รูปสินค้า */}
                 <div className="flex size-36 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100">
                   {imageUrl ? (
                     <img
@@ -246,6 +260,7 @@ function OrderDetail() {
                   )}
                 </div>
 
+                {/* รายละเอียดสินค้า */}
                 <div className="min-w-0 flex-1">
                   <h3 className="text-xl font-bold text-neutral-900">
                     {productName}
@@ -268,15 +283,13 @@ function OrderDetail() {
                     ฿
                     {Number(
                       order.agreedPrice ?? 0,
-                    ).toLocaleString(
-                      "en-US",
-                    )}
+                    ).toLocaleString("en-US")}
                   </p>
                 </div>
               </div>
             </article>
 
-            {/* Delivery Info */}
+            {/* ข้อมูลการจัดส่ง */}
             <Card title="Shipping Information">
               <InfoRow
                 icon={Truck}
@@ -288,9 +301,7 @@ function OrderDetail() {
               <InfoRow
                 icon={PackageCheck}
                 label="Tracking Number"
-                value={
-                  shipment?.trackingNumber
-                }
+                value={shipment?.trackingNumber}
                 emptyText="No tracking number"
               />
 
@@ -301,38 +312,23 @@ function OrderDetail() {
                 emptyText="No shipping information"
               />
 
+              {/* ปุ่มยืนยันรับสินค้า */}
               {canConfirmDelivery && (
                 <button
                   type="button"
-                  onClick={
-                    handleConfirmDelivery
-                  }
+                  onClick={handleOpenConfirmModal}
                   disabled={
                     confirmDeliveryMutation.isPending
                   }
-                  className="mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {confirmDeliveryMutation.isPending ? (
-                    <>
-                      <LoaderCircle
-                        size={18}
-                        className="animate-spin"
-                      />
-                      Confirming...
-                    </>
-                  ) : (
-                    <>
-                      <PackageCheck
-                        size={18}
-                      />
-                      Confirm Delivery
-                    </>
-                  )}
+                  <PackageCheck size={18} />
+                  Confirm Delivery
                 </button>
               )}
             </Card>
 
-            {/* Inspection Result */}
+            {/* ผลการตรวจสอบสินค้า */}
             {inspection && (
               <Card title="Inspection Results">
                 <InfoRow
@@ -353,8 +349,7 @@ function OrderDetail() {
                   icon={CircleDollarSign}
                   label="Condition Score"
                   value={
-                    inspection.verifiedScore !==
-                      null &&
+                    inspection.verifiedScore !== null &&
                     inspection.verifiedScore !==
                       undefined
                       ? `${inspection.verifiedScore}/100`
@@ -365,23 +360,21 @@ function OrderDetail() {
             )}
           </div>
 
-          {/* Right Column */}
+          {/* คอลัมน์ด้านขวา */}
           <aside className="space-y-6">
+            {/* สรุปคำสั่งซื้อ */}
             <Card title="Order Summary">
               <InfoRow
                 icon={CalendarDays}
                 label="Order Date"
-                value={formatDate(
-                  order.createdAt,
-                )}
+                value={formatDate(order.createdAt)}
               />
 
               <InfoRow
                 icon={CircleDollarSign}
                 label="Payment Status"
                 value={
-                  order.checkout?.payment
-                    ?.status ||
+                  order.checkout?.payment?.status ||
                   order.checkout?.status
                 }
                 emptyText="No payment information"
@@ -394,15 +387,14 @@ function OrderDetail() {
               />
             </Card>
 
+            {/* ที่อยู่จัดส่ง */}
             <Card title="Shipping Address">
               {address ? (
                 <>
                   <InfoRow
                     icon={MapPin}
                     label="Recipient"
-                    value={
-                      address.recipientName
-                    }
+                    value={address.recipientName}
                   />
 
                   <InfoRow
@@ -416,25 +408,137 @@ function OrderDetail() {
                   </div>
                 </>
               ) : (
-                <p className="text-sm text-neutral-400">
-                  No shipping address available
-                </p>
+                <p className="text-sm text-neutral-400">No shipping address available</p>
               )}
             </Card>
           </aside>
         </div>
       </div>
+
+      {/* Modal ยืนยันรับสินค้า */}
+      <ConfirmDeliveryModal
+        isOpen={isConfirmModalOpen}
+        isPending={confirmDeliveryMutation.isPending}
+        onClose={handleCloseConfirmModal}
+        onConfirm={handleConfirmDelivery}
+      />
     </section>
   );
 }
 
+/* Modal สำหรับยืนยันรับสินค้า */
+function ConfirmDeliveryModal({
+  isOpen,
+  isPending,
+  onClose,
+  onConfirm,
+}) {
+  /* ถ้าไม่ได้เปิด ไม่ต้องแสดง Modal */
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-[2px]"
+      onMouseDown={(event) => {
+        /* กดบริเวณพื้นหลังสีดำเพื่อปิด Modal */
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-delivery-title"
+        className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl"
+      >
+        {/* ไอคอนและปุ่มปิด */}
+        <div className="flex items-start justify-between gap-4">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-orange-50 text-orange-500">
+            <PackageCheck size={24} />
+          </span>
+
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isPending}
+            aria-label="Close modal"
+            className="cursor-pointer rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* หัวข้อ Modal */}
+        <div className="mt-4">
+          <h2
+            id="confirm-delivery-title"
+            className="text-xl font-bold text-neutral-900"
+          >Confirm Delivery</h2>
+
+          <p className="mt-2 text-sm leading-6 text-neutral-500">
+            Have you received the product and checked that
+            everything is correct?
+          </p>
+        </div>
+
+        {/* คำเตือน */}
+        <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4 text-amber-800">
+          <AlertTriangle
+            size={20}
+            className="mt-0.5 shrink-0"
+          />
+
+          <p className="text-sm leading-5">
+            After confirmation, the order will be completed
+            and the payment may be released to the seller.
+          </p>
+        </div>
+
+        {/* ปุ่มด้านล่าง */}
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isPending}
+            className="cursor-pointer rounded-xl border border-neutral-300 bg-white px-5 py-2.5 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >Cancel</button>
+
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={isPending}
+            className="inline-flex min-w-36 cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isPending ? (
+              <>
+                <LoaderCircle
+                  size={18}
+                  className="animate-spin"
+                />
+                Confirming...
+              </>
+            ) : (
+              <>
+                <PackageCheck size={18} />Yes, Confirm
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* กล่อง Card ที่ใช้ซ้ำในหน้า */
 function Card({ title, children }) {
   return (
     <article className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
       <h2 className="mb-5 text-lg font-bold text-neutral-900">
         {title}
       </h2>
-
       <div className="space-y-4">
         {children}
       </div>
@@ -442,21 +546,22 @@ function Card({ title, children }) {
   );
 }
 
+/* แถวข้อมูลที่มีไอคอน หัวข้อ และค่า */
 function InfoRow({
   icon: Icon,
   label,
   value,
-  emptyText = "No information",
+  emptyText = "-",
 }) {
   const hasValue =
     value !== null &&
     value !== undefined &&
-    String(value).trim() !== "";
+    value !== "";
 
   return (
     <div className="flex items-start gap-3">
       <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-orange-50 text-orange-500">
-        <Icon size={19} />
+        <Icon size={18} />
       </span>
 
       <div className="min-w-0">
@@ -467,30 +572,35 @@ function InfoRow({
         <p
           className={`mt-1 break-words text-sm font-medium ${
             hasValue
-              ? "text-neutral-700"
+              ? "text-neutral-800"
               : "text-neutral-400"
           }`}
-        >
-          {hasValue ? value : emptyText}
+        >{hasValue ? value : emptyText}
         </p>
       </div>
     </div>
   );
 }
 
+/* แปลงวันที่ให้อ่านง่าย */
 function formatDate(date) {
-  if (!date) return "No information";
+  if (!date) {
+    return "-";
+  }
 
-  return new Intl.DateTimeFormat(
-    "en-US",
-    {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    },
-  ).format(new Date(date));
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(parsedDate);
 }
 
 export default OrderDetail;
