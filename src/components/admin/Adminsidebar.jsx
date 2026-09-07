@@ -5,7 +5,7 @@ import {
   MessageSquareText,
   PackageCheck,
   ScanLine,
-  TriangleAlert,
+  ClipboardList,
 } from "lucide-react";
 import { NavLink } from "react-router";
 
@@ -16,6 +16,16 @@ const menuItems = [
     name: "หน้าหลัก",
     path: "/admin",
     icon: LayoutGrid,
+  },
+  {
+    name: "หมวดหมู่",
+    path: "/admin/categories",
+    icon: ListTree,
+  },
+  {
+    name: "แชท",
+    path: "/admin/chats",
+    icon: MessageSquareText,
   },
   {
     name: "พัสดุรอสแกนรับ",
@@ -33,20 +43,12 @@ const menuItems = [
     icon: PackageCheck,
   },
   {
-    name: "ต้องดำเนินการ",
-    path: "/admin/orders/action-required",
-    icon: TriangleAlert,
+    name: "สรุปการจัดส่ง",
+    path: "/admin/orders/summary",
+    icon: ClipboardList,
   },
-  {
-    name: "แชท",
-    path: "/admin/chats",
-    icon: MessageSquareText,
-  },
-  {
-    name: "หมวดหมู่",
-    path: "/admin/categories",
-    icon: ListTree,
-  },
+  
+  
 ];
 
 function AdminSidebar() {
