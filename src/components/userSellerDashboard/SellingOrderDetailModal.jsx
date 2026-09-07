@@ -108,11 +108,7 @@ export default function SellingOrderDetailModal({
 
   return (
     <div className="modal modal-open bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div
-        className={`modal-box relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-3xl border border-base-300 bg-base-100 p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200 ${
-          activeTab === "support" ? "max-w-4xl" : "max-w-lg"
-        }`}
-      >
+      <div className="modal-box relative flex h-[min(680px,92vh)] w-full max-w-4xl flex-col gap-4 overflow-hidden rounded-3xl border border-base-300 bg-base-100 p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
         {/* Close Button */}
         <button
           type="button"
@@ -172,7 +168,7 @@ export default function SellingOrderDetailModal({
           </button>
         </div>
         {activeTab === "details" ? (
-          <div className="min-h-0 space-y-6 overflow-y-auto pr-1">
+          <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pr-1">
             {/* Current Status Badge Banner */}
             <div
               className={`p-4 rounded-2xl border flex items-center gap-3.5 ${statusInfo.color}`}
@@ -244,14 +240,19 @@ export default function SellingOrderDetailModal({
             </div>
 
             {/* Footer Action */}
-            <div className="pt-2">
+            <div className="mt-auto flex gap-3 pt-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="btn btn-primary text-white w-full rounded-xl font-bold"
+                className={`btn rounded-xl font-bold ${
+                  order.status === "PAID"
+                    ? "flex-1 btn-outline"
+                    : "w-full btn-primary text-white"
+                }`}
               >
                 Close
               </button>
+
               {order.status === "PAID" && (
                 <button
                   type="button"
@@ -265,7 +266,7 @@ export default function SellingOrderDetailModal({
             </div>
           </div>
         ) : (
-          <div className="min-h-0 flex-1 overflow-hidden rounded-2xl border border-base-200">
+          <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl">
             <SellerOrderSupport order={order} />
           </div>
         )}

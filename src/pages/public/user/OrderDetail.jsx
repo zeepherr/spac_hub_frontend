@@ -95,7 +95,6 @@ const CONFIRMABLE_SHIPMENT_STATUSES = new Set([
 
 function OrderDetail() {
   const { orderId } = useParams();
-
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   const [activeTab, setActiveTab] = useState("details");
@@ -287,7 +286,7 @@ function OrderDetail() {
           </span>
         </header>
 
-        {activeTab === "detail" ? (
+        {activeTab === "details" ? (
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
             {/* คอลัมน์ด้านซ้าย */}
             <div className="space-y-6">
