@@ -1,46 +1,92 @@
 import React from "react";
-import { ShoppingBag, Tag, ShieldCheck, MessageSquare, ChevronRight } from "lucide-react";
-
-const stats = [
-  {
-    label: "Buying",
-    value: "2",
-    icon: ShoppingBag,
-    color: "text-blue-500 dark:text-blue-400",
-    bgColor: "bg-blue-500/10",
-    borderColor: "group-hover:border-blue-500/40",
-    glowColor: "group-hover:shadow-blue-500/10",
-  },
-  {
-    label: "Selling",
-    value: "3",
-    icon: Tag,
-    color: "text-emerald-500 dark:text-emerald-400",
-    bgColor: "bg-emerald-500/10",
-    borderColor: "group-hover:border-emerald-500/40",
-    glowColor: "group-hover:shadow-emerald-500/10",
-  },
-  {
-    label: "Pending Verification",
-    value: "1",
-    icon: ShieldCheck,
-    color: "text-amber-500 dark:text-amber-400",
-    bgColor: "bg-amber-500/10",
-    borderColor: "group-hover:border-amber-500/40",
-    glowColor: "group-hover:shadow-amber-500/10",
-  },
-  {
-    label: "New Messages",
-    value: "4",
-    icon: MessageSquare,
-    color: "text-indigo-500 dark:text-indigo-400",
-    bgColor: "bg-indigo-500/10",
-    borderColor: "group-hover:border-indigo-500/40",
-    glowColor: "group-hover:shadow-indigo-500/10",
-  },
-];
+import {
+  ShoppingBag,
+  Tag,
+  ShieldCheck,
+  XCircle,
+  ChevronRight,
+} from "lucide-react";
+import { useBuyingOrders } from "@/hook/order/useBuyingOrders";
+import { useSellingOrders } from "@/hook/order/useSellingOrder";
+// import { useMyListings } from "@/hook/listing/useMyListings"; // Import hook สำหรับดึงรายการสินค้าที่ขาย (ถ้ามี)
 
 export default function StatCardsGroup() {
+  const { data: buyingOrders = [], isLoading: isLoadingBuying } = useBuyingOrders();
+  const { data: sellingOrders = [], isLoading: isLoadingSelling } = useSellingOrders();
+  // const { data: myListings = [] } = useMyListings(); // หรือดึงรายการประกาศขายจาก hook ของคุณ
+
+  // 1. Buying: จำนวนรายการคำสั่งซื้อของฉันที่มีคนกดซื้อและอยู่ระหว่างดำเนินการ/ชำระเงินแล้ว
+  const buyingCount = buyingOrders.filter((order) =>
+    [
+      "PAID",
+      "SELLER_SHIPPING",
+      "INSPECTION_PENDING",
+      "INSPECTING",
+      "NEEDS_REVIEW",
+      "VERIFIED",
+      "SHIPPING_TO_BUYER",
+      "COMPLETED",
+    ].includes(order.status)
+  ).length;
+
+  // 2. Selling: รายการของทั้งหมดที่ฉันขาย (นับจากคำสั่งซื้อขายที่ดำเนินการอยู่ หรือจำนวนประกาศขาย)
+  const sellingCount = sellingOrders.filter(
+    (order) => order.status !== "CANCELLED" && order.status !== "REJECTED"
+  ).length;
+
+  // 3. Pending Verification: รายการที่สินค้ายังอยู่กับ Admin เพื่อตรวจ SPEC
+  const pendingVerificationCount = sellingOrders.filter((order) =>
+    ["INSPECTION_PENDING", "INSPECTING", "NEEDS_REVIEW"].includes(order.status)
+  ).length;
+
+  // 4. Rejected: สินค้าที่โดน Reject กลับ (Logic กรองคำสั่งซื้อที่ถูกปฏิเสธ)
+  const rejectedCount = sellingOrders.filter(
+    (order) => order.status === "REJECTED"
+  ).length;
+
+  const stats = [
+    {
+      label: "Buying",
+      value: buyingCount,
+      icon: ShoppingBag,
+      color: "text-blue-500 dark:text-blue-400",
+      bgColor: "bg-blue-500/10",
+      borderColor: "group-hover:border-blue-500/40",
+      glowColor: "group-hover:shadow-blue-500/10",
+    },
+    {
+      label: "Selling",
+      value: sellingCount,
+      icon: Tag,
+      color: "text-emerald-500 dark:text-emerald-400",
+      bgColor: "bg-emerald-500/10",
+      borderColor: "group-hover:border-emerald-500/40",
+      glowColor: "group-hover:shadow-emerald-500/10",
+    },
+    {
+      label: "Pending Verification",
+      value: pendingVerificationCount,
+      icon: ShieldCheck,
+      color: "text-amber-500 dark:text-amber-400",
+      bgColor: "bg-amber-500/10",
+      borderColor: "group-hover:border-amber-500/40",
+      glowColor: "group-hover:shadow-amber-500/10",
+    },
+    {
+      label: "Rejected Items",
+      value: rejectedCount,
+      icon: XCircle,
+      color: "text-rose-500 dark:text-rose-400",
+      bgColor: "bg-rose-500/10",
+      borderColor: "group-hover:border-rose-500/40",
+      glowColor: "group-hover:shadow-rose-500/10",
+    },
+  ];
+
+  if (isLoadingBuying || isLoadingSelling) {
+    return <StatCardsGroupSkeleton />;
+  }
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
       {stats.map((item, idx) => {

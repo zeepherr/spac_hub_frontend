@@ -1,7 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-  ChevronRight,
-  PackageX,
   X,
   Package,
   Truck,
@@ -10,133 +8,35 @@ import {
   ShieldCheck,
   AlertCircle,
 } from "lucide-react";
-import { OrderItemCard } from "./OrderItemCard";
-import { useSellingOrders } from "@/hook/order/useSellingOrder";
-import { useNavigate } from "react-router";
-import ShipOrderModal from "./ShipOrderModal";
 
+// ดึง Public URL จาก Environment Variable
 const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || "";
 const DEFAULT_IMAGE = "https://placehold.co/150x150?text=No+Image";
 
-export default function RecentOrdersSection() {
-  const navigate = useNavigate();
-  const { data: sellingOrders = [], isLoading, isError } = useSellingOrders();
-
-  // State for Modal Management
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [isShipModalOpen, setIsShipModalOpen] = useState(false);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-
-  // 1. Filter out orders in initial/unprocessed states (PENDING / AWAITING_PAYMENT)
-  // 2. Sort by latest updated/created date
-  const activeSellingOrders = (sellingOrders || [])
-    .filter(
-      (order) =>
-        order.status !== "PENDING" && order.status !== "AWAITING_PAYMENT"
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.updatedAt || b.createdAt || 0) -
-        new Date(a.updatedAt || a.createdAt || 0)
-    );
-
-  // Handle clicking on a selling order card
-  const handleCardClick = (order) => {
-    setSelectedOrder(order);
-    if (order.status === "PAID") {
-      // If status is "PAID" (Awaiting Shipment), open shipping modal
-      setIsShipModalOpen(true);
-    } else {
-      // For other statuses, open detail & status modal
-      setIsDetailModalOpen(true);
-    }
-  };
-
-  if (isLoading) return <RecentOrdersSectionSkeleton />;
-
-  return (
-    <>
-      <div className="card hardware-surface p-6 space-y-4 h-150 flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-base-300/60 pb-4 shrink-0">
-          <h3 className="font-bold text-xl text-base-content">
-            My Sales Status
-          </h3>
-          <button
-            type="button"
-            onClick={() => navigate("/user/sell/selling-orders")}
-            className="text-sm text-base-content/70 hover:text-primary font-semibold flex items-center gap-1 transition-colors"
-          >
-            View All Sales <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Orders List Container */}
-        <div className="space-y-4 flex-1 pr-2 p-1.5 scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100 overflow-y-auto">
-          {isError ? (
-            <div className="text-center py-8 text-sm text-error">
-              Unable to load order data.
-            </div>
-          ) : activeSellingOrders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-base-content/50 space-y-2">
-              <PackageX className="w-12 h-12 stroke-1" />
-              <p className="text-base">No active sales status updates found</p>
-            </div>
-          ) : (
-            activeSellingOrders.map((order) => (
-              <OrderItemCard
-                key={order.id}
-                order={order}
-                onClick={() => handleCardClick(order)}
-              />
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Modal 1: Entering shipping details (PAID status) */}
-      <ShipOrderModal
-        isOpen={isShipModalOpen}
-        onClose={() => {
-          setIsShipModalOpen(false);
-          setSelectedOrder(null);
-        }}
-        order={selectedOrder}
-      />
-
-      {/* Modal 2: View order details and status (Other statuses) */}
-      <OrderDetailModal
-        isOpen={isDetailModalOpen}
-        onClose={() => {
-          setIsDetailModalOpen(false);
-          setSelectedOrder(null);
-        }}
-        order={selectedOrder}
-      />
-    </>
-  );
-}
-
-// Sub-component: OrderDetailModal สำหรับแสดง Status & Details
-function OrderDetailModal({ isOpen, onClose, order }) {
+export default function SellingOrderDetailModal({ isOpen, onClose, order }) {
   if (!isOpen || !order) return null;
 
   const item = order.listing || order.product || {};
 
-  // Logic การแกะและสร้าง URL ของรูปภาพเดียวกับ ShipOrderModal
+  // Logic การดึงและสร้าง Image URL
   const coverImage =
     item.images?.find((img) => img.isCover) || item.images?.[0];
 
   let imageUrl = DEFAULT_IMAGE;
-  const rawUrl = coverImage?.imageUrl || coverImage?.url;
-  const rawKey = coverImage?.imageKey || coverImage?.key;
 
-  if (rawUrl) {
-    imageUrl = rawUrl;
-  } else if (rawKey) {
-    imageUrl = rawKey.startsWith("http")
-      ? rawKey
-      : `${R2_PUBLIC_URL}/${rawKey}`;
+  if (typeof coverImage === "string") {
+    imageUrl = coverImage;
+  } else if (coverImage) {
+    const rawUrl = coverImage.imageUrl || coverImage.url;
+    const rawKey = coverImage.imageKey || coverImage.key;
+
+    if (rawUrl) {
+      imageUrl = rawUrl;
+    } else if (rawKey) {
+      imageUrl = rawKey.startsWith("http")
+        ? rawKey
+        : `${R2_PUBLIC_URL}/${rawKey}`;
+    }
   }
 
   // Status mapping
@@ -285,38 +185,6 @@ function OrderDetailModal({ isOpen, onClose, order }) {
             Close
           </button>
         </div>
-      </div>
-    </div>
-  );
-}
-
-export function RecentOrdersSectionSkeleton() {
-  return (
-    <div className="card hardware-surface p-6 space-y-4 h-[600px] flex flex-col">
-      <div className="flex items-center justify-between border-b border-base-300/60 pb-4">
-        <div className="skeleton h-6 w-40" />
-        <div className="skeleton h-4 w-24" />
-      </div>
-      <div className="space-y-4 flex-1 overflow-hidden">
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="p-5 border border-base-200 rounded-2xl space-y-4"
-          >
-            <div className="flex justify-between items-center">
-              <div className="skeleton h-5 w-28 rounded-md" />
-              <div className="skeleton h-6 w-20 rounded-full" />
-            </div>
-            <div className="flex gap-5 items-center">
-              <div className="skeleton w-[90px] h-[90px] rounded-xl shrink-0" />
-              <div className="space-y-3 flex-1">
-                <div className="skeleton h-5 w-2/3" />
-                <div className="skeleton h-6 w-1/3" />
-              </div>
-            </div>
-            <div className="skeleton h-8 w-full rounded-lg" />
-          </div>
-        ))}
       </div>
     </div>
   );

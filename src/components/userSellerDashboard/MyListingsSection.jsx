@@ -82,7 +82,7 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
           <h3 className="font-bold text-xl text-base-content">My Listings</h3>
           <button
             type="button"
-            onClick={() => navigate("/user/sell/listings")}
+            onClick={() => navigate("/user/sell/my-listings")}
             className="text-sm text-base-content/70 hover:text-primary font-semibold flex items-center gap-1 transition-colors"
           >
             View All <ChevronRight className="w-4 h-4" />
