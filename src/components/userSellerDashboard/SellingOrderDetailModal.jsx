@@ -1,19 +1,37 @@
-import React from "react";
+import { useEffect, useState } from "react";
+
+import SellerOrderSupport from "@/hook/support/SellerOrderSupport";
 import {
-  X,
-  Package,
-  Truck,
+  AlertCircle,
   CheckCircle2,
   Clock,
+  MessageSquareText,
+  Package,
+  PackageSearch,
   ShieldCheck,
-  AlertCircle,
+  Truck,
+  X,
 } from "lucide-react";
 
 // ดึง Public URL จาก Environment Variable
 const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || "";
 const DEFAULT_IMAGE = "https://placehold.co/150x150?text=No+Image";
 
-export default function SellingOrderDetailModal({ isOpen, onClose, order }) {
+export default function SellingOrderDetailModal({
+  isOpen,
+  onClose,
+  onOpenShip,
+  order,
+  hasUnreadSupport = false,
+}) {
+  const [activeTab, setActiveTab] = useState("details");
+
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab("details");
+    }
+  }, [isOpen, order?.id]);
+
   if (!isOpen || !order) return null;
 
   const item = order.listing || order.product || {};
@@ -90,7 +108,11 @@ export default function SellingOrderDetailModal({ isOpen, onClose, order }) {
 
   return (
     <div className="modal modal-open bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="modal-box bg-base-100 border border-base-300 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative space-y-6 animate-in fade-in zoom-in-95 duration-200">
+      <div
+        className={`modal-box relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-3xl border border-base-300 bg-base-100 p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200 ${
+          activeTab === "support" ? "max-w-4xl" : "max-w-lg"
+        }`}
+      >
         {/* Close Button */}
         <button
           type="button"
@@ -109,82 +131,144 @@ export default function SellingOrderDetailModal({ isOpen, onClose, order }) {
             Order #{order.orderNumber || order.id}
           </h3>
         </div>
-
-        {/* Current Status Badge Banner */}
         <div
-          className={`p-4 rounded-2xl border flex items-center gap-3.5 ${statusInfo.color}`}
+          role="tablist"
+          className="grid grid-cols-2 rounded-xl bg-base-200/70 p-1"
         >
-          <div className="p-2.5 rounded-xl bg-white/40 dark:bg-black/20 shrink-0">
-            <StatusIcon className="w-6 h-6" />
-          </div>
-          <div>
-            <span className="text-xs font-semibold uppercase opacity-80 block">
-              Current Status
-            </span>
-            <span className="text-base font-bold block">{statusInfo.label}</span>
-          </div>
-        </div>
-
-        {/* Product Details Card */}
-        <div className="flex gap-4 p-3 bg-base-200/50 rounded-2xl border border-base-200">
-          <div className="w-20 h-20 bg-base-300 rounded-xl overflow-hidden shrink-0 border border-base-200 flex items-center justify-center">
-            <img
-              src={imageUrl}
-              alt={item.title || "Product"}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex-1 min-w-0 space-y-1">
-            <h4 className="font-bold text-sm text-base-content truncate">
-              {item.title || "Untitled Product"}
-            </h4>
-            <p className="text-xs text-base-content/60">
-              Category: {item.category?.name || "General"}
-            </p>
-            <p className="text-sm font-black text-primary">
-              ฿{Number(order.agreedPrice || order.totalPrice || item.price || 0).toLocaleString()}
-            </p>
-          </div>
-        </div>
-
-        {/* Order Information Grid */}
-        <div className="space-y-2 text-xs bg-base-200/30 p-4 rounded-2xl border border-base-200">
-          <div className="flex justify-between">
-            <span className="text-base-content/60">Order Date:</span>
-            <span className="font-semibold text-base-content">
-              {order.createdAt
-                ? new Date(order.createdAt).toLocaleString("th-TH")
-                : "-"}
-            </span>
-          </div>
-          {order.trackingNumber && (
-            <div className="flex justify-between">
-              <span className="text-base-content/60">Tracking Number:</span>
-              <span className="font-mono font-bold text-primary">
-                {order.trackingNumber}
-              </span>
-            </div>
-          )}
-          {order.courier && (
-            <div className="flex justify-between">
-              <span className="text-base-content/60">Courier:</span>
-              <span className="font-semibold text-base-content">
-                {order.courier}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Footer Action */}
-        <div className="pt-2">
           <button
             type="button"
-            onClick={onClose}
-            className="btn btn-primary text-white w-full rounded-xl font-bold"
+            role="tab"
+            aria-selected={activeTab === "details"}
+            onClick={() => setActiveTab("details")}
+            className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-all ${
+              activeTab === "details"
+                ? "bg-base-100 text-primary shadow-sm"
+                : "text-base-content/60 hover:text-base-content"
+            }`}
           >
-            Close
+            <PackageSearch className="h-4 w-4" />
+            Details
+          </button>
+
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeTab === "support"}
+            onClick={() => setActiveTab("support")}
+            className={`relative flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-all ${
+              activeTab === "support"
+                ? "bg-base-100 text-primary shadow-sm"
+                : "text-base-content/60 hover:text-base-content"
+            }`}
+          >
+            <MessageSquareText className="h-4 w-4" />
+            Support
+            {hasUnreadSupport && activeTab !== "support" && (
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-70" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-orange-500" />
+              </span>
+            )}
           </button>
         </div>
+        {activeTab === "details" ? (
+          <div className="min-h-0 space-y-6 overflow-y-auto pr-1">
+            {/* Current Status Badge Banner */}
+            <div
+              className={`p-4 rounded-2xl border flex items-center gap-3.5 ${statusInfo.color}`}
+            >
+              <div className="p-2.5 rounded-xl bg-white/40 dark:bg-black/20 shrink-0">
+                <StatusIcon className="w-6 h-6" />
+              </div>
+              <div>
+                <span className="text-xs font-semibold uppercase opacity-80 block">
+                  Current Status
+                </span>
+                <span className="text-base font-bold block">
+                  {statusInfo.label}
+                </span>
+              </div>
+            </div>
+
+            {/* Product Details Card */}
+            <div className="flex gap-4 p-3 bg-base-200/50 rounded-2xl border border-base-200">
+              <div className="w-20 h-20 bg-base-300 rounded-xl overflow-hidden shrink-0 border border-base-200 flex items-center justify-center">
+                <img
+                  src={imageUrl}
+                  alt={item.title || "Product"}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex-1 min-w-0 space-y-1">
+                <h4 className="font-bold text-sm text-base-content truncate">
+                  {item.title || "Untitled Product"}
+                </h4>
+                <p className="text-xs text-base-content/60">
+                  Category: {item.category?.name || "General"}
+                </p>
+                <p className="text-sm font-black text-primary">
+                  ฿
+                  {Number(
+                    order.agreedPrice || order.totalPrice || item.price || 0,
+                  ).toLocaleString()}
+                </p>
+              </div>
+            </div>
+
+            {/* Order Information Grid */}
+            <div className="space-y-2 text-xs bg-base-200/30 p-4 rounded-2xl border border-base-200">
+              <div className="flex justify-between">
+                <span className="text-base-content/60">Order Date:</span>
+                <span className="font-semibold text-base-content">
+                  {order.createdAt
+                    ? new Date(order.createdAt).toLocaleString("th-TH")
+                    : "-"}
+                </span>
+              </div>
+              {order.trackingNumber && (
+                <div className="flex justify-between">
+                  <span className="text-base-content/60">Tracking Number:</span>
+                  <span className="font-mono font-bold text-primary">
+                    {order.trackingNumber}
+                  </span>
+                </div>
+              )}
+              {order.courier && (
+                <div className="flex justify-between">
+                  <span className="text-base-content/60">Courier:</span>
+                  <span className="font-semibold text-base-content">
+                    {order.courier}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Footer Action */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn btn-primary text-white w-full rounded-xl font-bold"
+              >
+                Close
+              </button>
+              {order.status === "PAID" && (
+                <button
+                  type="button"
+                  onClick={onOpenShip}
+                  className="btn btn-primary flex-1 rounded-xl font-bold text-white"
+                >
+                  <Truck className="h-4 w-4" />
+                  Ship to Admin
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="min-h-0 flex-1 overflow-hidden rounded-2xl border border-base-200">
+            <SellerOrderSupport order={order} />
+          </div>
+        )}
       </div>
     </div>
   );

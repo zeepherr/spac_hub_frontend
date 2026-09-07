@@ -6,7 +6,9 @@ import {
   ClipboardCheck,
   LoaderCircle,
   MapPin,
+  MessageSquareText,
   PackageCheck,
+  PackageSearch,
   Phone,
   Store,
   Truck,
@@ -15,8 +17,12 @@ import {
 import { useState } from "react";
 import { useParams } from "react-router";
 
+import BuyerOrderSupport from "@/components/support/BuyerOrderSupport";
+import { hasUnreadSupportMessage } from "@/components/support/support.constants";
 import { useConfirmOrderDelivery } from "@/hook/order/useConfirmOrderDelivery";
 import { useOrderById } from "@/hook/order/useOrderById";
+import { useMySupportCases } from "@/hook/support/useMySupportCases";
+import useAuthStore from "@/stores/auth.store";
 import BackButton from "./BackButton";
 
 const ORDER_STATUS = {
@@ -89,7 +95,14 @@ const CONFIRMABLE_SHIPMENT_STATUSES = new Set([
 
 function OrderDetail() {
   const { orderId } = useParams();
+
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
+  const [activeTab, setActiveTab] = useState("details");
+
+  const currentUser = useAuthStore((state) => state.user);
+
+  const { data: mySupportCases = [] } = useMySupportCases();
 
   /* ดึงรายละเอียด Order จาก Backend*/
   const {
@@ -104,12 +117,11 @@ function OrderDetail() {
   if (isPending) {
     return (
       <div className="flex min-h-96 items-center justify-center gap-3">
-        <LoaderCircle
-          size={28}
-          className="animate-spin text-orange-500"
-        />
+        <LoaderCircle size={28} className="animate-spin text-orange-500" />
 
-        <span className="text-sm text-neutral-500">Loading order details...</span>
+        <span className="text-sm text-neutral-500">
+          Loading order details...
+        </span>
       </div>
     );
   }
@@ -119,15 +131,16 @@ function OrderDetail() {
     return (
       <div className="flex min-h-96 flex-col items-center justify-center gap-4">
         <p className="text-red-500">
-          {error?.response?.data?.message ||
-            "Unable to load order details"}
+          {error?.response?.data?.message || "Unable to load order details"}
         </p>
 
         <button
           type="button"
           onClick={() => refetch()}
           className="cursor-pointer rounded-xl border border-orange-500 px-5 py-2.5 font-semibold text-orange-500 transition hover:bg-orange-50"
-        >Try Again</button>
+        >
+          Try Again
+        </button>
       </div>
     );
   }
@@ -135,9 +148,20 @@ function OrderDetail() {
   /* Backend ไม่ส่งข้อมูล Order กลับมา */
   if (!order) {
     return (
-      <div className="flex min-h-96 items-center justify-center text-neutral-500">Order not found</div>
+      <div className="flex min-h-96 items-center justify-center text-neutral-500">
+        Order not found
+      </div>
     );
   }
+
+  const orderSupportCase = mySupportCases.find(
+    (supportCase) => Number(supportCase.orderId) === Number(order.id),
+  );
+
+  const hasUnreadSupport = hasUnreadSupportMessage(
+    orderSupportCase,
+    currentUser?.id,
+  );
 
   /* แยกข้อมูลออกมาเพื่อเรียกใช้ง่ายขึ้น */
   const listing = order.listing;
@@ -147,32 +171,21 @@ function OrderDetail() {
 
   /* หารูปปกสินค้าถ้าไม่มีรูปปกให้ใช้รูปแรก */
   const images = listing?.images ?? [];
-  const coverImage =
-    images.find((image) => image.isCover) ??
-    images[0];
+  const coverImage = images.find((image) => image.isCover) ?? images[0];
 
-  const imageUrl =
-    coverImage?.imageUrl ||
-    coverImage?.url ||
-    "";
+  const imageUrl = coverImage?.imageUrl || coverImage?.url || "";
 
   /*หาชื่อสินค้า */
   const productName =
     listing?.title ||
-    [listing?.brand, listing?.model]
-      .filter(Boolean)
-      .join(" ") ||
+    [listing?.brand, listing?.model].filter(Boolean).join(" ") ||
     "Untitled Item";
 
   /* รวมชื่อและนามสกุลผู้ขาย */
   const sellerName =
-    [
-      order.seller?.firstName,
-      order.seller?.lastName,
-    ]
+    [order.seller?.firstName, order.seller?.lastName]
       .filter(Boolean)
-      .join(" ") ||
-    "Unknown Seller";
+      .join(" ") || "Unknown Seller";
 
   /* เลือกข้อความและสีตามสถานะ Order */
   const status = ORDER_STATUS[order.status] ?? {
@@ -184,9 +197,8 @@ function OrderDetail() {
    * ปุ่ม Confirm Delivery จะแสดงเมื่อ:  1. Order กำลังส่งให้ผู้ซื้อ  2. มี deliveryShipment 3. Shipment เป็น SHIPPED, IN_TRANSIT หรือ DELIVERED */
   const canConfirmDelivery =
     order.status === "SHIPPING_TO_BUYER" &&
-    Boolean(shipment) && CONFIRMABLE_SHIPMENT_STATUSES.has(
-      shipment.status,
-    );
+    Boolean(shipment) &&
+    CONFIRMABLE_SHIPMENT_STATUSES.has(shipment.status);
 
   /* เปิด Modal */
   function handleOpenConfirmModal() {
@@ -208,7 +220,6 @@ function OrderDetail() {
         orderId: order.id,
       },
       {
-        
         onSuccess: () => {
           setIsConfirmModalOpen(false);
         },
@@ -220,199 +231,230 @@ function OrderDetail() {
     <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
       <div className="mx-auto max-w-6xl">
         <BackButton fallbackPath="/user/orders" />
+        <nav
+          aria-label="Order detail sections"
+          className="mb-6 flex gap-1 rounded-xl border border-neutral-200 bg-white p-1 shadow-sm"
+        >
+          <button
+            type="button"
+            onClick={() => setActiveTab("details")}
+            className={`inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition ${
+              activeTab === "details"
+                ? "bg-neutral-900 text-white shadow-sm"
+                : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
+            }`}
+          >
+            <PackageSearch size={18} />
+            Order Details
+          </button>
 
+          <button
+            type="button"
+            onClick={() => setActiveTab("support")}
+            className={`relative inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition ${
+              activeTab === "support"
+                ? "bg-orange-500 text-white shadow-sm"
+                : "text-neutral-500 hover:bg-orange-50 hover:text-orange-600"
+            }`}
+          >
+            <MessageSquareText size={18} />
+            Support
+            {hasUnreadSupport && activeTab !== "support" && (
+              <span className="relative ml-1 flex size-2.5">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-orange-400 opacity-60" />
+
+                <span className="relative inline-flex size-2.5 rounded-full bg-orange-500" />
+              </span>
+            )}
+          </button>
+        </nav>
         <header className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-orange-500">Order detail</p>
-
-            <h1 className="mt-1 text-3xl font-bold text-neutral-900">Order Details</h1>
-            <p className="mt-2 text-sm text-neutral-500">
-              {order.orderNumber}
+            <p className="text-sm font-semibold uppercase tracking-wider text-orange-500">
+              Order detail
             </p>
+
+            <h1 className="mt-1 text-3xl font-bold text-neutral-900">
+              Order Details
+            </h1>
+            <p className="mt-2 text-sm text-neutral-500">{order.orderNumber}</p>
           </div>
 
           <span
             className={`w-fit rounded-full px-4 py-2 text-sm font-semibold ${status.className}`}
-          >{status.label}</span>
+          >
+            {status.label}
+          </span>
         </header>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
-          {/* คอลัมน์ด้านซ้าย */}
-          <div className="space-y-6">
-            {/* ข้อมูลสินค้า */}
-            <article className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-5 text-lg font-bold text-neutral-900">Item Information</h2>
+        {activeTab === "detail" ? (
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
+            {/* คอลัมน์ด้านซ้าย */}
+            <div className="space-y-6">
+              {/* ข้อมูลสินค้า */}
+              <article className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <h2 className="mb-5 text-lg font-bold text-neutral-900">
+                  Item Information
+                </h2>
 
-              <div className="flex flex-col gap-5 sm:flex-row">
-                {/* รูปสินค้า */}
-                <div className="flex size-36 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100">
-                  {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt={productName}
-                      className="size-full object-cover"
-                    />
-                  ) : (
-                    <Box
-                      size={44}
-                      className="text-neutral-400"
-                    />
-                  )}
-                </div>
+                <div className="flex flex-col gap-5 sm:flex-row">
+                  {/* รูปสินค้า */}
+                  <div className="flex size-36 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100">
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={productName}
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      <Box size={44} className="text-neutral-400" />
+                    )}
+                  </div>
 
-                {/* รายละเอียดสินค้า */}
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-xl font-bold text-neutral-900">
-                    {productName}
-                  </h3>
+                  {/* รายละเอียดสินค้า */}
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-xl font-bold text-neutral-900">
+                      {productName}
+                    </h3>
 
-                  <p className="mt-2 text-sm text-neutral-500">
-                    {[listing?.brand, listing?.model]
-                      .filter(Boolean)
-                      .join(" ") ||
-                      "Brand/Model details unavailable"}
-                  </p>
-
-                  {listing?.description && (
-                    <p className="mt-4 line-clamp-3 text-sm leading-6 text-neutral-500">
-                      {listing.description}
+                    <p className="mt-2 text-sm text-neutral-500">
+                      {[listing?.brand, listing?.model]
+                        .filter(Boolean)
+                        .join(" ") || "Brand/Model details unavailable"}
                     </p>
-                  )}
 
-                  <p className="mt-5 text-2xl font-bold text-orange-500">
-                    ฿
-                    {Number(
-                      order.agreedPrice ?? 0,
-                    ).toLocaleString("en-US")}
-                  </p>
+                    {listing?.description && (
+                      <p className="mt-4 line-clamp-3 text-sm leading-6 text-neutral-500">
+                        {listing.description}
+                      </p>
+                    )}
+
+                    <p className="mt-5 text-2xl font-bold text-orange-500">
+                      ฿{Number(order.agreedPrice ?? 0).toLocaleString("en-US")}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </article>
+              </article>
 
-            {/* ข้อมูลการจัดส่ง */}
-            <Card title="Shipping Information">
-              <InfoRow
-                icon={Truck}
-                label="Carrier"
-                value={shipment?.carrier}
-                emptyText="Carrier info not available"
-              />
-
-              <InfoRow
-                icon={PackageCheck}
-                label="Tracking Number"
-                value={shipment?.trackingNumber}
-                emptyText="No tracking number"
-              />
-
-              <InfoRow
-                icon={Box}
-                label="Shipment Status"
-                value={shipment?.status}
-                emptyText="No shipping information"
-              />
-
-              {/* ปุ่มยืนยันรับสินค้า */}
-              {canConfirmDelivery && (
-                <button
-                  type="button"
-                  onClick={handleOpenConfirmModal}
-                  disabled={
-                    confirmDeliveryMutation.isPending
-                  }
-                  className="mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <PackageCheck size={18} />
-                  Confirm Delivery
-                </button>
-              )}
-            </Card>
-
-            {/* ผลการตรวจสอบสินค้า */}
-            {inspection && (
-              <Card title="Inspection Results">
+              {/* ข้อมูลการจัดส่ง */}
+              <Card title="Shipping Information">
                 <InfoRow
-                  icon={ClipboardCheck}
-                  label="Result"
-                  value={inspection.result}
+                  icon={Truck}
+                  label="Carrier"
+                  value={shipment?.carrier}
+                  emptyText="Carrier info not available"
                 />
 
                 <InfoRow
                   icon={PackageCheck}
-                  label="Verified Condition"
-                  value={
-                    inspection.verifiedCondition
-                  }
+                  label="Tracking Number"
+                  value={shipment?.trackingNumber}
+                  emptyText="No tracking number"
+                />
+
+                <InfoRow
+                  icon={Box}
+                  label="Shipment Status"
+                  value={shipment?.status}
+                  emptyText="No shipping information"
+                />
+
+                {/* ปุ่มยืนยันรับสินค้า */}
+                {canConfirmDelivery && (
+                  <button
+                    type="button"
+                    onClick={handleOpenConfirmModal}
+                    disabled={confirmDeliveryMutation.isPending}
+                    className="mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <PackageCheck size={18} />
+                    Confirm Delivery
+                  </button>
+                )}
+              </Card>
+
+              {/* ผลการตรวจสอบสินค้า */}
+              {inspection && (
+                <Card title="Inspection Results">
+                  <InfoRow
+                    icon={ClipboardCheck}
+                    label="Result"
+                    value={inspection.result}
+                  />
+
+                  <InfoRow
+                    icon={PackageCheck}
+                    label="Verified Condition"
+                    value={inspection.verifiedCondition}
+                  />
+
+                  <InfoRow
+                    icon={CircleDollarSign}
+                    label="Condition Score"
+                    value={
+                      inspection.verifiedScore !== null &&
+                      inspection.verifiedScore !== undefined
+                        ? `${inspection.verifiedScore}/100`
+                        : null
+                    }
+                  />
+                </Card>
+              )}
+            </div>
+
+            {/* คอลัมน์ด้านขวา */}
+            <aside className="space-y-6">
+              {/* สรุปคำสั่งซื้อ */}
+              <Card title="Order Summary">
+                <InfoRow
+                  icon={CalendarDays}
+                  label="Order Date"
+                  value={formatDate(order.createdAt)}
                 />
 
                 <InfoRow
                   icon={CircleDollarSign}
-                  label="Condition Score"
+                  label="Payment Status"
                   value={
-                    inspection.verifiedScore !== null &&
-                    inspection.verifiedScore !==
-                      undefined
-                      ? `${inspection.verifiedScore}/100`
-                      : null
+                    order.checkout?.payment?.status || order.checkout?.status
                   }
+                  emptyText="No payment information"
                 />
+
+                <InfoRow icon={Store} label="Seller" value={sellerName} />
               </Card>
-            )}
+
+              {/* ที่อยู่จัดส่ง */}
+              <Card title="Shipping Address">
+                {address ? (
+                  <>
+                    <InfoRow
+                      icon={MapPin}
+                      label="Recipient"
+                      value={address.recipientName}
+                    />
+
+                    <InfoRow
+                      icon={Phone}
+                      label="Phone Number"
+                      value={address.phone}
+                    />
+
+                    <div className="rounded-xl bg-neutral-50 p-4 text-sm leading-7 text-neutral-600">
+                      {address.address}
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-sm text-neutral-400">
+                    No shipping address available
+                  </p>
+                )}
+              </Card>
+            </aside>
           </div>
-
-          {/* คอลัมน์ด้านขวา */}
-          <aside className="space-y-6">
-            {/* สรุปคำสั่งซื้อ */}
-            <Card title="Order Summary">
-              <InfoRow
-                icon={CalendarDays}
-                label="Order Date"
-                value={formatDate(order.createdAt)}
-              />
-
-              <InfoRow
-                icon={CircleDollarSign}
-                label="Payment Status"
-                value={
-                  order.checkout?.payment?.status ||
-                  order.checkout?.status
-                }
-                emptyText="No payment information"
-              />
-
-              <InfoRow
-                icon={Store}
-                label="Seller"
-                value={sellerName}
-              />
-            </Card>
-
-            {/* ที่อยู่จัดส่ง */}
-            <Card title="Shipping Address">
-              {address ? (
-                <>
-                  <InfoRow
-                    icon={MapPin}
-                    label="Recipient"
-                    value={address.recipientName}
-                  />
-
-                  <InfoRow
-                    icon={Phone}
-                    label="Phone Number"
-                    value={address.phone}
-                  />
-
-                  <div className="rounded-xl bg-neutral-50 p-4 text-sm leading-7 text-neutral-600">
-                    {address.address}
-                  </div>
-                </>
-              ) : (
-                <p className="text-sm text-neutral-400">No shipping address available</p>
-              )}
-            </Card>
-          </aside>
-        </div>
+        ) : (
+          <BuyerOrderSupport order={order} />
+        )}
       </div>
 
       {/* Modal ยืนยันรับสินค้า */}
@@ -427,12 +469,7 @@ function OrderDetail() {
 }
 
 /* Modal สำหรับยืนยันรับสินค้า */
-function ConfirmDeliveryModal({
-  isOpen,
-  isPending,
-  onClose,
-  onConfirm,
-}) {
+function ConfirmDeliveryModal({ isOpen, isPending, onClose, onConfirm }) {
   /* ถ้าไม่ได้เปิด ไม่ต้องแสดง Modal */
   if (!isOpen) {
     return null;
@@ -476,24 +513,23 @@ function ConfirmDeliveryModal({
           <h2
             id="confirm-delivery-title"
             className="text-xl font-bold text-neutral-900"
-          >Confirm Delivery</h2>
+          >
+            Confirm Delivery
+          </h2>
 
           <p className="mt-2 text-sm leading-6 text-neutral-500">
-            Have you received the product and checked that
-            everything is correct?
+            Have you received the product and checked that everything is
+            correct?
           </p>
         </div>
 
         {/* คำเตือน */}
         <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4 text-amber-800">
-          <AlertTriangle
-            size={20}
-            className="mt-0.5 shrink-0"
-          />
+          <AlertTriangle size={20} className="mt-0.5 shrink-0" />
 
           <p className="text-sm leading-5">
-            After confirmation, the order will be completed
-            and the payment may be released to the seller.
+            After confirmation, the order will be completed and the payment may
+            be released to the seller.
           </p>
         </div>
 
@@ -504,7 +540,9 @@ function ConfirmDeliveryModal({
             onClick={onClose}
             disabled={isPending}
             className="cursor-pointer rounded-xl border border-neutral-300 bg-white px-5 py-2.5 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
-          >Cancel</button>
+          >
+            Cancel
+          </button>
 
           <button
             type="button"
@@ -514,15 +552,13 @@ function ConfirmDeliveryModal({
           >
             {isPending ? (
               <>
-                <LoaderCircle
-                  size={18}
-                  className="animate-spin"
-                />
+                <LoaderCircle size={18} className="animate-spin" />
                 Confirming...
               </>
             ) : (
               <>
-                <PackageCheck size={18} />Yes, Confirm
+                <PackageCheck size={18} />
+                Yes, Confirm
               </>
             )}
           </button>
@@ -536,27 +572,15 @@ function ConfirmDeliveryModal({
 function Card({ title, children }) {
   return (
     <article className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-5 text-lg font-bold text-neutral-900">
-        {title}
-      </h2>
-      <div className="space-y-4">
-        {children}
-      </div>
+      <h2 className="mb-5 text-lg font-bold text-neutral-900">{title}</h2>
+      <div className="space-y-4">{children}</div>
     </article>
   );
 }
 
 /* แถวข้อมูลที่มีไอคอน หัวข้อ และค่า */
-function InfoRow({
-  icon: Icon,
-  label,
-  value,
-  emptyText = "-",
-}) {
-  const hasValue =
-    value !== null &&
-    value !== undefined &&
-    value !== "";
+function InfoRow({ icon: Icon, label, value, emptyText = "-" }) {
+  const hasValue = value !== null && value !== undefined && value !== "";
 
   return (
     <div className="flex items-start gap-3">
@@ -565,17 +589,14 @@ function InfoRow({
       </span>
 
       <div className="min-w-0">
-        <p className="text-xs text-neutral-400">
-          {label}
-        </p>
+        <p className="text-xs text-neutral-400">{label}</p>
 
         <p
           className={`mt-1 break-words text-sm font-medium ${
-            hasValue
-              ? "text-neutral-800"
-              : "text-neutral-400"
+            hasValue ? "text-neutral-800" : "text-neutral-400"
           }`}
-        >{hasValue ? value : emptyText}
+        >
+          {hasValue ? value : emptyText}
         </p>
       </div>
     </div>

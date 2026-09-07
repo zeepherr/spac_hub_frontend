@@ -276,6 +276,15 @@ export const useSupportSocket = ({
           })),
         };
       });
+      queryClient.invalidateQueries({
+        queryKey: listQueryKey,
+        exact: true,
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: detailQueryKey,
+        exact: true,
+      });
     };
 
     socket.on("connect", handleConnect);

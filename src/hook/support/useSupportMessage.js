@@ -6,7 +6,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { supportKeys } from "./supportKeys";
 
-const useSupportMessages = ({ supportCaseId, isAdmin, limit = 50 }) => {
+export const useSupportMessages = ({ supportCaseId, isAdmin, limit = 50 }) => {
   const parsedSupportCaseId = Number(supportCaseId);
 
   const isValidSupportCaseId =
