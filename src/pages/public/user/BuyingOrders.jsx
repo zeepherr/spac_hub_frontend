@@ -1,6 +1,6 @@
 import { useBuyingOrders } from "@/hook/order/useBuyingOrders";
 import { ChevronRight, LoaderCircle, PackageOpen } from "lucide-react";
-import { useNavigate,useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 
 function BuyingOrders() {
   const navigate = useNavigate();
@@ -11,43 +11,37 @@ function BuyingOrders() {
   const { data: orders = [], isPending, isError, refetch } = useBuyingOrders();
 
   const finishedStatuses = new Set([
-  "COMPLETED",
-  "CANCELLED",
-  "REJECTED",
-  "REFUNDED",
-]);
+    "COMPLETED",
+    "CANCELLED",
+    "REJECTED",
+    "REFUNDED",
+  ]);
 
-const filteredOrders = orders.filter(
-  (order) => {
+  const filteredOrders = orders.filter((order) => {
     /*กดการ์ด "กำลังจัดส่ง"*/
     if (selectedStatus === "shipping") {
-      return (
-        order.status === "SHIPPING_TO_BUYER")}
-
+      return order.status === "SHIPPING_TO_BUYER";
+    }
 
     /* กดการ์ด "กำลังดำเนินการ" */
     if (selectedStatus === "processing") {
       return (
-        !finishedStatuses.has( 
-          order.status ) &&
-          order.status !=="SHIPPING_TO_BUYER");}
-
+        !finishedStatuses.has(order.status) &&
+        order.status !== "SHIPPING_TO_BUYER"
+      );
+    }
 
     /* ไม่ใส่ status หรือ status เป็น all แสดงคำสั่งซื้อทั้งหมด */
     return true;
-  },
-);
+  });
 
-const pageTitles = {
-  all: "คำสั่งซื้อของฉัน",
-  processing:
-    "คำสั่งซื้อที่กำลังดำเนินการ",
-  shipping:
-    "คำสั่งซื้อที่กำลังจัดส่ง",
-};
+  const pageTitles = {
+    all: "คำสั่งซื้อของฉัน",
+    processing: "คำสั่งซื้อที่กำลังดำเนินการ",
+    shipping: "คำสั่งซื้อที่กำลังจัดส่ง",
+  };
 
-const pageTitle =
-  pageTitles[selectedStatus] || pageTitles.all;
+  const pageTitle = pageTitles[selectedStatus] || pageTitles.all;
 
   if (isPending) {
     return (
@@ -78,11 +72,11 @@ const pageTitle =
     <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
       <div className="mx-auto max-w-6xl">
         <header className="mb-7">
-          <h1 className="text-3xl font-bold text-neutral-900">
-            {pageTitle}
-          </h1>
+          <h1 className="text-3xl font-bold text-neutral-900">{pageTitle}</h1>
 
-          <p className="mt-2 text-sm text-neutral-500">ดูและติดตามสถานะคำสั่งซื้อทั้งหมด</p>
+          <p className="mt-2 text-sm text-neutral-500">
+            ดูและติดตามสถานะคำสั่งซื้อทั้งหมด
+          </p>
         </header>
 
         {filteredOrders.length === 0 ? (

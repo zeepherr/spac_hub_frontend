@@ -1,12 +1,17 @@
-import CheckoutStepIndicator from "@/components/cart/CheckoutStepLine";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
+import CheckoutStepIndicator from "@/components/cart/CheckoutStepLine";
+import { savePendingCheckoutSession } from "@/utils/auth/pendingCheckoutSession";
 
 function PaymentSuccessPage() {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    savePendingCheckoutSession(sessionId);
+  }, [sessionId]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -20,7 +25,7 @@ function PaymentSuccessPage() {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <CheckoutStepIndicator currentStep={3} />
 
-      <div className="mx-auto flex min-h-[60vh] w-full max-w-xl flex-col justify-center">
+      <div className="mx-auto flex min-h-[70vh] w-full max-w-xl flex-col justify-center">
         <div className="hardware-surface flex flex-col items-center gap-4 p-10 text-center">
           <div className="relative flex h-20 w-20 items-center justify-center">
             <span className="absolute inset-0 rounded-full bg-[#f97316]/15 blur-xl" />
