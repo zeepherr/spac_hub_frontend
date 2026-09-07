@@ -52,9 +52,7 @@ function OrderSummary({
 }) {
   const hasItems = items.length > 0;
   const isPending = hasItems && (isQuoteLoading || !quote);
-  const grandTotal = hasItems
-    ? (quote?.grandTotal ?? 0) + (includeAssembly ? ASSEMBLY_SERVICE_FEE : 0)
-    : 0;
+  const grandTotal = hasItems ? (quote?.grandTotal ?? 0) : 0;
 
   return (
     <div className="matte sticky top-24 p-6 text-white">
@@ -166,7 +164,7 @@ export default function CheckoutStep1Page() {
     () => items.map((item) => item.listingId),
     [items],
   );
-  const quoteQuery = useCheckoutQuote(listingIds);
+  const quoteQuery = useCheckoutQuote(listingIds, includeAssembly);
   const quote = quoteQuery.data;
 
   const {
@@ -212,6 +210,7 @@ export default function CheckoutStep1Page() {
           const checkout = await createCheckoutMutation.mutateAsync({
             listingIds,
             shippingAddress,
+            setupServiceRequested: includeAssembly,
           });
           const checkoutId = checkout?.data?.id;
 

@@ -50,7 +50,9 @@ export default function CategorySidebar() {
   return (
     <aside className="hardware-surface flex h-fit flex-col">
       <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
-        <h2 className="text-base font-bold text-neutral-900">Product Categories</h2>
+        <h2 className="text-base font-bold text-neutral-900">
+          Product Categories
+        </h2>
         <Menu size={18} className="text-neutral-400" />
       </div>
 
@@ -98,7 +100,9 @@ export default function CategorySidebar() {
         <p className="mb-3 text-xs text-neutral-500">
           Choose components, calculate your budget, and build a PC your way.
         </p>
-        <button className="btn btn-accent w-full">Start Building</button>
+        <Link to="/build" className="btn btn-accent w-full">
+          Start Building
+        </Link>
       </div>
     </aside>
   );

@@ -42,6 +42,8 @@ import CheckoutStep3Page from "@/pages/cart/CheckoutStep3Page";
 
 import PaymentSuccessPage from "@/pages/auth/payments/PaymentSuccessPage";
 
+import BuildPcPage from "@/pages/build/BuildPcPage";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -75,6 +77,15 @@ const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: "cart",
+        Component: CartPage,
+      },
+      {
+        // ปุ่ม "Start Building" ใน CategorySidebar.jsx navigate มาที่นี่
+        path: "build",
+        Component: BuildPcPage,
+      },
       { path: "/payment/success", Component: PaymentSuccessPage },
       { path: "/checkoutstep1", Component: CheckoutStep1Page },
       { path: "/checkoutstep2", Component: CheckoutStep2Page },
@@ -101,7 +112,7 @@ const router = createBrowserRouter([
                     path: "orders",
                     Component: BuyingOrders,
                   },
-                   {
+                  {
                     path: "orders/:orderId",
                     Component: OrderDetail,
                   },
