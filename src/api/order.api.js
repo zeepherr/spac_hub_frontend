@@ -87,3 +87,12 @@ export const shipOrderToBuyer = async (orderId, payload) => {
 
   return response.data;
 };
+
+export const returnOrderToSeller = async (orderId, payload) => {
+  const response = await authApi.post(
+    `/admin/orders/${orderId}/return-to-seller`,
+    payload,
+  );
+
+  return response.data;
+};

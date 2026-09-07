@@ -99,12 +99,20 @@ export const publishListing = async (listingId) => {
   return response.data;
 };
 
-export const getActiveListings = async () => {
-  const response = await publicApi.get("/listings");
+export const getActiveListings = async (search = "", config = {}) => {
+  const normalizedSearch = search.trim();
+
+  const response = await publicApi.get("/listings", {
+    ...config,
+    params: normalizedSearch
+      ? {
+          search: normalizedSearch,
+        }
+      : undefined,
+  });
 
   return response.data.data;
 };
-
 export const getListingsByCategory = async (categoryId) => {
   const response = await publicApi.get(`/listings/category/${categoryId}`);
 

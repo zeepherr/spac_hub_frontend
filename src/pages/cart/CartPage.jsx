@@ -31,9 +31,7 @@ function OrderSummary({
   const hasSelection = itemCount > 0;
   // ตอนยังไม่มีของที่เลือกเลย ไม่ต้องรอ quote (ไม่มีอะไรให้คำนวณ) โชว์ 0 ไปเลย
   const isPending = hasSelection && (isQuoteLoading || !quote);
-  const grandTotal = hasSelection
-    ? (quote?.grandTotal ?? 0) + (includeAssembly ? ASSEMBLY_SERVICE_FEE : 0)
-    : 0;
+  const grandTotal = hasSelection ? (quote?.grandTotal ?? 0) : 0;
 
   return (
     <div className="hardware-surface p-5">
@@ -221,7 +219,7 @@ export default function CartPage() {
     [items, deselectedIds],
   );
 
-  const quoteQuery = useCheckoutQuote(listingIds);
+  const quoteQuery = useCheckoutQuote(listingIds, includeAssembly);
   const quote = quoteQuery.data;
 
   // Another buyer may reserve a listing after this cart was loaded.
