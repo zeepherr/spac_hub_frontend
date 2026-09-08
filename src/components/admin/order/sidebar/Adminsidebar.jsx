@@ -9,44 +9,44 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router";
 
-import { LogoutButton } from "@/components/auth/LogoutButton";
+import AdminProfileMenu from "@/components/admin/sidebar/AdminProfileMenu";
 import { hasUnreadSupportMessage } from "@/components/support/support.constants";
 import { useAdminSupportCases } from "@/hook/support/useAdminSupportCases";
 import useAuthStore from "@/stores/auth.store";
 
 const menuItems = [
   {
-    name: "หน้าหลัก",
+    name: "Dashboard",
     path: "/admin",
     icon: LayoutGrid,
   },
   {
-    name: "หมวดหมู่",
+    name: "Categories",
     path: "/admin/categories",
     icon: ListTree,
   },
   {
-    name: "แชท",
+    name: "Chat",
     path: "/admin/chats",
     icon: MessageSquareText,
   },
   {
-    name: "พัสดุรอสแกนรับ",
+    name: "Awaiting Receipt",
     path: "/admin/orders/awaiting-receipt",
     icon: ScanLine,
   },
   {
-    name: "รอตรวจสภาพ",
+    name: "Inspection",
     path: "/admin/orders/inspection",
     icon: ClipboardCheck,
   },
   {
-    name: "พร้อมจัดส่ง",
+    name: "Ready to Ship",
     path: "/admin/orders/ready-to-ship",
     icon: PackageCheck,
   },
   {
-    name: "สรุปการจัดส่ง",
+    name: "Shipping Summary",
     path: "/admin/orders/summary",
     icon: ClipboardList,
   },
@@ -62,14 +62,21 @@ function AdminSidebar() {
   ).length;
   return (
     <aside className="flex h-full w-60 shrink-0 flex-col bg-[#1F1F1F] px-4 py-6">
+      {/* LOGO */}
       <div className="mb-10">
         <h1 className="text-xl font-bold text-white">
-          SPEC<span className="text-orange-500">HUB</span>
+          SPEC
+          <span className="text-orange-500">
+            HUB
+          </span>
         </h1>
 
-        <p className="text-xs text-gray-500">ADMIN PANEL</p>
+        <p className="text-xs text-gray-500">
+          ADMIN PANEL
+        </p>
       </div>
 
+      {/* MENU */}
       <nav className="scrollbar-hide min-h-0 flex-1 space-y-2 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
@@ -89,6 +96,7 @@ function AdminSidebar() {
             >
               <Icon size={18} />
 
+              <span>{item.name}</span>
               <span className="flex-1">{item.name}</span>
 
               {item.path === "/admin/chats" && unreadSupportCount > 0 && (
@@ -101,8 +109,9 @@ function AdminSidebar() {
         })}
       </nav>
 
+      {/* ADMIN PROFILE */}
       <div className="shrink-0 pt-4">
-        <LogoutButton />
+        <AdminProfileMenu />
       </div>
     </aside>
   );

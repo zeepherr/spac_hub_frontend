@@ -28,7 +28,7 @@ function AdminProfile() {
         />
 
         <span className="ml-3 text-sm text-neutral-500">
-          กำลังโหลดข้อมูล...
+          Loading profile...
         </span>
       </div>
     );
@@ -38,7 +38,7 @@ function AdminProfile() {
     return (
       <div className="flex min-h-96 flex-col items-center justify-center gap-3">
         <p className="text-red-500">
-          ไม่สามารถโหลดข้อมูลผู้ใช้ได้
+          Unable to load user profile
         </p>
 
         <button
@@ -46,7 +46,7 @@ function AdminProfile() {
           onClick={() => profileQuery.refetch()}
           className="cursor-pointer rounded-lg border border-orange-500 px-4 py-2 text-sm font-semibold text-orange-500 transition hover:bg-orange-50"
         >
-          ลองอีกครั้ง
+          Try Again
         </button>
       </div>
     );
@@ -55,22 +55,22 @@ function AdminProfile() {
   const fullName =
     [user.firstName, user.lastName]
       .filter(Boolean)
-      .join(" ") || "ยังไม่ได้ระบุชื่อ";
+      .join(" ") || "Name not provided";
 
   const roleLabel =
     user.role === "ADMIN"
-      ? "ผู้ดูแลระบบ"
+      ? "Administrator"
       : user.role === "SELLER"
-        ? "ผู้ขาย"
-        : "ผู้ใช้งานทั่วไป";
+        ? "Seller"
+        : "User";
 
   const createdAt = user.createdAt
-    ? new Intl.DateTimeFormat("th-TH", {
+    ? new Intl.DateTimeFormat("en-GB", {
         day: "numeric",
         month: "long",
         year: "numeric",
       }).format(new Date(user.createdAt))
-    : "ไม่พบข้อมูล";
+    : "No information available";
 
   return (
     <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
@@ -78,11 +78,11 @@ function AdminProfile() {
         {/* HEADER */}
         <header className="mb-7">
           <h1 className="text-3xl font-bold text-neutral-900">
-            โปรไฟล์แอดมิน
+            Admin Profile
           </h1>
 
           <p className="mt-2 text-sm text-neutral-500">
-            ดูข้อมูลบัญชีและรายละเอียดของผู้ดูแลระบบ
+            View administrator account information and details
           </p>
         </header>
 
@@ -109,7 +109,7 @@ function AdminProfile() {
                         className="fill-orange-500 text-white"
                       />
 
-                      ยืนยันตัวตนแล้ว
+                      Verified
                     </span>
                   )}
                 </div>
@@ -126,7 +126,7 @@ function AdminProfile() {
               className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl border border-orange-500 px-5 py-3 font-semibold text-orange-500 transition hover:bg-orange-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300"
             >
               <Pencil size={19} />
-              แก้ไขโปรไฟล์
+              Edit Profile
             </button>
           </div>
 
@@ -134,39 +134,39 @@ function AdminProfile() {
           <div className="mt-7 space-y-4">
             <ProfileRow
               icon={UserRound}
-              label="ชื่อ-นามสกุล"
+              label="Full Name"
               value={fullName}
             />
 
             <ProfileRow
               icon={Mail}
-              label="อีเมล"
+              label="Email"
               value={user.email}
             />
 
             <ProfileRow
               icon={Phone}
-              label="เบอร์โทรศัพท์"
+              label="Phone Number"
               value={user.phone}
-              emptyText="ยังไม่ได้เพิ่มเบอร์โทรศัพท์"
+              emptyText="No phone number added"
             />
 
             <ProfileRow
               icon={MapPin}
-              label="ที่อยู่"
+              label="Address"
               value={user.address}
-              emptyText="ยังไม่ได้เพิ่มที่อยู่"
+              emptyText="No address added"
             />
 
             <ProfileRow
               icon={Shield}
-              label="บทบาทในระบบ"
+              label="Role"
               value={roleLabel}
             />
 
             <ProfileRow
               icon={CalendarDays}
-              label="วันที่สมัครสมาชิก"
+              label="Member Since"
               value={createdAt}
             />
           </div>
@@ -182,7 +182,7 @@ function ProfileImage({ imageUrl, fullName }) {
       {imageUrl ? (
         <img
           src={imageUrl}
-          alt={`รูปโปรไฟล์ของ ${fullName}`}
+          alt={`${fullName}'s profile`}
           className="size-full object-cover"
         />
       ) : (
@@ -200,7 +200,7 @@ function ProfileRow({
   icon: Icon,
   label,
   value,
-  emptyText = "ไม่พบข้อมูล",
+  emptyText = "No information available",
 }) {
   const hasValue =
     value !== null &&
