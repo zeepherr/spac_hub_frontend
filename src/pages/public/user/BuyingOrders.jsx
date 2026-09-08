@@ -1,9 +1,18 @@
+import { hasUnreadSupportMessage } from "@/components/support/support.constants";
 import { useBuyingOrders } from "@/hook/order/useBuyingOrders";
-import { ChevronDown, ChevronRight, LoaderCircle, PackageOpen, Search, } from "lucide-react";
+import { useMySupportCases } from "@/hook/support/useMySupportCases";
+import useAuthStore from "@/stores/auth.store";
+import {
+  ChevronDown,
+  ChevronRight,
+  LoaderCircle,
+  MessageSquareText,
+  PackageOpen,
+  Search,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import BackButton from "./BackButton";
-
 const FINISHED_STATUSES = new Set([
   "COMPLETED",
   "CANCELLED",
@@ -12,11 +21,7 @@ const FINISHED_STATUSES = new Set([
 ]);
 
 /* สถานะที่ถือว่ายกเลิกหรือไม่สำเร็จ */
-const CANCELLED_STATUSES = new Set([
-  "CANCELLED",
-  "REJECTED",
-  "REFUNDED",
-]);
+const CANCELLED_STATUSES = new Set(["CANCELLED", "REJECTED", "REFUNDED"]);
 
 /* ข้อความและสีที่ใช้แสดงสถานะ */
 const ORDER_STATUS_CONFIG = {
@@ -115,6 +120,18 @@ function isOrderInCategory(order, category) {
 
 function BuyingOrders() {
   const navigate = useNavigate();
+  const currentUser = useAuthStore((state) => state.user);
+
+  const { data: supportCases = [] } = useMySupportCases();
+
+  const supportCaseByOrderId = useMemo(() => {
+    return new Map(
+      supportCases.map((supportCase) => [
+        String(supportCase.orderId),
+        supportCase,
+      ]),
+    );
+  }, [supportCases]);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -125,12 +142,7 @@ function BuyingOrders() {
   const [searchText, setSearchText] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
 
-  const {
-    data: orders = [],
-    isPending,
-    isError,
-    refetch,
-  } = useBuyingOrders();
+  const { data: orders = [], isPending, isError, refetch } = useBuyingOrders();
 
   /*จำนวนรายการในแต่ละหมวด*/
   const categoryCounts = useMemo(
@@ -145,17 +157,14 @@ function BuyingOrders() {
         isOrderInCategory(order, "processing"),
       ).length,
 
-      shipping: orders.filter((order) =>
-        isOrderInCategory(order, "shipping"),
-      ).length,
+      shipping: orders.filter((order) => isOrderInCategory(order, "shipping"))
+        .length,
 
-      completed: orders.filter((order) =>
-        isOrderInCategory(order, "completed"),
-      ).length,
+      completed: orders.filter((order) => isOrderInCategory(order, "completed"))
+        .length,
 
-      cancelled: orders.filter((order) =>
-        isOrderInCategory(order, "cancelled"),
-      ).length,
+      cancelled: orders.filter((order) => isOrderInCategory(order, "cancelled"))
+        .length,
     }),
     [orders],
   );
@@ -239,10 +248,7 @@ function BuyingOrders() {
   if (isPending) {
     return (
       <div className="flex min-h-96 items-center justify-center gap-3">
-        <LoaderCircle
-          size={28}
-          className="animate-spin text-orange-500"
-        />
+        <LoaderCircle size={28} className="animate-spin text-orange-500" />
 
         <span className="text-sm text-neutral-500">Loading orders...</span>
       </div>
@@ -273,7 +279,9 @@ function BuyingOrders() {
         <header className="mb-7">
           <h1 className="text-3xl font-bold text-neutral-900">My Orders</h1>
 
-          <p className="mt-2 text-sm text-neutral-500">View and track all your purchases</p>
+          <p className="mt-2 text-sm text-neutral-500">
+            View and track all your purchases
+          </p>
         </header>
 
         {/* แถบเลือกหมวดหมู่ */}
@@ -286,21 +294,21 @@ function BuyingOrders() {
                 <button
                   key={category.value}
                   type="button"
-                  onClick={() =>
-                    handleCategoryChange(category.value)
-                  }
-                  className={`flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-semibold transition lg:flex-1 ${isActive
+                  onClick={() => handleCategoryChange(category.value)}
+                  className={`flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-semibold transition lg:flex-1 ${
+                    isActive
                       ? "bg-orange-500 text-white shadow-sm"
                       : "text-neutral-600 hover:bg-orange-50 hover:text-orange-600"
-                    }`}
+                  }`}
                 >
                   {category.label}
 
                   <span
-                    className={`flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-xs ${isActive
+                    className={`flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-xs ${
+                      isActive
                         ? "bg-white/20 text-white"
                         : "bg-neutral-100 text-neutral-500"
-                      }`}
+                    }`}
                   >
                     {categoryCounts[category.value]}
                   </span>
@@ -312,30 +320,25 @@ function BuyingOrders() {
         {/* ช่องค้นหาและเรียงลำดับ */}
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_220px]">
           <label className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-5 shadow-sm transition focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100">
-            <Search
-              size={20}
-              className="shrink-0 text-neutral-400"
-            />
+            <Search size={20} className="shrink-0 text-neutral-400" />
 
             <input
               type="search"
               value={searchText}
-              onChange={(event) =>
-                setSearchText(event.target.value)
-              }
+              onChange={(event) => setSearchText(event.target.value)}
               placeholder="Search by order number or product name..."
               className="h-14 w-full bg-transparent text-sm text-neutral-900 outline-none placeholder:text-neutral-400"
             />
           </label>
 
           <label className="relative rounded-2xl border border-neutral-200 bg-white px-5 shadow-sm">
-            <span className="absolute left-5 top-2 text-xs text-neutral-400">Sort by</span>
+            <span className="absolute left-5 top-2 text-xs text-neutral-400">
+              Sort by
+            </span>
 
             <select
               value={sortOrder}
-              onChange={(event) =>
-                setSortOrder(event.target.value)
-              }
+              onChange={(event) => setSortOrder(event.target.value)}
               className="h-14 w-full cursor-pointer appearance-none bg-transparent pt-4 text-sm font-semibold text-neutral-800 outline-none"
             >
               <option value="newest">Most Recent</option>
@@ -352,20 +355,26 @@ function BuyingOrders() {
         {/* รายการคำสั่งซื้อ */}
         <div className="mt-5">
           {filteredOrders.length === 0 ? (
-            <EmptyOrders
-              hasSearchText={Boolean(searchText.trim())}
-            />
+            <EmptyOrders hasSearchText={Boolean(searchText.trim())} />
           ) : (
             <div className="space-y-3">
-              {filteredOrders.map((order) => (
-                <OrderRow
-                  key={order.id}
-                  order={order}
-                  onClick={() =>
-                    navigate(`/user/orders/${order.id}`)
-                  }
-                />
-              ))}
+              {filteredOrders.map((order) => {
+                const supportCase = supportCaseByOrderId.get(String(order.id));
+
+                const hasUnreadSupport = hasUnreadSupportMessage(
+                  supportCase,
+                  currentUser?.id,
+                );
+
+                return (
+                  <OrderRow
+                    key={order.id}
+                    order={order}
+                    hasUnreadSupport={hasUnreadSupport}
+                    onClick={() => navigate(`/user/orders/${order.id}`)}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
@@ -374,40 +383,33 @@ function BuyingOrders() {
   );
 }
 
-function OrderRow({ order, onClick }) {
+function OrderRow({ order, onClick, hasUnreadSupport = false }) {
   /* หารูปปก ถ้าไม่มีให้ใช้รูปแรก */
   const images = order.listing?.images ?? [];
 
-  const coverImage =
-    images.find((image) => image.isCover) ?? images[0];
+  const coverImage = images.find((image) => image.isCover) ?? images[0];
 
-  const imageUrl =
-    coverImage?.imageUrl ||
-    coverImage?.url ||
-    "";
+  const imageUrl = coverImage?.imageUrl || coverImage?.url || "";
 
   /* หาชื่อสินค้า */
   const productName =
     order.listing?.title ||
-    [order.listing?.brand, order.listing?.model]
-      .filter(Boolean)
-      .join(" ") ||
+    [order.listing?.brand, order.listing?.model].filter(Boolean).join(" ") ||
     "Untitled Item";
 
   /* แปลงวันที่เป็นรูปแบบภาษาอังกฤษ */
   const createdAt = order.createdAt
     ? new Intl.DateTimeFormat("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }).format(new Date(order.createdAt))
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }).format(new Date(order.createdAt))
     : "-";
 
   /* เลือกข้อความและสีของสถานะ */
   const status = ORDER_STATUS_CONFIG[order.status] ?? {
     label: order.status || "Unknown",
-    className:
-      "bg-neutral-100 text-neutral-600 ring-neutral-200",
+    className: "bg-neutral-100 text-neutral-600 ring-neutral-200",
   };
 
   return (
@@ -417,7 +419,7 @@ function OrderRow({ order, onClick }) {
       className="grid w-full cursor-pointer grid-cols-[76px_minmax(0,1fr)_20px] items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md sm:grid-cols-[84px_minmax(0,1fr)_140px_180px_24px] sm:p-5"
     >
       {/* รูปสินค้า */}
-      <div className="flex size-[76px] shrink-0 items-center justify-center overflow-hidden rounded-xl bg-neutral-100 sm:size-20">
+      <div className="flex size-19 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-neutral-100 sm:size-20">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -425,18 +427,28 @@ function OrderRow({ order, onClick }) {
             className="size-full object-cover"
           />
         ) : (
-          <PackageOpen
-            size={30}
-            className="text-neutral-400"
-          />
+          <PackageOpen size={30} className="text-neutral-400" />
         )}
       </div>
 
       {/* เลขคำสั่งซื้อ ชื่อสินค้า และวันที่ */}
       <div className="min-w-0">
-        <p className="truncate text-xs font-medium text-neutral-400">
-          {order.orderNumber}
-        </p>
+        <div className="flex min-w-0 items-center gap-2">
+          <p className="min-w-0 truncate text-xs font-medium text-neutral-400">
+            {order.orderNumber}
+          </p>
+
+          {hasUnreadSupport && (
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-orange-50 px-2 py-1 text-[10px] font-bold text-orange-600">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-orange-400 opacity-70" />
+                <span className="relative inline-flex size-2 rounded-full bg-orange-500" />
+              </span>
+              <MessageSquareText size={12} />
+              New message
+            </span>
+          )}
+        </div>
 
         <h2 className="mt-1 truncate font-semibold text-neutral-900">
           {productName}
@@ -449,10 +461,7 @@ function OrderRow({ order, onClick }) {
         {/* ราคาและสถานะสำหรับหน้าจอมือถือ */}
         <div className="mt-3 flex flex-wrap items-center gap-2 sm:hidden">
           <p className="font-bold text-neutral-900">
-            ฿
-            {Number(
-              order.agreedPrice ?? 0,
-            ).toLocaleString("th-TH")}
+            ฿{Number(order.agreedPrice ?? 0).toLocaleString("th-TH")}
           </p>
 
           <span
@@ -465,10 +474,7 @@ function OrderRow({ order, onClick }) {
 
       {/* ราคาสำหรับหน้าจอใหญ่ */}
       <p className="hidden font-bold text-neutral-900 sm:block sm:text-right">
-        ฿
-        {Number(
-          order.agreedPrice ?? 0,
-        ).toLocaleString("th-TH")}
+        ฿{Number(order.agreedPrice ?? 0).toLocaleString("th-TH")}
       </p>
 
       {/* สถานะสำหรับหน้าจอใหญ่ */}
@@ -480,10 +486,7 @@ function OrderRow({ order, onClick }) {
         </span>
       </div>
 
-      <ChevronRight
-        size={20}
-        className="shrink-0 text-neutral-400"
-      />
+      <ChevronRight size={20} className="shrink-0 text-neutral-400" />
     </button>
   );
 }
@@ -496,9 +499,7 @@ function EmptyOrders({ hasSearchText }) {
       </span>
 
       <h2 className="mt-4 text-lg font-bold text-neutral-900">
-        {hasSearchText
-          ? "No matching orders"
-          : "No orders in this category"}
+        {hasSearchText ? "No matching orders" : "No orders in this category"}
       </h2>
 
       <p className="mt-2 text-sm text-neutral-500">

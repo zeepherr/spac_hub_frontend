@@ -1,15 +1,14 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import {
   ClipboardCheck,
   LoaderCircle,
   RefreshCw,
   Search,
-  X,
 } from "lucide-react";
 
 import { useAdminOrders } from "@/hook/order/useAdminOrder";
 import { useStartOrderInspection } from "@/hook/order/useStartOrderInspection";
-import { useCompleteOrderInspection } from "@/hook/order/useCompleteOrderInspection";
 
 function getProductName(order) {
   return order.listing?.title || "-";
@@ -54,12 +53,12 @@ const statusOptions = [
 ];
 
 function Inspection() {
+  const navigate = useNavigate();
+
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
-  const [selectedOrder, setSelectedOrder] = useState(null);
 
   const startInspectionMutation = useStartOrderInspection();
-  const completeInspectionMutation = useCompleteOrderInspection();
 
   const statuses =
     status === "ALL"
@@ -72,7 +71,7 @@ function Inspection() {
 
   const orders = Array.isArray(ordersQuery.data)
     ? ordersQuery.data
-    : ordersQuery.data?.data ?? [];
+    : (ordersQuery.data?.data ?? []);
 
   const filteredOrders = useMemo(() => {
     const keyword = search.trim().toLowerCase();
@@ -99,46 +98,23 @@ function Inspection() {
     });
   }, [orders, search]);
 
-  const handleStartInspection = () => {
-    if (!selectedOrder) return;
+  const handleInspection = (order) => {
+    if (order.status === "INSPECTING") {
+      navigate(`/admin/orders/inspection/${order.id}`);
+      return;
+    }
 
     startInspectionMutation.mutate(
       {
-        orderId: selectedOrder.id,
+        orderId: order.id,
       },
       {
         onSuccess: () => {
-          setSelectedOrder(null);
+          navigate(`/admin/orders/inspection/${order.id}`);
         },
       },
     );
   };
-
-  const handlePassInspection = () => {
-    if (!selectedOrder) return;
-
-    completeInspectionMutation.mutate(
-      {
-        orderId: selectedOrder.id,
-
-        payload: {
-          result: "PASSED",
-          verifiedCondition: "LIKE_NEW",
-          verifiedScore: 92,
-          notes: "Product matches the listing.",
-        },
-      },
-      {
-        onSuccess: () => {
-          setSelectedOrder(null);
-        },
-      },
-    );
-  };
-
-  const isMutationPending =
-    startInspectionMutation.isPending ||
-    completeInspectionMutation.isPending;
 
   return (
     <div className="min-h-screen bg-[#F5F5F4] p-8">
@@ -173,7 +149,9 @@ function Inspection() {
             <RefreshCw
               size={16}
               className={
-                ordersQuery.isFetching ? "animate-spin" : ""
+                ordersQuery.isFetching
+                  ? "animate-spin"
+                  : ""
               }
             />
 
@@ -208,7 +186,9 @@ function Inspection() {
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() => setStatus(option.value)}
+                  onClick={() =>
+                    setStatus(option.value)
+                  }
                   className={`h-11 rounded-xl px-5 text-sm font-medium transition ${
                     status === option.value
                       ? "bg-orange-500 text-white shadow-sm hover:bg-orange-600"
@@ -243,7 +223,9 @@ function Inspection() {
 
               <button
                 type="button"
-                onClick={() => ordersQuery.refetch()}
+                onClick={() =>
+                  ordersQuery.refetch()
+                }
                 className="mt-4 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-orange-600"
               >
                 ลองอีกครั้ง
@@ -295,7 +277,14 @@ function Inspection() {
 
                 <tbody className="divide-y divide-neutral-100">
                   {filteredOrders.map((order) => {
-                    const coverImage = getCoverImage(order);
+                    const coverImage =
+                      getCoverImage(order);
+
+                    const isStarting =
+                      startInspectionMutation.isPending &&
+                      startInspectionMutation
+                        .variables?.orderId ===
+                        order.id;
 
                     return (
                       <tr
@@ -305,11 +294,14 @@ function Inspection() {
                         {/* Order */}
                         <td className="px-6 py-4">
                           <p className="truncate text-sm font-semibold text-neutral-900">
-                            {order.orderNumber || "-"}
+                            {order.orderNumber ||
+                              "-"}
                           </p>
 
                           <p className="mt-1 text-xs text-neutral-400">
-                            {formatDate(order.createdAt)}
+                            {formatDate(
+                              order.createdAt,
+                            )}
                           </p>
                         </td>
 
@@ -319,8 +311,12 @@ function Inspection() {
                             <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
                               {coverImage ? (
                                 <img
-                                  src={coverImage}
-                                  alt={getProductName(order)}
+                                  src={
+                                    coverImage
+                                  }
+                                  alt={getProductName(
+                                    order,
+                                  )}
                                   className="h-full w-full object-cover"
                                 />
                               ) : (
@@ -335,12 +331,15 @@ function Inspection() {
 
                             <div className="min-w-0">
                               <p className="truncate text-sm font-medium text-neutral-900">
-                                {order.listing?.title || "-"}
+                                {order.listing
+                                  ?.title || "-"}
                               </p>
 
                               <p className="mt-1 truncate text-xs text-neutral-400">
-                                {order.listing?.brand || "-"}
-                                {order.listing?.model
+                                {order.listing
+                                  ?.brand || "-"}
+                                {order.listing
+                                  ?.model
                                   ? ` • ${order.listing.model}`
                                   : ""}
                               </p>
@@ -351,13 +350,16 @@ function Inspection() {
                         {/* Price */}
                         <td className="px-6 py-4">
                           <span className="text-sm font-semibold text-neutral-900">
-                            {formatPrice(order.agreedPrice)}
+                            {formatPrice(
+                              order.agreedPrice,
+                            )}
                           </span>
                         </td>
 
                         {/* Status */}
                         <td className="px-6 py-4">
-                          {order.status === "INSPECTING" ? (
+                          {order.status ===
+                          "INSPECTING" ? (
                             <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
                               กำลังตรวจ
                             </span>
@@ -373,13 +375,19 @@ function Inspection() {
                           <button
                             type="button"
                             onClick={() =>
-                              setSelectedOrder(order)
+                              handleInspection(
+                                order,
+                              )
                             }
-                            className="min-w-[140px] rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 active:bg-orange-700"
+                            disabled={isStarting}
+                            className="min-w-[140px] rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 active:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            {order.status === "INSPECTING"
-                              ? "ตรวจสอบสินค้า"
-                              : "เริ่มตรวจ"}
+                            {isStarting
+                              ? "กำลังเริ่มตรวจ..."
+                              : order.status ===
+                                  "INSPECTING"
+                                ? "ตรวจสอบสินค้า"
+                                : "เริ่มตรวจ"}
                           </button>
                         </td>
                       </tr>
@@ -391,213 +399,6 @@ function Inspection() {
           )}
         </div>
       </div>
-
-      {/* Inspection Modal */}
-      {selectedOrder && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-          onClick={() => {
-            if (!isMutationPending) {
-              setSelectedOrder(null);
-            }
-          }}
-        >
-          <div
-            className="w-full max-w-xl rounded-2xl bg-white shadow-xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-neutral-200 px-6 py-5">
-              <div>
-                <h2 className="text-xl font-semibold text-neutral-900">
-                  {selectedOrder.status === "INSPECTING"
-                    ? "ตรวจสอบสินค้า"
-                    : "เริ่มตรวจสินค้า"}
-                </h2>
-
-                <p className="mt-1 text-sm text-neutral-500">
-                  {selectedOrder.orderNumber}
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setSelectedOrder(null)}
-                disabled={isMutationPending}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-700 disabled:opacity-50"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="p-6">
-              {/* Product */}
-              <div className="flex items-center gap-4 rounded-xl border border-neutral-200 p-4">
-                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
-                  {getCoverImage(selectedOrder) ? (
-                    <img
-                      src={getCoverImage(selectedOrder)}
-                      alt={selectedOrder.listing?.title}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                      <ClipboardCheck
-                        className="text-neutral-300"
-                        size={24}
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-neutral-900">
-                    {selectedOrder.listing?.title || "-"}
-                  </p>
-
-                  <p className="mt-1 text-sm text-neutral-500">
-                    {selectedOrder.listing?.brand || "-"}
-                    {selectedOrder.listing?.model
-                      ? ` • ${selectedOrder.listing.model}`
-                      : ""}
-                  </p>
-
-                  <p className="mt-1 text-sm font-semibold text-orange-500">
-                    {formatPrice(selectedOrder.agreedPrice)}
-                  </p>
-                </div>
-              </div>
-
-              {/* Order Detail */}
-              <div className="mt-5 grid grid-cols-2 gap-4 rounded-xl bg-neutral-50 p-4">
-                <div>
-                  <p className="text-xs text-neutral-400">
-                    สถานะ
-                  </p>
-
-                  <p className="mt-1 text-sm font-medium text-neutral-800">
-                    {selectedOrder.status === "INSPECTING"
-                      ? "กำลังตรวจ"
-                      : "รอตรวจ"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs text-neutral-400">
-                    วันที่สร้าง
-                  </p>
-
-                  <p className="mt-1 text-sm font-medium text-neutral-800">
-                    {formatDate(selectedOrder.createdAt)}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs text-neutral-400">
-                    ผู้ขาย
-                  </p>
-
-                  <p className="mt-1 text-sm font-medium text-neutral-800">
-                    {`${selectedOrder.seller?.firstName ?? ""} ${
-                      selectedOrder.seller?.lastName ?? ""
-                    }`.trim() || "-"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs text-neutral-400">
-                    ราคาซื้อขาย
-                  </p>
-
-                  <p className="mt-1 text-sm font-semibold text-neutral-800">
-                    {formatPrice(selectedOrder.agreedPrice)}
-                  </p>
-                </div>
-              </div>
-
-              {/* Inspection Area */}
-              {selectedOrder.status === "INSPECTING" && (
-                <div className="mt-5 rounded-xl border border-orange-100 bg-orange-50/50 p-4">
-                  <p className="text-sm font-semibold text-neutral-800">
-                    ผลการตรวจสินค้า
-                  </p>
-
-                  <div className="mt-4 grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-xs text-neutral-500">
-                        Condition
-                      </p>
-
-                      <p className="mt-1 text-sm font-medium text-neutral-900">
-                        LIKE_NEW
-                      </p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-neutral-500">
-                        Score
-                      </p>
-
-                      <p className="mt-1 text-sm font-medium text-neutral-900">
-                        92 / 100
-                      </p>
-                    </div>
-                  </div>
-
-                  <p className="mt-4 text-xs text-neutral-500">
-                    หมายเหตุ
-                  </p>
-
-                  <p className="mt-1 text-sm text-neutral-800">
-                    Product matches the listing.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="flex justify-end gap-3 border-t border-neutral-200 px-6 py-5">
-              <button
-                type="button"
-                onClick={() => setSelectedOrder(null)}
-                disabled={isMutationPending}
-                className="rounded-xl border border-neutral-200 bg-white px-5 py-2.5 text-sm font-medium text-neutral-600 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                ยกเลิก
-              </button>
-
-              {selectedOrder.status ===
-                "INSPECTION_PENDING" && (
-                <button
-                  type="button"
-                  onClick={handleStartInspection}
-                  disabled={startInspectionMutation.isPending}
-                  className="min-w-[140px] rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {startInspectionMutation.isPending
-                    ? "กำลังเริ่มตรวจ..."
-                    : "เริ่มตรวจ"}
-                </button>
-              )}
-
-              {selectedOrder.status === "INSPECTING" && (
-                <button
-                  type="button"
-                  onClick={handlePassInspection}
-                  disabled={
-                    completeInspectionMutation.isPending
-                  }
-                  className="min-w-[140px] rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {completeInspectionMutation.isPending
-                    ? "กำลังบันทึก..."
-                    : "ผ่านการตรวจ"}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
