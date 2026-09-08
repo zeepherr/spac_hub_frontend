@@ -336,7 +336,9 @@ export const useSupportSocket = ({
        * Current MVP has no global notification socket,
        * so disconnect when leaving the chat screen.
        */
-      disconnectSupportSocket();
+      if (!isAdmin) {
+        disconnectSupportSocket();
+      }
 
       socketRef.current = null;
     };
