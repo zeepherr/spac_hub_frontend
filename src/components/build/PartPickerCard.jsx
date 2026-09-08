@@ -1,12 +1,6 @@
 import { Cpu } from "lucide-react";
 import { Link } from "react-router";
 
-// การ์ดสินค้าเวอร์ชันหน้า "จัดสเปค" - ต่างจาก ProductCard.jsx ทั่วไป (ที่มีปุ่มเพิ่มลงตะกร้าไอคอนเดียว) ตรงที่มี
-// ปุ่ม "จัดชุดสเปค" (เพิ่มเข้ารายการที่เลือกไว้ฝั่งซ้าย) กับ "รายละเอียด" (ไปหน้า product detail) แยกกันชัดเจน
-
-// หารูปปกจาก listing.images (isCover ก่อน ถ้าไม่มีเอารูปแรก) - เหมือน getCoverImageUrl ใน ProductCard.jsx
-// (backend คืน imageUrl เต็มมาให้อยู่แล้ว) ตอนเป็น mock ใช้ field product.imageUrl ตรงๆ แต่ listing จริงจาก
-// useListingsByCategory ไม่มี field นี้ มีแต่ images[] แทน
 function getCoverImageUrl(product) {
   const images = product.images ?? [];
   const cover = images.find((img) => img.isCover) ?? images[0];
@@ -41,7 +35,7 @@ function PartPickerCard({ product, onAddToBuild }) {
         )}
       </div>
 
-      <span className="hardware-label normal-case text-secondary">ราคา</span>
+      <span className="hardware-label normal-case text-secondary">Price</span>
       <p className="mb-4 text-xl font-bold text-[#f97316]">
         {formatPrice(product.price)}
       </p>
@@ -52,13 +46,13 @@ function PartPickerCard({ product, onAddToBuild }) {
           onClick={() => onAddToBuild?.(product)}
           className="btn btn-accent flex-1 text-xs text-white sm:text-sm"
         >
-          จัดชุดสเปค
+          Add to Build
         </button>
         <Link
           to={`/products/${product.id}`}
           className="btn flex-1 border-none bg-blue-600 text-xs text-white hover:bg-blue-700 sm:text-sm"
         >
-          รายละเอียด
+          Details
         </Link>
       </div>
     </div>

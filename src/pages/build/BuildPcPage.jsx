@@ -68,7 +68,7 @@ export default function BuildPcPage() {
       return [...prev, newPart];
     });
 
-    toast.success(`เพิ่ม "${product.title}" ลงชุดสเปคแล้ว`, {
+    toast.success(`Added "${product.title}" to your build`, {
       position: "top-right",
     });
   };
@@ -98,11 +98,12 @@ export default function BuildPcPage() {
           await addCartItem.mutateAsync(part.id);
         }
       }
-      toast.success("เพิ่มชิ้นส่วนทั้งหมดลงตะกร้าแล้ว", {
+      toast.success("All parts added to cart", {
         position: "top-right",
       });
+      setSelectedParts([]);
     } catch (error) {
-      toast.error(error.response?.data?.message || "เพิ่มลงตะกร้าไม่สำเร็จ", {
+      toast.error(error.response?.data?.message || "Failed to add to cart", {
         position: "top-right",
       });
     }
@@ -112,10 +113,10 @@ export default function BuildPcPage() {
     <div className="mx-auto max-w-[1400px] px-4 py-6">
       <div className="mb-4 flex items-center gap-1.5 text-xs text-neutral-400">
         <Link to="/" className="hover:text-[#f97316]">
-          หน้าแรก
+          Home
         </Link>
         <ChevronRight size={12} />
-        <span className="font-medium text-neutral-700">จัดสเปค</span>
+        <span className="font-medium text-neutral-700">Build PC</span>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
@@ -137,14 +138,14 @@ export default function BuildPcPage() {
                 className="btn btn-accent gap-2 text-sm text-white"
               >
                 <Trophy size={16} />
-                จัดอันดับสเปคคอม
+                Build Rankings
               </button>
 
               <div className="flex min-w-[220px] flex-1 items-center gap-2 rounded-field border border-neutral-200 px-3 py-2">
                 <Search size={16} className="text-neutral-400" />
                 <input
                   type="text"
-                  placeholder={`ค้นหา ${activeCategory?.name ?? ""}`}
+                  placeholder={`Search ${activeCategory?.name ?? ""}`}
                   className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
                 />
               </div>
@@ -152,7 +153,7 @@ export default function BuildPcPage() {
                 type="button"
                 className="rounded-field border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:border-[#f97316] hover:text-[#f97316]"
               >
-                ค้นหา
+                Search
               </button>
 
               <div className="ml-auto flex items-center gap-3">
@@ -164,10 +165,10 @@ export default function BuildPcPage() {
                   filter
                 </button>
                 <select className="select select-bordered select-sm">
-                  <option>จัดเรียงโดย</option>
-                  <option>ราคาต่ำ-สูง</option>
-                  <option>ราคาสูง-ต่ำ</option>
-                  <option>ใหม่ล่าสุด</option>
+                  <option>Sort by</option>
+                  <option>Price: Low to High</option>
+                  <option>Price: High to Low</option>
+                  <option>Newest</option>
                 </select>
               </div>
             </div>
@@ -178,7 +179,7 @@ export default function BuildPcPage() {
                   Brand
                 </label>
                 <select className="select select-bordered select-sm w-full">
-                  <option>กรุณาเลือก</option>
+                  <option>Please select</option>
                 </select>
               </div>
               <div className="flex flex-col gap-1">
@@ -186,14 +187,14 @@ export default function BuildPcPage() {
                   Series
                 </label>
                 <select className="select select-bordered select-sm w-full">
-                  <option>กรุณาเลือก</option>
+                  <option>Please select</option>
                 </select>
               </div>
             </div>
           </div>
 
           <p className="text-xs text-neutral-400">
-            ทั้งหมด '{activeCategory?.name ?? ""}' : {products.length} รายการ
+            All '{activeCategory?.name ?? ""}': {products.length} items
           </p>
 
           {isLoadingProducts ? (
@@ -207,12 +208,12 @@ export default function BuildPcPage() {
             </div>
           ) : isErrorProducts ? (
             <div className="hardware-surface flex h-40 items-center justify-center">
-              <p className="text-sm text-[#dc2626]">โหลดสินค้าไม่สำเร็จ</p>
+              <p className="text-sm text-[#dc2626]">Failed to load products</p>
             </div>
           ) : products.length === 0 ? (
             <div className="hardware-surface flex h-40 items-center justify-center">
               <p className="text-sm text-neutral-400">
-                ยังไม่มีสินค้าในหมวดหมู่นี้
+                No products in this category yet
               </p>
             </div>
           ) : (

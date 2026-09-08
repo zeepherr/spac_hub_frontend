@@ -49,7 +49,7 @@ function SelectedPartRow({
     >
       <button
         type="button"
-        aria-label="นำออก"
+        aria-label="Remove"
         onClick={(e) => {
           e.stopPropagation();
           onRemove?.(part.id);
@@ -84,7 +84,7 @@ function SelectedPartRow({
             onClick={(e) => e.stopPropagation()}
             className="hardware-label normal-case text-secondary hover:text-[#f97316]"
           >
-            รายละเอียด
+            Details
           </Link>
           <button
             type="button"
@@ -94,7 +94,7 @@ function SelectedPartRow({
             }}
             className="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-700"
           >
-            จำนวน x {part.qty}
+            Qty x {part.qty}
             <Pencil size={12} />
           </button>
         </div>
@@ -126,7 +126,7 @@ function BuildSidebar({
   return (
     <aside className="flex h-fit flex-col gap-4">
       <div className="hardware-surface flex items-center justify-between px-4 py-3">
-        <span className="text-sm font-bold text-neutral-900">รวมทั้งหมด</span>
+        <span className="text-sm font-bold text-neutral-900">Total</span>
         <span className="text-xl font-bold text-[#f97316]">
           {formatPrice(total)}
         </span>
@@ -143,7 +143,7 @@ function BuildSidebar({
 
         {isError && (
           <p className="px-4 py-3 text-sm text-[#dc2626]">
-            โหลดหมวดหมู่ไม่สำเร็จ
+            Failed to load categories
           </p>
         )}
 
@@ -201,7 +201,7 @@ function BuildSidebar({
         className="btn btn-accent gap-2 text-sm text-white disabled:opacity-50"
       >
         <ShoppingCart size={16} />
-        {isAddingAllToCart ? "กำลังเพิ่มลงตะกร้า..." : "เพิ่มทั้งหมดลงตะกร้า"}
+        {isAddingAllToCart ? "Adding to cart..." : "Add All to Cart"}
       </button>
     </aside>
   );

@@ -2,13 +2,13 @@ import { ChevronDown } from "lucide-react";
 import { NavLink } from "react-router";
 
 const TOP_NAV = [
-  { label: "หน้าหลัก", to: "/" },
-  { label: "คอมประกอบ", to: "/build", hasDropdown: true },
-  { label: "โปรโมชั่น", to: "/promotions" },
-  { label: "สินค้า", to: "/products" },
-  { label: "รีวิว", to: "/reviews" },
-  { label: "บริการ", to: "/services" },
-  { label: "ติดต่อเรา", to: "/contact" },
+  { label: "Home", to: "/" },
+  { label: "Build PC", to: "/build", hasDropdown: true },
+  { label: "Promotions", to: "/promotions" },
+  { label: "Products", to: "/products" },
+  { label: "Reviews", to: "/reviews" },
+  { label: "Services", to: "/services" },
+  { label: "Contact", to: "/contact" },
 ];
 
 function MainNav() {
