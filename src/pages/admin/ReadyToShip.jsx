@@ -9,6 +9,8 @@ import { useNavigate } from "react-router";
 
 import { useAdminOrders } from "@/hook/order/useAdminOrder";
 
+import ReadyToShipTable from "@/components/admin/order/ready-to-ship/ReadyToShipTable";
+
 function ReadyToShip() {
   const navigate = useNavigate();
 
@@ -27,16 +29,17 @@ function ReadyToShip() {
     return orders.filter((order) => {
       const listing = order.listing;
 
-      // REJECTED จะยังคงเป็น REJECTED
-      // แม้ Admin จะสร้าง shipment คืน Seller แล้ว
-      // เพราะฉะนั้นต้องเช็ก ADMIN_TO_SELLER เพิ่ม
+      // REJECTED orders remain REJECTED
+      // even after Admin creates a return shipment to Seller.
+      // Therefore, ADMIN_TO_SELLER shipment must also be checked.
       const hasReturnShipment = order.shipments?.some(
         (shipment) =>
           shipment.shipmentType ===
           "ADMIN_TO_SELLER",
       );
 
-      // คืนสินค้าไปแล้ว -> เอาออกจากหน้าพร้อมจัดส่ง
+      // Product has already been returned,
+      // so remove it from the Ready to Ship page.
       if (
         order.status === "REJECTED" &&
         hasReturnShipment
@@ -63,7 +66,10 @@ function ReadyToShip() {
         filter === "ALL" ||
         order.status === filter;
 
-      return matchesSearch && matchesFilter;
+      return (
+        matchesSearch &&
+        matchesFilter
+      );
     });
   }, [orders, search, filter]);
 
@@ -76,7 +82,7 @@ function ReadyToShip() {
         />
 
         <span className="ml-3 text-sm text-neutral-500">
-          กำลังโหลดข้อมูล...
+          Loading data...
         </span>
       </div>
     );
@@ -87,15 +93,17 @@ function ReadyToShip() {
       <div className="flex min-h-[500px] items-center justify-center">
         <div className="text-center">
           <p className="text-sm text-red-500">
-            ไม่สามารถโหลดข้อมูลได้
+            Unable to load data
           </p>
 
           <button
             type="button"
-            onClick={() => ordersQuery.refetch()}
+            onClick={() =>
+              ordersQuery.refetch()
+            }
             className="mt-4 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-orange-600"
           >
-            ลองใหม่
+            Try Again
           </button>
         </div>
       </div>
@@ -117,19 +125,23 @@ function ReadyToShip() {
 
             <div>
               <h1 className="text-xl font-semibold text-neutral-900">
-                พร้อมจัดส่ง
+                Ready to Ship
               </h1>
 
               <p className="mt-1 text-xs text-neutral-500">
-                จัดการสินค้าที่ตรวจสอบเรียบร้อยแล้ว
+                Manage products that have completed inspection.
               </p>
             </div>
           </div>
 
           <button
             type="button"
-            onClick={() => ordersQuery.refetch()}
-            disabled={ordersQuery.isFetching}
+            onClick={() =>
+              ordersQuery.refetch()
+            }
+            disabled={
+              ordersQuery.isFetching
+            }
             className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-medium text-neutral-700 shadow-sm transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <RefreshCw
@@ -141,7 +153,7 @@ function ReadyToShip() {
               }
             />
 
-            รีเฟรช
+            Refresh
           </button>
         </div>
 
@@ -158,213 +170,62 @@ function ReadyToShip() {
                 type="text"
                 value={search}
                 onChange={(event) =>
-                  setSearch(event.target.value)
+                  setSearch(
+                    event.target.value,
+                  )
                 }
-                placeholder="ค้นหา Order, สินค้า, Brand หรือ Model"
+                placeholder="Search by order, product, brand, or model"
                 className="h-11 w-full rounded-xl border border-neutral-200 bg-white pl-11 pr-4 text-sm text-neutral-800 outline-none transition placeholder:text-neutral-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
               />
             </div>
 
             <div className="flex gap-2">
               <FilterButton
-                active={filter === "ALL"}
-                onClick={() => setFilter("ALL")}
+                active={
+                  filter === "ALL"
+                }
+                onClick={() =>
+                  setFilter("ALL")
+                }
               >
-                ทั้งหมด
+                All
               </FilterButton>
 
               <FilterButton
-                active={filter === "VERIFIED"}
+                active={
+                  filter === "VERIFIED"
+                }
                 onClick={() =>
                   setFilter("VERIFIED")
                 }
               >
-                รอส่งผู้ซื้อ
+                Ship to Buyer
               </FilterButton>
 
               <FilterButton
-                active={filter === "REJECTED"}
+                active={
+                  filter === "REJECTED"
+                }
                 onClick={() =>
                   setFilter("REJECTED")
                 }
               >
-                รอคืนผู้ขาย
+                Return to Seller
               </FilterButton>
             </div>
           </div>
         </div>
 
-        {/* TABLE */}
-        <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-neutral-200 bg-neutral-50/60 text-left">
-                  <th className="px-6 py-4 text-xs font-semibold text-neutral-500">
-                    ออเดอร์
-                  </th>
-
-                  <th className="px-6 py-4 text-xs font-semibold text-neutral-500">
-                    สินค้า
-                  </th>
-
-                  <th className="px-6 py-4 text-xs font-semibold text-neutral-500">
-                    ราคาซื้อขาย
-                  </th>
-
-                  <th className="px-6 py-4 text-xs font-semibold text-neutral-500">
-                    สถานะ
-                  </th>
-
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-500">
-                    จัดการ
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {filteredOrders.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={5}
-                      className="px-6 py-16 text-center"
-                    >
-                      <PackageCheck
-                        size={36}
-                        className="mx-auto text-neutral-300"
-                      />
-
-                      <p className="mt-3 text-sm font-medium text-neutral-500">
-                        ไม่พบรายการสินค้า
-                      </p>
-
-                      <p className="mt-1 text-xs text-neutral-400">
-                        ลองเปลี่ยนคำค้นหาหรือตัวกรอง
-                      </p>
-                    </td>
-                  </tr>
-                ) : (
-                  filteredOrders.map((order) => (
-                    <OrderRow
-                      key={order.id}
-                      order={order}
-                      onOpen={() =>
-                        navigate(
-                          `/admin/orders/ready-to-ship/${order.id}`,
-                        )
-                      }
-                    />
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <ReadyToShipTable
+          orders={filteredOrders}
+          onOpen={(order) =>
+            navigate(
+              `/admin/orders/ready-to-ship/${order.id}`,
+            )
+          }
+        />
       </div>
     </div>
-  );
-}
-
-function OrderRow({ order, onOpen }) {
-  const listing = order.listing;
-
-  const images = listing?.images ?? [];
-
-  const coverImage =
-    images.find((image) => image.isCover)
-      ?.imageUrl ||
-    images[0]?.imageUrl ||
-    null;
-
-  const isVerified =
-    order.status === "VERIFIED";
-
-  return (
-    <tr className="border-b border-neutral-100 last:border-b-0 transition hover:bg-neutral-50/60">
-      <td className="px-6 py-4">
-        <div className="min-w-[220px]">
-          <p className="text-sm font-semibold text-neutral-900">
-            {order.orderNumber}
-          </p>
-
-          <p className="mt-1 text-xs text-neutral-400">
-            {formatDate(order.createdAt)}
-          </p>
-        </div>
-      </td>
-
-      <td className="px-6 py-4">
-        <div className="flex min-w-[280px] items-center gap-3">
-          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
-            {coverImage ? (
-              <img
-                src={coverImage}
-                alt={listing?.title || "Product"}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center">
-                <PackageCheck
-                  size={20}
-                  className="text-neutral-300"
-                />
-              </div>
-            )}
-          </div>
-
-          <div className="min-w-0">
-            <p className="max-w-[250px] truncate text-sm font-medium text-neutral-900">
-              {listing?.title || "-"}
-            </p>
-
-            <p className="mt-1 max-w-[250px] truncate text-xs text-neutral-400">
-              {listing?.brand || "-"}
-              {listing?.category?.name
-                ? ` • ${listing.category.name}`
-                : ""}
-            </p>
-          </div>
-        </div>
-      </td>
-
-      <td className="px-6 py-4">
-        <p className="whitespace-nowrap text-sm font-semibold text-neutral-900">
-          {formatPrice(order.agreedPrice)}
-        </p>
-      </td>
-
-      <td className="px-6 py-4">
-        {isVerified ? (
-          <span className="inline-flex whitespace-nowrap rounded-full bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-700">
-            ผ่านการตรวจ
-          </span>
-        ) : (
-          <span className="inline-flex whitespace-nowrap rounded-full bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-600">
-            ไม่ผ่านการตรวจ
-          </span>
-        )}
-      </td>
-
-      <td className="px-6 py-4 text-right">
-        {isVerified ? (
-          <button
-            type="button"
-            onClick={onOpen}
-            className="min-w-[130px] rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
-          >
-            จัดส่งสินค้า
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={onOpen}
-            className="min-w-[130px] rounded-xl bg-red-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600"
-          >
-            คืนสินค้า
-          </button>
-        )}
-      </td>
-    </tr>
   );
 }
 
@@ -386,21 +247,6 @@ function FilterButton({
       {children}
     </button>
   );
-}
-
-function formatPrice(price) {
-  return `฿${Number(
-    price || 0,
-  ).toLocaleString("th-TH")}`;
-}
-
-function formatDate(date) {
-  if (!date) return "-";
-
-  return new Intl.DateTimeFormat("th-TH", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(date));
 }
 
 export default ReadyToShip;

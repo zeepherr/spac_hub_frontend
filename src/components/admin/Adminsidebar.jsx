@@ -13,37 +13,37 @@ import { LogoutButton } from "@/components/auth/LogoutButton";
 
 const menuItems = [
   {
-    name: "หน้าหลัก",
+    name: "Dashboard",
     path: "/admin",
     icon: LayoutGrid,
   },
   {
-    name: "หมวดหมู่",
+    name: "Categories",
     path: "/admin/categories",
     icon: ListTree,
   },
   {
-    name: "แชท",
+    name: "Chat",
     path: "/admin/chats",
     icon: MessageSquareText,
   },
   {
-    name: "พัสดุรอสแกนรับ",
+    name: "Awaiting Receipt",
     path: "/admin/orders/awaiting-receipt",
     icon: ScanLine,
   },
   {
-    name: "รอตรวจสภาพ",
+    name: "Inspection",
     path: "/admin/orders/inspection",
     icon: ClipboardCheck,
   },
   {
-    name: "พร้อมจัดส่ง",
+    name: "Ready to Ship",
     path: "/admin/orders/ready-to-ship",
     icon: PackageCheck,
   },
   {
-    name: "สรุปการจัดส่ง",
+    name: "Shipping Summary",
     path: "/admin/orders/summary",
     icon: ClipboardList,
   },

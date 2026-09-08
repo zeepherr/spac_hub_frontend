@@ -56,7 +56,7 @@ function ShippingDetail() {
         />
 
         <span className="ml-3 text-sm text-neutral-500">
-          กำลังโหลดข้อมูล...
+          Loading order details...
         </span>
       </div>
     );
@@ -67,7 +67,7 @@ function ShippingDetail() {
       <div className="flex min-h-[500px] items-center justify-center">
         <div className="text-center">
           <p className="text-sm text-red-500">
-            ไม่สามารถโหลดข้อมูล Order ได้
+            Unable to load order details
           </p>
 
           <button
@@ -79,7 +79,7 @@ function ShippingDetail() {
             }
             className="mt-4 rounded-xl bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white"
           >
-            กลับ
+            Back
           </button>
         </div>
       </div>
@@ -141,7 +141,7 @@ function ShippingDetail() {
 
     /*
      * ===========================
-     * ส่งสินค้าให้ Buyer
+     * Ship product to Buyer
      * ===========================
      */
     if (isVerified) {
@@ -164,7 +164,7 @@ function ShippingDetail() {
 
     /*
      * ===========================
-     * คืนสินค้าให้ Seller
+     * Return product to Seller
      * ===========================
      */
     if (isRejected) {
@@ -198,7 +198,7 @@ function ShippingDetail() {
           className="mb-5 flex items-center gap-2 text-sm font-medium text-neutral-500 transition hover:text-neutral-900"
         >
           <ArrowLeft size={17} />
-          กลับไปหน้าพร้อมจัดส่ง
+          Back to Ready to Ship
         </button>
 
         {/* HEADER */}
@@ -206,8 +206,8 @@ function ShippingDetail() {
           <div>
             <h1 className="text-2xl font-semibold text-neutral-900">
               {isVerified
-                ? "จัดส่งสินค้าให้ผู้ซื้อ"
-                : "คืนสินค้าให้ผู้ขาย"}
+                ? "Ship Product to Buyer"
+                : "Return Product to Seller"}
             </h1>
 
             <p className="mt-1 text-sm text-neutral-500">
@@ -227,7 +227,7 @@ function ShippingDetail() {
           <div className="space-y-5">
             {/* ORDER */}
             <Card
-              title="ข้อมูลออเดอร์"
+              title="Order Information"
               icon={Package}
             >
               <InfoGrid>
@@ -237,23 +237,23 @@ function ShippingDetail() {
                 />
 
                 <Info
-                  label="ราคาซื้อขาย"
+                  label="Price"
                   value={formatPrice(
                     order.agreedPrice,
                   )}
                 />
 
                 <Info
-                  label="สถานะ"
+                  label="Status"
                   value={
                     isVerified
-                      ? "ผ่านการตรวจ"
-                      : "ไม่ผ่านการตรวจ"
+                      ? "Inspection Passed"
+                      : "Inspection Failed"
                   }
                 />
 
                 <Info
-                  label="วันที่สร้าง"
+                  label="Order Date"
                   value={formatDate(
                     order.createdAt,
                   )}
@@ -264,17 +264,17 @@ function ShippingDetail() {
             {/* BUYER */}
             {isVerified && (
               <Card
-                title="ข้อมูลผู้ซื้อ"
+                title="Buyer Information"
                 icon={UserRound}
               >
                 <InfoGrid>
                   <Info
-                    label="ชื่อผู้ซื้อ"
+                    label="Buyer Name"
                     value={buyerName}
                   />
 
                   <Info
-                    label="ชื่อผู้รับ"
+                    label="Recipient Name"
                     value={
                       order.deliveryAddress
                         ?.recipientName
@@ -282,7 +282,7 @@ function ShippingDetail() {
                   />
 
                   <Info
-                    label="เบอร์โทรศัพท์"
+                    label="Phone Number"
                     value={
                       order.deliveryAddress
                         ?.phone
@@ -290,7 +290,7 @@ function ShippingDetail() {
                   />
 
                   <Info
-                    label="ที่อยู่จัดส่ง"
+                    label="Shipping Address"
                     value={
                       order.deliveryAddress
                         ?.address
@@ -304,12 +304,12 @@ function ShippingDetail() {
             {/* SELLER */}
             {isRejected && (
               <Card
-                title="ข้อมูลผู้ขาย"
+                title="Seller Information"
                 icon={UserRound}
               >
                 <InfoGrid>
                   <Info
-                    label="ชื่อผู้ขาย"
+                    label="Seller Name"
                     value={sellerName}
                   />
 
@@ -319,12 +319,12 @@ function ShippingDetail() {
                   />
 
                   <Info
-                    label="เบอร์โทรศัพท์"
+                    label="Phone Number"
                     value={seller?.phone}
                   />
 
                   <Info
-                    label="ที่อยู่สำหรับคืนสินค้า"
+                    label="Return Address"
                     value={seller?.address}
                     full
                   />
@@ -334,7 +334,7 @@ function ShippingDetail() {
 
             {/* PRODUCT */}
             <Card
-              title="ข้อมูลสินค้า"
+              title="Product Information"
               icon={Package}
             >
               <div className="flex flex-col gap-5 md:flex-row">
@@ -392,14 +392,14 @@ function ShippingDetail() {
                     />
 
                     <Info
-                      label="ราคาซื้อขาย"
+                      label="Price"
                       value={formatPrice(
                         order.agreedPrice,
                       )}
                     />
 
                     <Info
-                      label="สภาพที่ประเมิน"
+                      label="Estimated Condition"
                       value={
                         listing?.estimatedCondition
                       }
@@ -408,7 +408,7 @@ function ShippingDetail() {
                     {isVerified && (
                       <>
                         <Info
-                          label="สภาพที่ตรวจสอบ"
+                          label="Verified Condition"
                           value={
                             order.inspection
                               ?.verifiedCondition
@@ -416,7 +416,7 @@ function ShippingDetail() {
                         />
 
                         <Info
-                          label="คะแนน"
+                          label="Condition Score"
                           value={
                             order.inspection
                               ?.verifiedScore !==
@@ -429,7 +429,7 @@ function ShippingDetail() {
                     )}
 
                     <Info
-                      label="สถานที่"
+                      label="Location"
                       value={
                         listing?.location
                       }
@@ -439,7 +439,7 @@ function ShippingDetail() {
                   {listing?.description && (
                     <div className="mt-5">
                       <p className="text-xs font-medium text-neutral-400">
-                        รายละเอียดสินค้า
+                        Product Description
                       </p>
 
                       <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-neutral-700">
@@ -455,12 +455,12 @@ function ShippingDetail() {
 
             {/* IMAGES */}
             <Card
-              title="รูปภาพสินค้า"
+              title="Product Images"
               icon={ImageIcon}
             >
               {images.length === 0 ? (
                 <p className="text-sm text-neutral-400">
-                  ไม่มีรูปภาพสินค้า
+                  No product images
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-3">
@@ -477,7 +477,7 @@ function ShippingDetail() {
 
                       {image.isCover && (
                         <span className="absolute bottom-2 left-2 rounded-md bg-orange-500 px-2 py-1 text-[10px] font-semibold text-white">
-                          รูปปก
+                          Cover
                         </span>
                       )}
                     </div>
@@ -497,20 +497,20 @@ function ShippingDetail() {
             >
               <h2 className="text-lg font-semibold text-neutral-900">
                 {isVerified
-                  ? "ข้อมูลการจัดส่ง"
-                  : "ข้อมูลการคืนสินค้า"}
+                  ? "Shipping Information"
+                  : "Return Information"}
               </h2>
 
               <p className="mt-1 text-xs text-neutral-500">
                 {isVerified
-                  ? "กรอกข้อมูลพัสดุสำหรับจัดส่งให้ผู้ซื้อ"
-                  : "กรอกข้อมูลพัสดุสำหรับส่งคืนให้ผู้ขาย"}
+                  ? "Enter the shipment details for delivery to the buyer."
+                  : "Enter the shipment details for returning the product to the seller."}
               </p>
 
               {/* CARRIER */}
               <div className="mt-6">
                 <label className="mb-2 block text-sm font-medium text-neutral-700">
-                  บริษัทขนส่ง
+                  Carrier
                 </label>
 
                 <select
@@ -521,7 +521,7 @@ function ShippingDetail() {
                   className="h-11 w-full rounded-xl border border-neutral-200 bg-white px-4 text-sm text-neutral-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                 >
                   <option value="">
-                    เลือกบริษัทขนส่ง
+                    Select Carrier
                   </option>
 
                   {THAI_CARRIERS.map(
@@ -559,7 +559,7 @@ function ShippingDetail() {
                       : 150
                   }
                   rows={3}
-                  placeholder="เช่น TH123456789"
+                  placeholder="e.g. TH123456789"
                   className="w-full resize-none rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 outline-none transition placeholder:text-neutral-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                 />
               </div>
@@ -568,19 +568,18 @@ function ShippingDetail() {
               {isRejected && (
                 <div className="mt-5 rounded-xl border border-red-100 bg-red-50 p-4">
                   <p className="text-sm font-semibold text-red-600">
-                    หมายเหตุจากการตรวจสินค้า
+                    Inspection Notes
                   </p>
 
                   <p className="mt-1 text-xs text-red-400">
-                    หมายเหตุที่ Admin
-                    ระบุไว้ตอนตรวจสินค้า
+                    Notes recorded by the admin during product inspection.
                   </p>
 
                   <div className="mt-3 min-h-24 rounded-lg border border-red-100 bg-white p-3">
                     <p className="whitespace-pre-wrap text-sm leading-6 text-neutral-700">
                       {order.inspection
                         ?.notes ||
-                        "ไม่มีหมายเหตุ"}
+                        "No inspection notes"}
                     </p>
                   </div>
                 </div>
@@ -601,8 +600,8 @@ function ShippingDetail() {
                   <div>
                     <p className="text-sm font-semibold text-neutral-800">
                       {isVerified
-                        ? "จัดส่งไปยัง"
-                        : "ส่งคืนไปยัง"}
+                        ? "Ship To"
+                        : "Return To"}
                     </p>
 
                     <p className="mt-2 text-sm font-medium text-neutral-700">
@@ -651,7 +650,7 @@ function ShippingDetail() {
                   }
                   className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-600 transition hover:bg-neutral-50 disabled:opacity-50"
                 >
-                  ยกเลิก
+                  Cancel
                 </button>
 
                 <button
@@ -664,10 +663,10 @@ function ShippingDetail() {
                   }`}
                 >
                   {isPending
-                    ? "กำลังดำเนินการ..."
+                    ? "Processing..."
                     : isVerified
-                      ? "ยืนยันการจัดส่ง"
-                      : "ยืนยันคืนสินค้า"}
+                      ? "Confirm Shipment"
+                      : "Confirm Return"}
                 </button>
               </div>
             </form>
@@ -737,7 +736,7 @@ function StatusBadge({ status }) {
   if (status === "VERIFIED") {
     return (
       <span className="rounded-full bg-green-100 px-4 py-2 text-xs font-semibold text-green-700">
-        ผ่านการตรวจ
+        Inspection Passed
       </span>
     );
   }
@@ -745,7 +744,7 @@ function StatusBadge({ status }) {
   if (status === "REJECTED") {
     return (
       <span className="rounded-full bg-red-100 px-4 py-2 text-xs font-semibold text-red-600">
-        ไม่ผ่านการตรวจ
+        Inspection Failed
       </span>
     );
   }
@@ -766,7 +765,7 @@ function formatPrice(price) {
 function formatDate(date) {
   if (!date) return "-";
 
-  return new Intl.DateTimeFormat("th-TH", {
+  return new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(date));
