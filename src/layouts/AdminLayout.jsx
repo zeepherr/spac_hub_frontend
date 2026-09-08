@@ -1,7 +1,9 @@
+import { useAdminSupportRealtime } from "@/hook/support/useAdminSupportRealitme";
 import { Outlet } from "react-router";
 import AdminSidebar from "../components/admin/AdminSidebar";
 
 function AdminLayout() {
+  useAdminSupportRealtime();
   return (
     <div className="flex h-dvh overflow-hidden">
       <AdminSidebar />
