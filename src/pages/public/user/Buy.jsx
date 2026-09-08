@@ -1,8 +1,15 @@
-import {Clock3,PackageCheck,ShoppingBag,ShoppingCart,Truck,} from "lucide-react";
+import {
+  Clock3,
+  PackageCheck,
+  PackageOpen,
+  ShoppingBag,
+  ShoppingCart,
+  Truck,
+} from "lucide-react";
 import { useNavigate } from "react-router";
+
 import DashboardStatCard from "@/components/userDashboard/DashboardStatCard";
 import PendingReceipt from "@/components/userDashboard/PendingReceipt";
-import RecentMessages from "@/components/userDashboard/RecentMessages";
 import RecentOrders from "@/components/userDashboard/RecentOrders";
 import { useBuyingOrders } from "@/hook/order/useBuyingOrders";
 import useAuthStore from "@/stores/auth.store";
@@ -14,38 +21,17 @@ const FINISHED_ORDER_STATUSES = new Set([
   "REFUNDED",
 ]);
 
-/*
- * Mock data for backend API endpoints not yet implemented.
- * Remove and replace with actual queries when available.
- */
-
-const recentMessagesMock = [
-  {
-    id: 1,
-    senderName: "Tech Corner",
-    senderImageUrl: "",
-    message: "Hello! Your item is ready for shipment.",
-    timeText: "20 mins ago",
-    isUnread: true,
-  },
-  {
-    id: 2,
-    senderName: "NextGen Gadget",
-    senderImageUrl: "",
-    message: "Thank you! 🙏",
-    timeText: "2 hours ago",
-    isUnread: true,
-  },
-];
-
 function mapOrderForDashboard(order) {
   const images = order.listing?.images ?? [];
 
-  const coverImage = images.find((image) => image.isCover) ?? images[0];
+  const coverImage =
+    images.find((image) => image.isCover) ??
+    images[0];
 
   return {
     id: order.id,
     orderNumber: order.orderNumber,
+
     productName:
       order.listing?.title ||
       [order.listing?.brand, order.listing?.model]
@@ -67,7 +53,9 @@ function mapOrderForDashboard(order) {
 function Buy() {
   const navigate = useNavigate();
 
-  const user = useAuthStore((state) => state.user);
+  const user = useAuthStore(
+    (state) => state.user,
+  );
 
   const {
     data: buyingOrders = [],
@@ -75,103 +63,198 @@ function Buy() {
     isError,
     refetch,
   } = useBuyingOrders();
-  console.log(buyingOrders);
 
-  const displayName = user?.firstName || user?.email || "User";
+  const displayName =
+    user?.firstName ||
+    user?.email ||
+    "User";
 
-  /* Total order count */
+  /*
+   * จำนวน Order ทั้งหมด
+   */
   const totalOrders = buyingOrders.length;
 
-  /* In Progress: Count orders not in a finished state */
+  /*
+   * Order ที่กำลังดำเนินการ
+   * ไม่นับ Awaiting Payment
+   * ไม่นับ Shipping to Buyer
+   * ไม่นับ Order ที่จบแล้ว
+   */
   const processingOrders =
     buyingOrders.filter(
-      (order) => !FINISHED_ORDER_STATUSES.has(order.status)
+      (order) =>
+        !FINISHED_ORDER_STATUSES.has(
+          order.status,
+        ) &&
+        order.status !==
+          "AWAITING_PAYMENT" &&
+        order.status !==
+          "SHIPPING_TO_BUYER",
     ).length;
 
-  /* Shipping: Must have deliveryShipment and no delivery timestamp */
+  /*
+   * Order ที่กำลังส่งให้ผู้ซื้อ
+   */
   const shippingOrders =
-    buyingOrders.filter((order) => {
-      const shipment = order.deliveryShipment;
+    buyingOrders.filter(
+      (order) =>
+        order.status ===
+        "SHIPPING_TO_BUYER",
+    ).length;
 
-      return shipment && !shipment.deliveredAt;
-    }).length;
+  /*
+   * สร้างรายการสำหรับ Action Items
+   *
+   * ใช้ filter เพราะต้องการหลายรายการ
+   * แสดงสูงสุด 2 รายการบน Dashboard
+   */
+  const actionItems = buyingOrders
+    .filter(
+      (order) =>
+        order.status ===
+        "SHIPPING_TO_BUYER",
+    )
+    .map((order) => ({
+      id: order.id,
 
-  /* Find order where item has arrived but buyer hasn't confirmed receipt */
-  const orderWaitingForReceipt =
-    buyingOrders.find((order) => {
-      const shipment = order.deliveryShipment;
+      orderNumber: order.orderNumber,
 
-      return shipment?.deliveredAt && order.status !== "COMPLETED";
-    });
+      productName:
+        order.listing?.title ||
+        [
+          order.listing?.brand,
+          order.listing?.model,
+        ]
+          .filter(Boolean)
+          .join(" ") ||
+        "Ordered Item",
 
-  /* Map data for PendingReceipt */
-  const pendingReceipt =
-    orderWaitingForReceipt
-      ? {
-          id: orderWaitingForReceipt.id,
-          orderNumber: orderWaitingForReceipt.orderNumber,
-          productName:
-            orderWaitingForReceipt.listing?.title || "Ordered Item",
-          message:
-            "Your order has arrived. Please confirm receipt.",
-        }
-      : null;
+      message:
+        "Your item is on the way. Open the order to view shipping details.",
+    }));
 
-  /* Backend orders by createdAt desc; select top 3 */
-  const recentOrders = buyingOrders
-    .slice(0, 3)
-    .map(mapOrderForDashboard);
+  /*
+   * แสดง Order ล่าสุดสูงสุด 2 รายการ
+   */
+  const recentOrders = buyingOrders.map(mapOrderForDashboard);
 
+  /*
+   * ข้อมูลสำหรับการ์ดสรุปด้านบน
+   */
   const stats = [
     {
       id: "cart",
-      label: "Cart Items",
+      label: "Cart",
       value: 0,
-      unit: "items",
+      unit: "รายการ",
       icon: ShoppingCart,
-      iconClassName: "bg-emerald-50 text-emerald-600",
+
+      cardClassName:
+        "border-orange-200 bg-gradient-to-br from-orange-50 to-white",
+
+      iconClassName:
+        "bg-orange-100 text-orange-500",
+
+      watermarkClassName:
+        "text-orange-500",
+
+      actionText: "View cart",
+
       onClick: () => navigate("/cart"),
     },
+
     {
       id: "all-orders",
       label: "Total Orders",
       value: totalOrders,
-      unit: "items",
-      icon: ShoppingBag,
-      iconClassName: "bg-orange-50 text-orange-600",
-      onClick: () => navigate("/user/orders"),
+      unit: "รายการ",
+      icon: PackageOpen,
+
+      cardClassName:
+        "border-neutral-200 bg-white",
+
+      iconClassName:
+        "bg-neutral-100 text-neutral-900",
+
+      watermarkClassName:
+        "text-neutral-500",
+
+      actionText: "View orders",
+
+      onClick: () =>
+        navigate("/user/orders"),
     },
+
     {
       id: "processing",
-      label: "In Progress",
+      label: "Processing",
       value: processingOrders,
-      unit: "items",
+      unit: "รายการ",
       icon: Clock3,
-      iconClassName: "bg-amber-50 text-amber-600",
-      onClick: () => navigate("/user/orders?status=processing"),
+
+      cardClassName:
+        "border-orange-200 bg-gradient-to-br from-orange-50 to-white",
+
+      iconClassName:
+        "bg-orange-100 text-orange-500",
+
+      watermarkClassName:
+        "text-orange-500",
+
+      actionText: "View details",
+
+      onClick: () =>
+        navigate(
+          "/user/orders?status=processing",
+        ),
     },
+
     {
       id: "shipping",
-      label: "In Transit",
+      label: "Shipping",
       value: shippingOrders,
-      unit: "items",
+      unit: "รายการ",
       icon: Truck,
-      iconClassName: "bg-blue-50 text-blue-600",
-      onClick: () => navigate("/user/orders?status=shipping"),
+
+      cardClassName:
+        "border-neutral-200 bg-white",
+
+      iconClassName:
+        "bg-neutral-100 text-neutral-900",
+
+      watermarkClassName:
+        "text-neutral-500",
+
+      actionText: "Track shipment",
+
+      onClick: () =>
+        navigate(
+          "/user/orders?status=shipping",
+        ),
     },
   ];
 
+  /*
+   * Loading
+   */
   if (isPending) {
     return (
-      <div className="flex min-h-96 items-center justify-center">
-        <Clock3 size={30} className="animate-pulse text-orange-500" />
-        <span className="ml-3 text-sm text-neutral-500">
+      <div className="flex min-h-96 items-center justify-center gap-3">
+        <Clock3
+          size={30}
+          className="animate-pulse text-orange-500"
+        />
+
+        <span className="text-sm text-neutral-500">
           Loading Dashboard...
         </span>
       </div>
     );
   }
 
+  /*
+   * Error
+   */
   if (isError) {
     return (
       <div className="flex min-h-96 flex-col items-center justify-center gap-4">
@@ -191,77 +274,71 @@ function Buy() {
   }
 
   return (
-    <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
-      <div className="mx-auto max-w-7xl">
-        {/* Header & Shop Button */}
-        <header className="mb-7 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-neutral-900">
-              Hello, {displayName} 👋
-            </h1>
+    <section className="min-h-full bg-neutral-50 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 xl:px-10">
+  <div className="mx-auto w-full max-w-[1440px]">
+    {/* Header */}
+    <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <h1 className="break-words text-2xl font-bold text-neutral-900 sm:text-3xl">
+          Hello,{" "}
+          <span className="text-orange-500">
+            {displayName}
+          </span>{" "}
+          👋
+        </h1>
 
-            <p className="mt-2 text-sm text-neutral-500">
-              Track your orders and activity
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => navigate("/listings")}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-orange-600"
-          >
-            <ShoppingBag size={20} />
-            Shop Now
-          </button>
-        </header>
-
-        {/* 4 Summary Stat Cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {stats.map((stat) => (
-            <DashboardStatCard
-              key={stat.id}
-              label={stat.label}
-              value={stat.value}
-              unit={stat.unit}
-              icon={stat.icon}
-              iconClassName={stat.iconClassName}
-              onClick={stat.onClick}
-            />
-          ))}
-        </div>
-
-        {/* Action Items + Recent Messages */}
-        <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
-          <PendingReceipt
-            order={pendingReceipt}
-            icon={PackageCheck}
-            onConfirm={(orderId) => {
-              /*
-               * Confirmation API not implemented yet;
-               * redirect to order details page.
-               */
-              navigate(`/user/orders/${orderId}`);
-            }}
-          />
-
-          <RecentMessages
-            messages={recentMessagesMock}
-            onViewAll={() => navigate("/messages")}
-          />
-        </div>
-
-        {/* Recent Orders */}
-        <div className="mt-5">
-          <RecentOrders
-            orders={recentOrders}
-            onViewAll={() => navigate("/user/orders")}
-            onSelectOrder={(orderId) =>
-              navigate(`/user/orders/${orderId}`)
-            }
-          />
-        </div>
+        <p className="mt-2 text-sm text-neutral-500">
+          Track your orders and activity
+        </p>
       </div>
-    </section>
+
+      <button
+        type="button"
+        onClick={() => navigate("/")}
+        className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white transition hover:bg-orange-600 sm:w-auto"
+      >
+        <ShoppingBag size={20} />
+        Shop Now
+      </button>
+    </header>
+
+    {/* การ์ดสรุป */}
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-6">
+      {stats.map((stat) => (
+        <DashboardStatCard
+          key={stat.id}
+          {...stat}
+        />
+      ))}
+    </div>
+
+    {/* Action Items และ Recent Orders */}
+    <div className="mt-6 grid grid-cols-1 items-stretch gap-6 xl:grid-cols-2">
+      <PendingReceipt
+        orders={actionItems}
+        icon={PackageCheck}
+        onViewAll={() =>
+          navigate(
+            "/user/orders?status=shipping",
+          )
+        }
+        onConfirm={(orderId) =>
+          navigate(`/user/orders/${orderId}`)
+        }
+      />
+
+      <RecentOrders
+        orders={recentOrders}
+        onViewAll={() =>
+          navigate("/user/orders")
+        }
+        onSelectOrder={(orderId) =>
+          navigate(`/user/orders/${orderId}`)
+        }
+      />
+    </div>
+  </div>
+</section>
   );
 }
 

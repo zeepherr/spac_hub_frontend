@@ -39,7 +39,7 @@ function ProfileLayout() {
     "User";
 
   return (
-    <div className=" flex h-dvh overflow-hidden bg-base-100 text-base-content md:flex-row">
+    <div className=" flex h-full overflow-hidden bg-base-100 text-base-content md:flex-row">
       {/* Sidebar - ปรับเป็น md:w-80 เพื่อให้สมส่วนและเต็มกรอบ */}
       <aside className="flex h-full w-full shrink-0 flex-col border-b border-base-300 bg-base-200/50 md:w-80 md:border-b-0 md:border-r">
         {/* ส่วนโปรไฟล์ - จัดกึ่งกลาง (flex flex-col items-center text-center) */}
