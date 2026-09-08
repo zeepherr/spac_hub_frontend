@@ -4,7 +4,7 @@ import {
   PackageCheck,
   RefreshCw,
   ScanLine,
-  TriangleAlert,
+  History,
 } from "lucide-react";
 import { Link } from "react-router";
 
@@ -28,6 +28,12 @@ const summaryItems = [
     statuses: ["VERIFIED"],
     path: "/admin/orders/ready-to-ship",
     icon: PackageCheck,
+  },
+  {
+    title: "Shipping Summary",
+    statuses: ["COMPLETED","REJECTED","SHIPPING_TO_BUYER"],
+    path: "/admin/orders/summary",
+    icon: History,
   },
 ];
 
