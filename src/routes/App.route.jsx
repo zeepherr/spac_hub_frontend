@@ -25,11 +25,13 @@ import HomePage from "../pages/public/HomePage";
 import ProtectedRoute from "./Protected.route";
 import RoleRoute, { ROLES } from "./Role.route";
 
-import ActionRequired from "@/pages/admin/ActionRequired";
 import AdminChats from "@/pages/admin/AdminChats";
 import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
 import Inspection from "@/pages/admin/Inspection";
 import ReadyToShip from "@/pages/admin/ReadyToShip";
+import InspectionDetail from "@/pages/admin/InspectionDetail";
+import ShippingDetail from "@/pages/admin/ShippingDetail";
+import OrderSummary from "@/pages/admin/OrderSummary";
 
 import CheckoutPage from "@/pages/cart/CheckoutPage";
 import BuyingOrders from "@/pages/public/user/BuyingOrders";
@@ -192,12 +194,20 @@ const router = createBrowserRouter([
                 Component: Inspection,
               },
               {
+                path: "orders/inspection/:orderId",
+                Component: InspectionDetail,
+              },
+              {
                 path: "orders/ready-to-ship",
                 Component: ReadyToShip,
               },
               {
-                path: "orders/action-required",
-                Component: ActionRequired,
+                path: "orders/ready-to-ship/:orderId",
+                Component: ShippingDetail,
+              },
+              {
+                path: "orders/summary",
+                Component: OrderSummary,
               },
               {
                 path: "chats",
