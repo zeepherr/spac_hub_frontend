@@ -3,7 +3,6 @@ import { hasUnreadSupportMessage } from "@/components/support/support.constants"
 import { useMySupportCases } from "@/hook/support/useMySupportCases";
 import useAuthStore from "@/stores/auth.store";
 import {
-  Heart,
   LayoutDashboard,
   MessageSquareText,
   Store,
@@ -37,12 +36,6 @@ const menus = [
     label: "Profile",
     to: "/user/profile",
     icon: Tag,
-  },
-  {
-    id: "favorites",
-    label: "Favorites",
-    to: "/user/favorites",
-    icon: Heart,
   },
 ];
 

@@ -121,7 +121,7 @@ const router = createBrowserRouter([
                   },
                   {
                     path: "chats",
-                    element: SupportInbox,
+                    Component: SupportInbox,
                   },
                   {
                     path: "sell",
