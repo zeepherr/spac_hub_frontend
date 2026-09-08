@@ -163,10 +163,10 @@ function AdminChats() {
   function handleCloseOrderDetails() {
     setIsOrderDetailOpen(false);
   }
-
+  console.log(filteredSupportCases);
   return (
     <section className="h-full min-h-0 overflow-hidden bg-[#F5F5F4] px-4 py-4 lg:px-6">
-      <div className="mx-auto flex h-full min-h-0 w-full max-w-[1500px] flex-col">
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-375 flex-col">
         <div className="shrink-0">
           <AdminChatsHeader
             totalCases={supportCases.length}
