@@ -28,24 +28,24 @@ import RoleRoute, { ROLES } from "./Role.route";
 import AdminChats from "@/pages/admin/AdminChats";
 import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
 import Inspection from "@/pages/admin/Inspection";
-import ReadyToShip from "@/pages/admin/ReadyToShip";
 import InspectionDetail from "@/pages/admin/InspectionDetail";
-import ShippingDetail from "@/pages/admin/ShippingDetail";
 import OrderSummary from "@/pages/admin/OrderSummary";
+import ReadyToShip from "@/pages/admin/ReadyToShip";
+import ShippingDetail from "@/pages/admin/ShippingDetail";
 
-import CheckoutPage from "@/pages/cart/CheckoutPage";
-import BuyingOrders from "@/pages/public/user/BuyingOrders";
-import OrderDetail from "@/pages/public/user/OrderDetail";
 import CheckoutStep1Page from "@/pages/cart/CheckoutStep1Page";
 import CheckoutStep2Page from "@/pages/cart/CheckoutStep2Page";
 import CheckoutStep3Page from "@/pages/cart/CheckoutStep3Page";
+import BuyingOrders from "@/pages/public/user/BuyingOrders";
+import OrderDetail from "@/pages/public/user/OrderDetail";
 
 import PaymentSuccessPage from "@/pages/auth/payments/PaymentSuccessPage";
 import MyListingsPage from "@/pages/seller/MyListingsPage";
-import SellingOrdersPage from "@/pages/seller/SellingOrdersPage";
 import SalesReportPage from "@/pages/seller/SalesReportPage";
+import SellingOrdersPage from "@/pages/seller/SellingOrdersPage";
 
 import BuildPcPage from "@/pages/build/BuildPcPage";
+import SupportInbox from "@/pages/public/user/SupportInbox";
 
 const router = createBrowserRouter([
   {
@@ -120,8 +120,8 @@ const router = createBrowserRouter([
                     Component: OrderDetail,
                   },
                   {
-                    path: "orders/:orderId",
-                    Component: OrderDetail,
+                    path: "chats",
+                    Component: SupportInbox,
                   },
                   {
                     path: "sell",
@@ -138,10 +138,6 @@ const router = createBrowserRouter([
                   {
                     path: "profile/edit",
                     Component: EditProfile,
-                  },
-                  {
-                    path: "favorites",
-                    element: null,
                   },
                   {
                     path: "sell/selling-orders",
