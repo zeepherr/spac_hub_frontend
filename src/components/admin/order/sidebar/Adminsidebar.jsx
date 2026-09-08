@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router";
 
-import { LogoutButton } from "@/components/auth/LogoutButton";
+import AdminProfileMenu from "@/components/admin/sidebar/AdminProfileMenu";
 
 const menuItems = [
   {
@@ -47,21 +47,26 @@ const menuItems = [
     path: "/admin/orders/summary",
     icon: ClipboardList,
   },
-  
-  
 ];
 
 function AdminSidebar() {
   return (
     <aside className="flex h-full w-60 shrink-0 flex-col bg-[#1F1F1F] px-4 py-6">
+      {/* LOGO */}
       <div className="mb-10">
         <h1 className="text-xl font-bold text-white">
-          SPEC<span className="text-orange-500">HUB</span>
+          SPEC
+          <span className="text-orange-500">
+            HUB
+          </span>
         </h1>
 
-        <p className="text-xs text-gray-500">ADMIN PANEL</p>
+        <p className="text-xs text-gray-500">
+          ADMIN PANEL
+        </p>
       </div>
 
+      {/* MENU */}
       <nav className="scrollbar-hide min-h-0 flex-1 space-y-2 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
@@ -80,14 +85,16 @@ function AdminSidebar() {
               }
             >
               <Icon size={18} />
+
               <span>{item.name}</span>
             </NavLink>
           );
         })}
       </nav>
 
+      {/* ADMIN PROFILE */}
       <div className="shrink-0 pt-4">
-        <LogoutButton />
+        <AdminProfileMenu />
       </div>
     </aside>
   );
