@@ -178,6 +178,12 @@ export const useSupportSocket = ({
     };
 
     const handleNewMessage = (response) => {
+      console.log("[Socket] message:new received:", response);
+      console.log("[Socket] expected conversation:", parsedConversationId);
+      console.log(
+        "[Socket] received conversation:",
+        response?.data?.conversationId,
+      );
       const message = response?.data;
 
       if (
@@ -189,8 +195,7 @@ export const useSupportSocket = ({
       }
 
       /*
-       * Backend broadcasts to the sender too,
-       * so optimistic insertion is unnecessary.
+       * Insert the Socket message into the active chat immediately.
        */
       queryClient.setQueryData(messagesQueryKey, (oldData) => {
         if (!oldData?.pages?.length) {
@@ -198,43 +203,46 @@ export const useSupportSocket = ({
         }
 
         const alreadyExists = oldData.pages.some((page) =>
-          page.messages.some((item) => item.id === message.id),
+          page.messages.some((item) => String(item.id) === String(message.id)),
         );
 
         if (alreadyExists) {
           return oldData;
         }
 
-        /*
-         * pages[0] contains the newest message page.
-         */
-        const pages = oldData.pages.map((page, index) => {
-          if (index !== 0) {
-            return page;
-          }
-
-          return {
-            ...page,
-            messages: [...page.messages, message],
-          };
-        });
-
         return {
           ...oldData,
-          pages,
+          pages: oldData.pages.map((page, index) =>
+            index === 0
+              ? {
+                  ...page,
+                  messages: [...page.messages, message],
+                }
+              : page,
+          ),
         };
       });
 
       /*
-       * Refresh last-message preview, queue order
-       * and reopened case status.
+       * Fallback synchronization.
+       * If the Socket event arrived before the message query was ready,
+       * refetch the active message history immediately.
        */
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
+        queryKey: messagesQueryKey,
+        exact: true,
+        refetchType: "active",
+      });
+
+      /*
+       * Update latest-message preview, unread count and case status.
+       */
+      void queryClient.invalidateQueries({
         queryKey: listQueryKey,
         exact: true,
       });
 
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: detailQueryKey,
         exact: true,
       });
@@ -258,13 +266,12 @@ export const useSupportSocket = ({
 
         return {
           ...oldData,
-
           pages: oldData.pages.map((page) => ({
             ...page,
-
             messages: page.messages.map((message) => {
               const shouldMarkRead =
-                message.senderId !== readData.readerId && !message.readAt;
+                String(message.senderId) !== String(readData.readerId) &&
+                !message.readAt;
 
               return shouldMarkRead
                 ? {
@@ -276,12 +283,13 @@ export const useSupportSocket = ({
           })),
         };
       });
-      queryClient.invalidateQueries({
+
+      void queryClient.invalidateQueries({
         queryKey: listQueryKey,
         exact: true,
       });
 
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: detailQueryKey,
         exact: true,
       });
@@ -328,7 +336,9 @@ export const useSupportSocket = ({
        * Current MVP has no global notification socket,
        * so disconnect when leaving the chat screen.
        */
-      disconnectSupportSocket();
+      if (!isAdmin) {
+        disconnectSupportSocket();
+      }
 
       socketRef.current = null;
     };
