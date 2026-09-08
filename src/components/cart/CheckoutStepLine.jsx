@@ -1,7 +1,7 @@
 const STEPS = [
-  { id: 1, label: "จัดส่ง" },
-  { id: 2, label: "ชำระเงิน" },
-  { id: 3, label: "ยืนยัน" },
+  { id: 1, label: "Shipping" },
+  { id: 2, label: "Payment" },
+  { id: 3, label: "Confirmation" },
 ];
 
 function CheckoutStepIndicator({ currentStep }) {

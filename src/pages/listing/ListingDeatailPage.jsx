@@ -35,13 +35,13 @@ function DetailError() {
   return (
     <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-4 py-24 text-center">
       <p className="text-sm text-[#dc2626]">
-        ไม่พบสินค้านี้ หรือสินค้าถูกปิดการขายไปแล้ว
+        This product was not found, or it is no longer available.
       </p>
       <Link
         to="/"
         className="text-sm font-medium text-[#f97316] hover:text-orange-600"
       >
-        กลับไปหน้าแรก
+        Back to Home
       </Link>
     </div>
   );
@@ -50,10 +50,10 @@ function DetailError() {
 // label ภาษาไทยของ estimatedCondition - schema ยืนยันเจอค่า "FAIR" จริงจาก backend
 // ค่าอื่นเป็นการเดาตามรูปแบบทั่วไป (LIKE_NEW/GOOD/FAIR/POOR) ถ้าใช้ enum คนละชื่อปรับ key ตรงนี้ให้ตรง
 const CONDITION_LABELS = {
-  LIKE_NEW: { label: "เหมือนใหม่", color: "text-green-600" },
-  GOOD: { label: "สภาพดี", color: "text-green-600" },
-  FAIR: { label: "สภาพปานกลาง", color: "text-[#f97316]" },
-  POOR: { label: "สภาพต้องซ่อมแซม", color: "text-[#dc2626]" },
+  LIKE_NEW: { label: "Like New", color: "text-green-600" },
+  GOOD: { label: "Good", color: "text-green-600" },
+  FAIR: { label: "Fair", color: "text-[#f97316]" },
+  POOR: { label: "Poor / Needs Repair", color: "text-[#dc2626]" },
 };
 
 function getConditionInfo(condition) {
@@ -152,7 +152,7 @@ export default function ListingDetailPage() {
       {/* Breadcrumb */}
       <nav className="hardware-label mb-4 flex flex-wrap items-center gap-2 normal-case text-secondary">
         <Link to="/" className="hover:text-[#f97316]">
-          หน้าแรก
+          Home
         </Link>
         {listing.category?.name && (
           <>
@@ -181,7 +181,7 @@ export default function ListingDetailPage() {
           <div className="hardware-surface relative mb-3 flex aspect-square items-center justify-center overflow-hidden bg-neutral-50">
             <span className="hardware-shadow absolute left-3 top-3 flex items-center gap-1 rounded-field bg-white/90 px-3 py-1 text-xs font-semibold text-neutral-700">
               <ShieldCheck size={14} className="text-[#f97316]" />
-              ตรวจสอบแล้วโดย SpecHub
+              Verified by SpecHub
             </span>
             {activeImage ? (
               <img
@@ -222,11 +222,11 @@ export default function ListingDetailPage() {
             {/* field เกรดสภาพสินค้ายังไม่ยืนยันชื่อจริงจาก backend ปรับ listing.grade ให้ตรงถ้าใช้ชื่ออื่น */}
             {listing.grade && (
               <span className="hardware-label rounded-field bg-neutral-100 px-3 py-1 normal-case text-secondary">
-                เกรด {listing.grade}
+                Grade {listing.grade}
               </span>
             )}
             <span className="hardware-label rounded-field bg-neutral-100 px-3 py-1 normal-case text-secondary">
-              สินค้ามือสอง
+              Used Item
             </span>
           </div>
 
@@ -245,7 +245,7 @@ export default function ListingDetailPage() {
               </span>
               {originalPrice && (
                 <span className="text-sm text-neutral-400 line-through">
-                  ฿{originalPrice.toLocaleString()} ราคาใหม่
+                  ฿{originalPrice.toLocaleString()} New Price
                 </span>
               )}
             </div>
@@ -257,19 +257,19 @@ export default function ListingDetailPage() {
               className="btn btn-accent mt-4 w-full gap-2 disabled:opacity-50"
             >
               <ShoppingCart size={18} />
-              เพิ่มลงตะกร้า
+              Add to Cart
             </button>
             <button
               type="button"
               onClick={handleBuyNow}
               className="btn mt-2 w-full gap-2 border-none bg-neutral-900 text-white hover:bg-neutral-800"
             >
-              ซื้อเลย
+              Buy Now
             </button>
 
             <p className="mt-3 flex items-center justify-center gap-1 text-xs text-neutral-400">
               <Lock size={12} />
-              คุ้มครองการซื้อขายโดย SpecHub Escrow
+              Transaction protected by SpecHub Escrow
             </p>
           </div>
 
@@ -278,7 +278,7 @@ export default function ListingDetailPage() {
             <div className="hardware-surface p-5">
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-sm font-bold text-neutral-900">
-                  คะแนนประเมินสภาพสินค้า
+                  Condition Score
                 </h2>
                 <span
                   className={`text-xs font-semibold ${conditionInfo.color}`}
@@ -301,24 +301,26 @@ export default function ListingDetailPage() {
             <div className="hardware-surface p-5">
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-sm font-bold text-neutral-900">
-                  สรุปผลการตรวจสอบ
+                  Inspection Summary
                 </h2>
                 <span className="text-xs font-medium text-[#f97316]">
-                  ดูรายงานฉบับเต็ม
+                  View Full Report
                 </span>
               </div>
               <div className="grid grid-cols-3 divide-x divide-base-300 text-center">
                 <div className="px-2">
                   <Eye size={18} className="mx-auto mb-1 text-neutral-500" />
                   <p className="hardware-label normal-case text-secondary">
-                    รูปลักษณ์
+                    Appearance
                   </p>
-                  <p className="text-sm font-semibold text-neutral-900">ผ่าน</p>
+                  <p className="text-sm font-semibold text-neutral-900">
+                    Passed
+                  </p>
                 </div>
                 <div className="px-2">
                   <Gauge size={18} className="mx-auto mb-1 text-neutral-500" />
                   <p className="hardware-label normal-case text-secondary">
-                    ประสิทธิภาพ
+                    Performance
                   </p>
                   <p className="text-sm font-semibold text-neutral-900">
                     {listing.inspection.performanceScore ?? "-"}%
@@ -330,9 +332,11 @@ export default function ListingDetailPage() {
                     className="mx-auto mb-1 text-neutral-500"
                   />
                   <p className="hardware-label normal-case text-secondary">
-                    ความร้อน
+                    Temperature
                   </p>
-                  <p className="text-sm font-semibold text-neutral-900">ปกติ</p>
+                  <p className="text-sm font-semibold text-neutral-900">
+                    Normal
+                  </p>
                 </div>
               </div>
               {listing.inspection.note && (
@@ -362,12 +366,12 @@ export default function ListingDetailPage() {
                 <p className="hardware-label normal-case text-secondary">
                   {listing.seller.rating && `★ ${listing.seller.rating}`}
                   {listing.seller.salesCount != null &&
-                    ` (${listing.seller.salesCount} ขายแล้ว)`}
+                    ` (${listing.seller.salesCount} sold)`}
                 </p>
               </div>
               <button
                 type="button"
-                aria-label="แชทกับผู้ขาย"
+                aria-label="Chat with seller"
                 className="text-neutral-400 hover:text-[#f97316]"
               >
                 <MessageCircle size={20} />
@@ -381,7 +385,7 @@ export default function ListingDetailPage() {
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_360px]">
         <div>
           <h2 className="mb-4 text-lg font-bold text-neutral-900">
-            ข้อมูลจำเพาะ
+            Specifications
           </h2>
           <div className="hardware-surface divide-y divide-base-300">
             {/* schema ยังไม่ยืนยันว่าสเปคมาเป็น array แบบไหน ปรับ listing.specs ให้ตรงจริง
@@ -402,7 +406,7 @@ export default function ListingDetailPage() {
               <>
                 {listing.category?.name && (
                   <div className="flex justify-between px-4 py-3 text-sm">
-                    <span className="text-neutral-500">หมวดหมู่</span>
+                    <span className="text-neutral-500">Category</span>
                     <span className="font-medium text-neutral-900">
                       {listing.category.name}
                     </span>
@@ -410,7 +414,7 @@ export default function ListingDetailPage() {
                 )}
                 {listing.brand && (
                   <div className="flex justify-between px-4 py-3 text-sm">
-                    <span className="text-neutral-500">ยี่ห้อ</span>
+                    <span className="text-neutral-500">Brand</span>
                     <span className="font-medium text-neutral-900">
                       {listing.brand}
                     </span>
@@ -418,7 +422,7 @@ export default function ListingDetailPage() {
                 )}
                 {listing.model && (
                   <div className="flex justify-between px-4 py-3 text-sm">
-                    <span className="text-neutral-500">รุ่น</span>
+                    <span className="text-neutral-500">Model</span>
                     <span className="font-medium text-neutral-900">
                       {listing.model}
                     </span>
@@ -431,7 +435,7 @@ export default function ListingDetailPage() {
 
         <div>
           <h2 className="mb-4 text-lg font-bold text-neutral-900">
-            ขั้นตอนการซื้อขาย
+            Purchase Process
           </h2>
           <div className="matte flex flex-col gap-5 p-5 text-white">
             <div className="flex gap-3">
@@ -439,9 +443,12 @@ export default function ListingDetailPage() {
                 1
               </span>
               <div>
-                <p className="text-sm font-semibold">ผู้ขายส่งสินค้าเข้าคลัง</p>
+                <p className="text-sm font-semibold">
+                  Seller ships item to warehouse
+                </p>
                 <p className="text-xs text-neutral-400">
-                  สินค้าถูกส่งไปตรวจสอบที่ศูนย์ก่อนถึงมือคุณ
+                  The item is sent for inspection at our center before reaching
+                  you
                 </p>
               </div>
             </div>
@@ -450,9 +457,10 @@ export default function ListingDetailPage() {
                 2
               </span>
               <div>
-                <p className="text-sm font-semibold">ตรวจสอบโดย SpecHub</p>
+                <p className="text-sm font-semibold">Inspected by SpecHub</p>
                 <p className="text-xs text-neutral-400">
-                  ทดสอบ ทำความสะอาด และตรวจสอบสเปคให้ตรงตามที่ประกาศ
+                  Tested, cleaned, and verified to match the listed
+                  specifications
                 </p>
               </div>
             </div>
@@ -461,9 +469,10 @@ export default function ListingDetailPage() {
                 3
               </span>
               <div>
-                <p className="text-sm font-semibold">จัดส่งอย่างปลอดภัย</p>
+                <p className="text-sm font-semibold">Safely delivered</p>
                 <p className="text-xs text-neutral-400">
-                  ผ่านการตรวจแล้วจึงจัดส่งถึงคุณ หากไม่ผ่านคืนเงินเต็มจำนวนทันที
+                  Delivered to you only after passing inspection. If it doesn't
+                  pass, you get a full refund immediately.
                 </p>
               </div>
             </div>

@@ -225,11 +225,11 @@ function AuthLinks() {
     <div className="flex items-center gap-1.5 text-neutral-700">
       <User size={18} />
       <NavLink to="/login" className={navLinkClass}>
-        Register
+        Sign up
       </NavLink>
       <span> / </span>
       <NavLink to="/register" className={navLinkClass}>
-        Sign up
+        Register
       </NavLink>
     </div>
   );
@@ -238,7 +238,7 @@ function AuthLinks() {
 function ProfileLink({ user }) {
   return (
     <NavLink
-      to="/user"
+      to="/user" // TODO: แก้ path ให้ตรงกับ route หน้าโปรไฟล์จริงของคุณ เช่น `/users/${user.id}`
       className="flex items-center gap-2 text-neutral-700 hover:text-[#f97316]"
     >
       {user.profileImageUrl ? (
@@ -303,11 +303,11 @@ function Header() {
           <Logo />
 
           <div className="flex justify-center">
-            {isAuthPage ? <MainNav /> : <SearchForm />}
+            {!isAuthPage && <SearchForm />}
           </div>
 
           <div className="justify-center pr-2 sm:pr-4">
-            {!isAuthPage && <MainNav />}
+            <MainNav />
           </div>
         </div>
       </div>

@@ -22,10 +22,13 @@ export default function AuthAside() {
   return (
     <div className="hidden flex-col justify-center px-10 py-12 lg:flex">
       <div className="mx-auto flex w-full max-w-lg flex-col gap-8">
-        <h1 className="text-5xl font-black leading-tight">
-          กลับเข้าสู่ <span className="">SPEC</span>
-          <span className="text-[#f97316]">HUB</span>
-        </h1>
+        <div>
+          <h1 className="text-xl font-black leading-tight">Welcome back to</h1>
+          <div className="text-6xl font-black leading-tight">
+            <span className="">SPEC</span>
+            <span className="text-[#f97316]">HUB</span>
+          </div>
+        </div>
 
         <div className="grid grid-cols-3 divide-x divide-[#525252] gap-6">
           {FEATURES.map(({ icon: Icon, title, subtitle }) => (

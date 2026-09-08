@@ -8,11 +8,11 @@ import { clearPendingCheckoutSession } from "@/utils/auth/pendingCheckoutSession
 function formatPaymentStatus(status) {
   if (!status) return null;
   const map = {
-    PAID: "ชำระเงินสำเร็จ",
-    SUCCEEDED: "ชำระเงินสำเร็จ",
-    COMPLETED: "ชำระเงินสำเร็จ",
-    PENDING: "รอดำเนินการ",
-    FAILED: "ชำระเงินไม่สำเร็จ",
+    PAID: "Payment Successful",
+    SUCCEEDED: "Payment Successful",
+    COMPLETED: "Payment Successful",
+    PENDING: "Pending",
+    FAILED: "Payment Failed",
   };
   return map[status] ?? status;
 }
@@ -81,7 +81,7 @@ function CheckoutStep4({ sessionId }) {
                     className="flex items-center justify-between gap-3"
                   >
                     <span className="text-neutral-500">
-                      เลขคำสั่งซื้อ{orders.length > 1 ? ` #${idx + 1}` : ""}
+                      Order Number{orders.length > 1 ? ` #${idx + 1}` : ""}
                     </span>
                     <button
                       type="button"
@@ -99,7 +99,7 @@ function CheckoutStep4({ sessionId }) {
                 ))}
                 {paymentStatus && (
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-neutral-500">สถานะการชำระเงิน</span>
+                    <span className="text-neutral-500">Payment Status</span>
                     <span className="font-medium text-green-600">
                       {paymentStatus}
                     </span>
@@ -107,15 +107,13 @@ function CheckoutStep4({ sessionId }) {
                 )}
                 {amount && (
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-neutral-500">ยอดชำระ</span>
+                    <span className="text-neutral-500">Amount Paid</span>
                     <span className="font-bold text-neutral-900">{amount}</span>
                   </div>
                 )}
                 {sessionId && (
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-neutral-500">
-                      เลขอ้างอิงการชำระเงิน
-                    </span>
+                    <span className="text-neutral-500">Payment Reference</span>
                     <span className="truncate font-mono text-xs font-medium text-neutral-900">
                       {sessionId}
                     </span>

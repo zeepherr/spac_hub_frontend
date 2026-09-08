@@ -50,19 +50,19 @@ function OrderSummary({
   return (
     <div className="hardware-surface p-5">
       <h2 className="mb-4 text-base font-bold text-neutral-900">
-        สรุปคำสั่งซื้อ
+        Order Summary
       </h2>
 
       {hasSelection && isQuoteError ? (
         <p className="mb-4 text-sm text-[#dc2626]">
           {quoteError?.response?.data?.message ||
-            "คำนวณยอดไม่สำเร็จ กรุณาลองใหม่อีกครั้ง"}
+            "Failed to calculate total. Please try again."}
         </p>
       ) : (
         <div className="flex flex-col gap-6 text-sm">
           <div className="flex items-center justify-between">
             <span className="text-neutral-500">
-              ยอดรวมสินค้า ({itemCount} ชิ้น)
+              Items total ({itemCount} items)
             </span>
             <span className="font-medium text-neutral-900">
               {isPending ? "..." : formatPrice(quote?.subtotal ?? 0)}
@@ -104,18 +104,18 @@ function OrderSummary({
             <span className="flex-1">
               <span className="flex items-center justify-between">
                 <span className="font-semibold text-neutral-900">
-                  บริการประกอบเครื่อง
+                  Assembly Service
                 </span>
                 <span className="font-medium text-neutral-900">
                   +{formatPrice(ASSEMBLY_SERVICE_FEE)}
                 </span>
               </span>
               <span className="hardware-label block normal-case text-secondary">
-                ประกอบโดยช่างมืออาชีพ + จัดสายไฟให้เรียบร้อย
+                Professional assembly + tidy cable management
               </span>
               {isAssemblyLocked && (
                 <span className="mt-1 block text-xs text-[#dc2626]">
-                  ต้องมีสินค้าในหมวดหมู่ต่อไปนี้ก่อน:{" "}
+                  Requires items in the following categories first:{" "}
                   {missingAssemblyCategories.join(", ")}
                 </span>
               )}
@@ -127,13 +127,13 @@ function OrderSummary({
       <div className="hardware-divider my-4" />
 
       <div className="mb-4 flex items-end justify-between">
-        <span className="text-base font-bold text-neutral-900">รวมทั้งหมด</span>
+        <span className="text-base font-bold text-neutral-900">Total</span>
         <span className="text-right">
           <span className="block text-2xl font-bold text-neutral-900">
             {isPending ? "..." : formatPrice(grandTotal)}
           </span>
           <span className="hardware-label normal-case text-secondary">
-            รวม VAT แล้ว
+            VAT included
           </span>
         </span>
       </div>
@@ -144,13 +144,13 @@ function OrderSummary({
         disabled={checkoutDisabled}
         className="btn btn-accent w-full gap-2 text-white disabled:opacity-50"
       >
-        ดำเนินการชำระเงิน{itemCount > 0 && ` (${itemCount})`}
+        Proceed to Checkout{itemCount > 0 && ` (${itemCount})`}
         <ArrowRight size={18} />
       </button>
 
       <p className="mt-3 flex items-center justify-center gap-1 text-xs text-neutral-400">
         <Lock size={12} />
-        เข้ารหัสข้อมูลตลอดเส้นทาง
+        End-to-end encrypted
       </p>
     </div>
   );
@@ -269,9 +269,9 @@ export default function CartPage() {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6 flex items-start justify-between border-b border-neutral-100 pb-6">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900">ตะกร้าสินค้า</h1>
+          <h1 className="text-3xl font-bold text-neutral-900">Shopping Cart</h1>
           <p className="mt-1 text-sm text-neutral-500">
-            {items.length} รายการ รอการตรวจสอบ
+            {items.length} items pending review
           </p>
         </div>
         <Link
@@ -279,7 +279,7 @@ export default function CartPage() {
           className="hardware-label flex items-center gap-1 normal-case text-secondary hover:text-[#f97316]"
         >
           <ArrowLeft size={14} />
-          เลือกซื้อสินค้าต่อ
+          Continue Shopping
         </Link>
       </div>
 
@@ -289,13 +289,11 @@ export default function CartPage() {
             <div className="hardware-surface h-40 animate-pulse bg-neutral-100" />
           ) : isErrorCart ? (
             <div className="hardware-surface flex h-40 items-center justify-center">
-              <p className="text-sm text-[#dc2626]">
-                โหลดตะกร้าสินค้าไม่สำเร็จ
-              </p>
+              <p className="text-sm text-[#dc2626]">Failed to load cart</p>
             </div>
           ) : items.length === 0 ? (
             <div className="hardware-surface flex h-40 items-center justify-center">
-              <p className="text-sm text-neutral-400">ยังไม่มีสินค้าในตะกร้า</p>
+              <p className="text-sm text-neutral-400">Your cart is empty</p>
             </div>
           ) : (
             <div className="hardware-surface flex flex-col gap-4 p-4">
@@ -307,7 +305,7 @@ export default function CartPage() {
                   disabled={selectableItems.length === 0}
                   className="checkbox checkbox-sm text-[#f97316] inset-shadow-sm/25 disabled:cursor-not-allowed disabled:opacity-40"
                 />
-                เลือกทั้งหมด ({selectedItems.length}/{selectableItems.length})
+                Select all ({selectedItems.length}/{selectableItems.length})
               </label>
 
               {items.map((item) => (
@@ -321,13 +319,13 @@ export default function CartPage() {
             </div>
           )}
 
-          <button
-            type="button"
+          <Link
+            to="/products"
             className="flex items-center justify-center gap-2 rounded-box border border-dashed border-neutral-200 py-5 text-sm font-medium text-neutral-500 hover:border-[#f97316] hover:text-[#f97316]"
           >
             <Plus size={18} />
-            เพิ่มสินค้าจากตลาด
-          </button>
+            Add products from marketplace
+          </Link>
         </div>
 
         <div>
