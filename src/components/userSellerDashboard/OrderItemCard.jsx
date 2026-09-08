@@ -1,5 +1,4 @@
-import React from "react";
-import { XCircle, CheckCircle } from "lucide-react";
+import { CheckCircle, MessageSquareText, XCircle } from "lucide-react";
 
 const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || "";
 const DEFAULT_IMAGE = "https://placehold.co/150x150?text=No+Image";
@@ -44,69 +43,89 @@ const getStatusBadge = (status) => {
   switch (status) {
     case "PAID":
       return (
-        <span className={`${badgeBaseClass} bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30`}>
+        <span
+          className={`${badgeBaseClass} bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30`}
+        >
           Awaiting Shipment
         </span>
       );
     case "SELLER_SHIPPING":
       return (
-        <span className={`${badgeBaseClass} bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30`}>
+        <span
+          className={`${badgeBaseClass} bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30`}
+        >
           In Transit to Warehouse
         </span>
       );
     case "INSPECTION_PENDING":
     case "INSPECTING":
       return (
-        <span className={`${badgeBaseClass} bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/30`}>
+        <span
+          className={`${badgeBaseClass} bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/30`}
+        >
           Inspecting SPEC
         </span>
       );
     case "NEEDS_REVIEW":
       return (
-        <span className={`${badgeBaseClass} bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30`}>
+        <span
+          className={`${badgeBaseClass} bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30`}
+        >
           Requires Further Review
         </span>
       );
     case "VERIFIED":
       return (
-        <span className={`${badgeBaseClass} bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30`}>
+        <span
+          className={`${badgeBaseClass} bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30`}
+        >
           SPEC Passed
         </span>
       );
     case "SHIPPING_TO_BUYER":
       return (
-        <span className={`${badgeBaseClass} bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/30`}>
+        <span
+          className={`${badgeBaseClass} bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/30`}
+        >
           Shipping to Buyer
         </span>
       );
     case "COMPLETED":
       return (
-        <span className={`${badgeBaseClass} bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30`}>
+        <span
+          className={`${badgeBaseClass} bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30`}
+        >
           Order Completed
         </span>
       );
     case "REJECTED":
       return (
-        <span className={`${badgeBaseClass} bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30`}>
+        <span
+          className={`${badgeBaseClass} bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30`}
+        >
           SPEC Failed
         </span>
       );
     case "CANCELLED":
       return (
-        <span className={`${badgeBaseClass} bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/30`}>
+        <span
+          className={`${badgeBaseClass} bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/30`}
+        >
           Cancelled
         </span>
       );
     default:
       return (
-        <span className={`${badgeBaseClass} bg-base-200 text-base-content border-base-300`}>
+        <span
+          className={`${badgeBaseClass} bg-base-200 text-base-content border-base-300`}
+        >
           {status}
         </span>
       );
   }
 };
 
-export function OrderItemCard({ order, onClick }) {
+export function OrderItemCard({ order, onClick, hasUnreadSupport = false }) {
   const currentStepIndex = getStepIndex(order.status);
   const isFailedOrCancelled = ["REJECTED", "CANCELLED"].includes(order.status);
   const isCompleted = order.status === "COMPLETED";
@@ -134,17 +153,26 @@ export function OrderItemCard({ order, onClick }) {
       className="p-5 bg-base-100 border border-base-200 rounded-2xl cursor-pointer hover:border-primary hover:shadow-[0_4px_16px_rgba(249,115,22,0.15)] transition-all duration-200 space-y-4"
     >
       {/* Header: Order ID & High-Contrast Status Badge */}
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-xs font-semibold text-base-content/70 tracking-tight">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs font-semibold tracking-tight text-base-content/70">
           Order ID: #{order.orderNumber || order.id}
         </span>
 
-        <div>{getStatusBadge(order.status)}</div>
+        {hasUnreadSupport && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-50 px-2 py-1 text-[10px] font-bold text-orange-600">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-70" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-500" />
+            </span>
+            <MessageSquareText className="h-3 w-3" />
+            New message
+          </span>
+        )}
       </div>
 
       {/* Main Content: Product Image & Price Details */}
       <div className="flex items-center gap-5 min-w-0">
-        <div className="bg-base-300 rounded-xl overflow-hidden shrink-0 flex items-center justify-center border border-base-200 w-[90px] h-[90px]">
+        <div className="bg-base-300 rounded-xl overflow-hidden shrink-0 flex items-center justify-center border border-base-200 w-22.5 h-22.5">
           <img
             src={imageUrl}
             alt={order.listing?.title || "Product"}
@@ -181,8 +209,8 @@ export function OrderItemCard({ order, onClick }) {
                   isCurrent
                     ? "text-primary font-black scale-105"
                     : isPassed
-                    ? "text-emerald-500 dark:text-emerald-400 font-bold"
-                    : "opacity-40"
+                      ? "text-emerald-500 dark:text-emerald-400 font-bold"
+                      : "opacity-40"
                 }`}
               >
                 <div>{step.label}</div>
