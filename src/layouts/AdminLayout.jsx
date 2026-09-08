@@ -1,6 +1,6 @@
 import { useAdminSupportRealtime } from "@/hook/support/useAdminSupportRealitme";
 import { Outlet } from "react-router";
-import AdminSidebar from "../components/admin/AdminSidebar";
+import AdminSidebar from "../components/admin/sidebar/Adminsidebar";
 
 function AdminLayout() {
   useAdminSupportRealtime();

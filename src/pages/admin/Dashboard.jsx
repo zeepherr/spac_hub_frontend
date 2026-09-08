@@ -4,7 +4,7 @@ import {
   PackageCheck,
   RefreshCw,
   ScanLine,
-  TriangleAlert,
+  History,
 } from "lucide-react";
 import { Link } from "react-router";
 
@@ -12,56 +12,63 @@ import { useAdminOrders } from "@/hook/order/useAdminOrder";
 
 const summaryItems = [
   {
-    title: "พัสดุรอสแกนรับ",
+    title: "Awaiting Receipt",
     statuses: ["SELLER_SHIPPING"],
     path: "/admin/orders/awaiting-receipt",
     icon: ScanLine,
   },
   {
-    title: "รอตรวจสภาพ",
+    title: "Under Inspection",
     statuses: ["INSPECTION_PENDING", "INSPECTING"],
     path: "/admin/orders/inspection",
     icon: ClipboardCheck,
   },
   {
-    title: "พร้อมจัดส่ง",
+    title: "Ready to Ship",
     statuses: ["VERIFIED"],
     path: "/admin/orders/ready-to-ship",
     icon: PackageCheck,
   },
   {
-    title: "ต้องดำเนินการ",
-    statuses: ["NEEDS_REVIEW", "REJECTED"],
-    path: "/admin/orders/action-required",
-    icon: TriangleAlert,
+    title: "Shipping Summary",
+    statuses: ["COMPLETED","REJECTED","SHIPPING_TO_BUYER"],
+    path: "/admin/orders/summary",
+    icon: History,
   },
 ];
 
-const dashboardStatuses = summaryItems.flatMap((item) => item.statuses);
+const dashboardStatuses = summaryItems.flatMap(
+  (item) => item.statuses,
+);
 
 const statusConfig = {
   SELLER_SHIPPING: {
-    label: "รอสแกนรับ",
+    label: "Awaiting Receipt",
     className: "bg-orange-50 text-orange-600",
   },
+
   INSPECTION_PENDING: {
-    label: "รอตรวจสภาพ",
+    label: "Awaiting Inspection",
     className: "bg-orange-50 text-orange-600",
   },
+
   INSPECTING: {
-    label: "กำลังตรวจ",
+    label: "Under Inspection",
     className: "bg-blue-50 text-blue-600",
   },
+
   VERIFIED: {
-    label: "พร้อมจัดส่ง",
+    label: "Ready to Ship",
     className: "bg-green-50 text-green-600",
   },
+
   NEEDS_REVIEW: {
-    label: "ต้องตรวจสอบเพิ่ม",
+    label: "Needs Review",
     className: "bg-amber-50 text-amber-700",
   },
+
   REJECTED: {
-    label: "ตรวจไม่ผ่าน",
+    label: "Inspection Failed",
     className: "bg-red-50 text-red-600",
   },
 };
@@ -73,13 +80,19 @@ const priceFormatter = new Intl.NumberFormat("th-TH", {
 });
 
 function formatPrice(value) {
-  if (value === null || value === undefined || value === "") {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
     return "—";
   }
 
   const amount = Number(value);
 
-  return Number.isFinite(amount) ? priceFormatter.format(amount) : "—";
+  return Number.isFinite(amount)
+    ? priceFormatter.format(amount)
+    : "—";
 }
 
 function getCreatedTime(order) {
@@ -95,9 +108,12 @@ function Dashboard() {
 
   const orders = ordersQuery.data ?? [];
   const hasData = ordersQuery.data !== undefined;
-  // console.log(orders);
+
   const latestOrders = [...orders]
-    .sort((a, b) => getCreatedTime(b) - getCreatedTime(a))
+    .sort(
+      (a, b) =>
+        getCreatedTime(b) - getCreatedTime(a),
+    )
     .slice(0, 10);
 
   return (
@@ -105,10 +121,13 @@ function Dashboard() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">หน้าหลัก</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Dashboard
+          </h1>
 
           <p className="mt-1 text-sm text-gray-500">
-            ภาพรวมคำสั่งซื้อที่ต้องดำเนินการโดยผู้ดูแลระบบ
+            Overview of orders that require admin
+            action.
           </p>
         </div>
 
@@ -120,10 +139,16 @@ function Dashboard() {
         >
           <RefreshCw
             size={16}
-            className={ordersQuery.isFetching ? "animate-spin" : ""}
+            className={
+              ordersQuery.isFetching
+                ? "animate-spin"
+                : ""
+            }
           />
 
-          {ordersQuery.isFetching ? "กำลังโหลด..." : "รีเฟรช"}
+          {ordersQuery.isFetching
+            ? "Loading..."
+            : "Refresh"}
         </button>
       </div>
 
@@ -135,13 +160,14 @@ function Dashboard() {
         >
           <p className="font-medium">
             {hasData
-              ? "อัปเดตข้อมูลไม่สำเร็จ กำลังแสดงข้อมูลที่โหลดไว้ก่อนหน้า"
-              : "โหลดข้อมูลคำสั่งซื้อไม่สำเร็จ"}
+              ? "Unable to update data. Showing previously loaded data."
+              : "Unable to load orders."}
           </p>
 
           <p className="mt-1">
-            {ordersQuery.error?.response?.data?.message ||
-              "กรุณาลองกดรีเฟรชอีกครั้ง"}
+            {ordersQuery.error?.response?.data
+              ?.message ||
+              "Please try refreshing again."}
           </p>
         </div>
       )}
@@ -162,20 +188,25 @@ function Dashboard() {
               className="rounded-xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-md"
             >
               <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-500">{item.title}</p>
+                <p className="text-sm text-gray-500">
+                  {item.title}
+                </p>
 
-                <Icon size={19} className="text-orange-500" />
+                <Icon
+                  size={19}
+                  className="text-orange-500"
+                />
               </div>
 
               <div className="mt-3 text-2xl font-bold text-gray-900">
                 {ordersQuery.isPending ? (
                   <LoaderCircle
                     size={24}
-                    aria-label="กำลังโหลดจำนวนออเดอร์"
+                    aria-label="Loading order count"
                     className="animate-spin text-orange-500"
                   />
                 ) : hasData ? (
-                  count.toLocaleString("th-TH")
+                  count.toLocaleString("en-US")
                 ) : (
                   "—"
                 )}
@@ -189,16 +220,21 @@ function Dashboard() {
       <section className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-6 py-5">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">รายการล่าสุด</h2>
+            <h2 className="text-lg font-bold text-gray-900">
+              Recent Orders
+            </h2>
 
             <p className="mt-1 text-sm text-gray-500">
-              คำสั่งซื้อที่รอดำเนินการ เรียงตามวันที่สร้างล่าสุด
+              Orders awaiting action, sorted by most
+              recently created.
             </p>
           </div>
 
           {hasData && (
             <p className="text-sm text-gray-500">
-              ทั้งหมด {orders.length.toLocaleString("th-TH")} รายการ
+              Total{" "}
+              {orders.length.toLocaleString("en-US")}{" "}
+              orders
             </p>
           )}
         </div>
@@ -208,24 +244,33 @@ function Dashboard() {
             role="status"
             className="flex min-h-52 items-center justify-center gap-3"
           >
-            <LoaderCircle size={26} className="animate-spin text-orange-500" />
+            <LoaderCircle
+              size={26}
+              className="animate-spin text-orange-500"
+            />
 
-            <p className="text-sm text-gray-500">กำลังโหลดคำสั่งซื้อ...</p>
+            <p className="text-sm text-gray-500">
+              Loading orders...
+            </p>
           </div>
         ) : !hasData ? (
           <div className="px-6 py-16 text-center text-sm text-gray-500">
-            ไม่สามารถแสดงข้อมูลได้ กรุณาลองใหม่
+            Unable to display data. Please try again.
           </div>
         ) : orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-6 py-16">
-            <PackageCheck size={36} className="text-gray-300" />
+            <PackageCheck
+              size={36}
+              className="text-gray-300"
+            />
 
             <p className="mt-3 font-medium text-gray-700">
-              ยังไม่มีคำสั่งซื้อที่ต้องดำเนินการ
+              No orders require action
             </p>
 
             <p className="mt-1 text-sm text-gray-500">
-              เมื่อผู้ขายแจ้งส่งสินค้า รายการจะแสดงที่นี่
+              Orders will appear here when sellers ship
+              their items.
             </p>
           </div>
         ) : (
@@ -234,21 +279,42 @@ function Dashboard() {
               <table className="w-full min-w-[900px] text-left text-sm">
                 <thead className="bg-gray-50 text-gray-500">
                   <tr>
-                    <th className="px-6 py-4 font-medium">คำสั่งซื้อ</th>
-                    <th className="px-6 py-4 font-medium">สินค้า</th>
-                    <th className="px-6 py-4 font-medium">ผู้ขาย</th>
-                    <th className="px-6 py-4 font-medium">ราคา</th>
-                    <th className="px-6 py-4 font-medium">สถานะ</th>
-                    <th className="px-6 py-4 font-medium">จัดการ</th>
+                    <th className="px-6 py-4 font-medium">
+                      Order
+                    </th>
+
+                    <th className="px-6 py-4 font-medium">
+                      Product
+                    </th>
+
+                    <th className="px-6 py-4 font-medium">
+                      Seller
+                    </th>
+
+                    <th className="px-6 py-4 font-medium">
+                      Price
+                    </th>
+
+                    <th className="px-6 py-4 font-medium">
+                      Status
+                    </th>
+
+                    <th className="px-6 py-4 font-medium">
+                      Action
+                    </th>
                   </tr>
                 </thead>
 
                 <tbody className="divide-y divide-gray-200">
                   {latestOrders.map((order) => {
-                    const status = statusConfig[order.status] ?? {
-                      label: order.status || "ไม่ทราบสถานะ",
-                      className: "bg-gray-100 text-gray-600",
-                    };
+                    const status =
+                      statusConfig[order.status] ?? {
+                        label:
+                          order.status ||
+                          "Unknown Status",
+                        className:
+                          "bg-gray-100 text-gray-600",
+                      };
 
                     const sellerName = [
                       order.seller?.firstName,
@@ -257,28 +323,39 @@ function Dashboard() {
                       .filter(Boolean)
                       .join(" ");
 
-                    const queue = summaryItems.find((item) =>
-                      item.statuses.includes(order.status),
-                    );
+                    const queue =
+                      summaryItems.find((item) =>
+                        item.statuses.includes(
+                          order.status,
+                        ),
+                      );
 
                     return (
-                      <tr key={order.id} className="hover:bg-gray-50">
+                      <tr
+                        key={order.id}
+                        className="hover:bg-gray-50"
+                      >
                         <td className="px-6 py-5 font-semibold text-gray-900">
-                          {order.orderNumber || `#${order.id}`}
+                          {order.orderNumber ||
+                            `#${order.id}`}
                         </td>
 
                         <td className="px-6 py-5 text-gray-700">
                           <p className="max-w-[260px] break-words">
-                            {order.listing?.title || "ไม่พบชื่อสินค้า"}
+                            {order.listing?.title ||
+                              "Product name unavailable"}
                           </p>
                         </td>
 
                         <td className="px-6 py-5 text-gray-600">
-                          {sellerName || "ไม่ระบุชื่อ"}
+                          {sellerName ||
+                            "Name unavailable"}
                         </td>
 
                         <td className="whitespace-nowrap px-6 py-5 font-medium text-gray-900">
-                          {formatPrice(order.agreedPrice)}
+                          {formatPrice(
+                            order.agreedPrice,
+                          )}
                         </td>
 
                         <td className="px-6 py-5">
@@ -295,10 +372,12 @@ function Dashboard() {
                               to={queue.path}
                               className="whitespace-nowrap font-medium text-orange-500 hover:text-orange-600 hover:underline"
                             >
-                              ไปหน้าจัดการ
+                              Manage
                             </Link>
                           ) : (
-                            <span className="text-gray-400">—</span>
+                            <span className="text-gray-400">
+                              —
+                            </span>
                           )}
                         </td>
                       </tr>
@@ -309,23 +388,13 @@ function Dashboard() {
             </div>
 
             <div className="border-t border-gray-200 px-6 py-4 text-sm text-gray-500">
-              แสดง {latestOrders.length} จาก{" "}
-              {orders.length.toLocaleString("th-TH")} รายการ
+              Showing {latestOrders.length} of{" "}
+              {orders.length.toLocaleString("en-US")}{" "}
+              orders
             </div>
           </>
         )}
       </section>
-
-      {/* Activity history is not available yet
-      <section className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
-        <div className="border-b border-gray-200 px-6 py-5">
-          <h2 className="text-lg font-bold text-gray-900">กิจกรรมล่าสุด</h2>
-        </div>
-
-        <div className="px-6 py-10 text-center text-sm text-gray-500">
-          ประวัติกิจกรรมยังไม่พร้อมใช้งาน
-        </div>
-      </section> */}
     </div>
   );
 }
