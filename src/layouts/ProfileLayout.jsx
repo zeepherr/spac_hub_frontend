@@ -1,14 +1,19 @@
+import { useState } from "react";
+
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { hasUnreadSupportMessage } from "@/components/support/support.constants";
 import { useMySupportCases } from "@/hook/support/useMySupportCases";
 import useAuthStore from "@/stores/auth.store";
+
 import {
+  ChevronUp,
   LayoutDashboard,
   MessageSquareText,
+  Settings,
   Store,
-  Tag,
   UserRound,
 } from "lucide-react";
+
 import { NavLink, Outlet } from "react-router";
 
 const menus = [
@@ -31,16 +36,13 @@ const menus = [
     to: "/user/chats",
     icon: MessageSquareText,
   },
-  {
-    id: "profile",
-    label: "Profile",
-    to: "/user/profile",
-    icon: Tag,
-  },
 ];
 
 function ProfileLayout() {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   const user = useAuthStore((state) => state.user);
+
   const { data: supportCases = [] } = useMySupportCases();
 
   const unreadSupportCount = supportCases.filter((supportCase) =>
@@ -53,10 +55,10 @@ function ProfileLayout() {
     "User";
 
   return (
-    <div className=" flex h-full overflow-hidden bg-base-100 text-base-content md:flex-row">
-      {/* Sidebar - ปรับเป็น md:w-80 เพื่อให้สมส่วนและเต็มกรอบ */}
+    <div className="flex h-full overflow-hidden bg-base-100 text-base-content md:flex-row">
+      {/* Sidebar */}
       <aside className="flex h-auto w-full shrink-0 flex-col border-b border-base-300 bg-base-200/50 md:h-full md:w-80 md:border-b-0 md:border-r">
-        {/* ส่วนโปรไฟล์ - จัดกึ่งกลาง (flex flex-col items-center text-center) */}
+        {/* User profile */}
         <div className="hidden flex-col items-center justify-center border-b border-base-300 px-6 py-8 text-center md:flex">
           <div className="relative mb-4 flex size-24 items-center justify-center rounded-full border border-base-300 bg-base-100 shadow-sm">
             {user?.profileImageUrl ? (
@@ -73,7 +75,7 @@ function ProfileLayout() {
                 aria-hidden="true"
               />
             )}
-            {/* LED Status Indicator (Hardware Theme) */}
+
             <span className="hardware-indicator absolute bottom-1 right-1" />
           </div>
 
@@ -86,9 +88,9 @@ function ProfileLayout() {
           </p>
         </div>
 
-        {/* เมนูการใช้งาน */}
+        {/* Main navigation */}
         <nav aria-label="เมนูบัญชี" className="p-2 md:p-4">
-          <p className="mb-3 hidden px-4 text-m font-bold uppercase tracking-wider text-neutral/70 md:block">
+          <p className="mb-3 hidden px-4 text-base font-bold uppercase tracking-wider text-neutral/70 md:block">
             My Profile
           </p>
 
@@ -102,10 +104,10 @@ function ProfileLayout() {
                     to={menu.to}
                     end={menu.end}
                     className={({ isActive }) =>
-                      `flex min-h-11 w-auto items-center gap-2.5 rounded-field px-3 py-2.5 text-left text-sm font-bold transition-all md:min-h-12 md:w-full md:gap-3 md:px-4 md:py-3 ${
+                      `flex min-h-11 w-auto items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm font-bold transition-all md:min-h-12 md:w-full md:gap-3 md:px-4 md:py-3 ${
                         isActive
-                          ? "bg-[#f97316] text-white shadow-md border border-[#ea580c]"
-                          : "border border-transparent text-base-content hover:bg-base-300/60 hover:text-base-content"
+                          ? "border-orange-600 bg-orange-500 text-white shadow-md shadow-orange-200/60"
+                          : "border-transparent text-base-content hover:bg-orange-50 hover:text-orange-600"
                       }`
                     }
                   >
@@ -115,33 +117,100 @@ function ProfileLayout() {
                       className="shrink-0"
                       aria-hidden="true"
                     />
+
                     <span className="min-w-0 flex-1 truncate">
                       {menu.label}
                     </span>
 
-                    {menu.id === "support-inbox" && unreadSupportCount > 0 && (
-                      <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-[10px] font-black text-orange-600">
-                        {unreadSupportCount > 99 ? "99+" : unreadSupportCount}
-                      </span>
-                    )}
+                    {menu.id === "support-inbox" &&
+                      unreadSupportCount > 0 && (
+                        <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-white px-1.5 py-0.5 text-[10px] font-black text-orange-600">
+                          {unreadSupportCount > 99
+                            ? "99+"
+                            : unreadSupportCount}
+                        </span>
+                      )}
                   </NavLink>
                 </li>
               );
             })}
           </ul>
         </nav>
+
+        {/* ดัน Settings ลงด้านล่าง */}
         <div className="hidden flex-1 md:block" />
 
-        {/* Logout Button at bottom of Sidebar */}
-        <div className="mt-auto hidden border-t border-base-300 p-4 md:block">
-          <LogoutButton />
+        {/* Settings area */}
+        <div className="relative mt-auto hidden border-t border-base-300 p-4 md:block">
+          {/* Popup menu */}
+          {isSettingsOpen && (
+            <div className="absolute bottom-[82px] left-4 right-4 z-50 overflow-hidden rounded-2xl border border-neutral-200 bg-white p-2 shadow-[0_18px_45px_rgba(0,0,0,0.16)]">
+              <NavLink
+                to="/user/profile"
+                onClick={() => setIsSettingsOpen(false)}
+                className={({ isActive }) =>
+                  `flex w-full items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-bold transition ${
+                    isActive
+                      ? "bg-orange-50 text-orange-600"
+                      : "text-neutral-700 hover:bg-orange-50 hover:text-orange-600"
+                  }`
+                }
+              >
+                <span className="flex size-9 items-center justify-center rounded-lg bg-orange-50 text-orange-500">
+                  <UserRound size={20} />
+                </span>
+
+                <span>Profile</span>
+              </NavLink>
+
+              <div className="mx-3 my-1 border-t border-neutral-200" />
+
+              <div className="[&>button]:w-full [&>button]:border-0 [&>button]:bg-transparent [&>button]:shadow-none">
+                <LogoutButton />
+              </div>
+            </div>
+          )}
+
+          {/* Settings button */}
+          <button
+            type="button"
+            onClick={() =>
+              setIsSettingsOpen((currentValue) => !currentValue)
+            }
+            aria-expanded={isSettingsOpen}
+            aria-controls="settings-menu"
+            className={`flex min-h-14 w-full cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-left font-bold shadow-sm transition-all ${
+              isSettingsOpen
+                ? "border-orange-300 bg-orange-50 text-orange-600"
+                : "border-neutral-200 bg-white text-neutral-800 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-600"
+            }`}
+          >
+            <span
+              className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${
+                isSettingsOpen
+                  ? "bg-orange-500 text-white"
+                  : "bg-neutral-100 text-neutral-700"
+              }`}
+            >
+              <Settings size={21} />
+            </span>
+
+            <span className="flex-1">Settings</span>
+
+            <ChevronUp
+              size={19}
+              className={`shrink-0 transition-transform duration-200 ${
+                isSettingsOpen ? "rotate-0" : "rotate-180"
+              }`}
+            />
+          </button>
         </div>
       </aside>
 
-      {/* เนื้อหาด้านขวา */}
+      {/* Main content */}
       <main
         aria-label="เนื้อหาบัญชี"
-        className="scrollbar-hide min-w-0 flex-1 overflow-y-auto bg-base-100 "
+        className="scrollbar-hide min-w-0 flex-1 overflow-y-auto bg-base-100"
       >
         <Outlet />
       </main>
