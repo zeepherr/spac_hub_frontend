@@ -149,15 +149,13 @@ const router = createBrowserRouter([
                   },
                   {
                     path: "sell/my-listings",
-                    element: <MyListingsPage />
-
+                    element: <MyListingsPage />,
                   },
                   {
                     path: "sell/sales-report",
-                    element: <SalesReportPage />
-
+                    element: <SalesReportPage />,
                   },
-                  
+
                   {
                     path: "*",
                     Component: NotFound,

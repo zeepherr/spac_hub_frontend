@@ -1,91 +1,59 @@
-import {
-  Boxes,
-  Cpu,
-  HardDrive,
-  Layers,
-  MemoryStick,
-  Pencil,
-  Snowflake,
-  X,
-} from "lucide-react";
+import { useCategories } from "@/hook/category/useCategory";
+import { Cpu, Pencil, ShoppingCart, X } from "lucide-react";
 import { Link } from "react-router";
+import { getCategoryIcon } from "../auth/CatagorySidebar";
 
-// TODO: เป็น mock ทั้งหมดก่อน (ยังไม่ต่อ store/hook จริงที่เก็บ selected parts ของการจัดสเปค)
-// รอโค้ด store/hook ที่มีอยู่แล้วจากคุณ แล้วจะเปลี่ยนมาดึงจากตรงนั้นแทน mock พวกนี้
-const MOCK_SELECTED_PARTS = [
-  {
-    id: 1,
-    category: "CPU",
-    title:
-      "AMD RYZEN 7 9800X3D - 8C 16T 4.7-5.2GHz (AMD SOCKET AM5) (ระบบระบายความร้อนไม่รวมอยู่ในสินค้า / CPU COOLER NOT INCLUDED)",
-    price: 17990,
-    qty: 1,
-    imageUrl: null,
-  },
-  {
-    id: 2,
-    category: "Mainboard",
-    title: "ASUS PRIME B650M-A II - AMD SOCKET AM5 DDR5 MICRO-ATX",
-    price: 3250,
-    qty: 1,
-    imageUrl: null,
-  },
+const ICON_BG_PALETTE = [
+  "bg-rose-100 text-rose-500",
+  "bg-amber-100 text-amber-500",
+  "bg-green-100 text-green-500",
+  "bg-teal-100 text-teal-500",
+  "bg-sky-100 text-sky-500",
+  "bg-blue-100 text-blue-500",
+  "bg-cyan-100 text-cyan-500",
+  "bg-purple-100 text-purple-500",
+  "bg-pink-100 text-pink-500",
+  "bg-lime-100 text-lime-500",
 ];
 
-// แต่ละหมวดหมู่มี icon + สีวงกลมพื้นหลังของตัวเอง (mock ไว้ก่อน ถ้ามี categories API จริงแล้ว (เห็น
-// CategorySidebar.jsx ใช้ useCategories อยู่) ค่อยเปลี่ยนมา map จาก category.id ที่ backend ส่งมาแทน slug
-// ตรงๆ แบบนี้)
-const CATEGORIES = [
-  {
-    slug: "vga",
-    label: "VGA Card",
-    icon: Layers,
-    iconBg: "bg-rose-100 text-rose-500",
-  },
-  {
-    slug: "memory",
-    label: "Memory",
-    icon: MemoryStick,
-    iconBg: "bg-amber-100 text-amber-500",
-  },
-  {
-    slug: "harddisk",
-    label: "Harddisk",
-    icon: HardDrive,
-    iconBg: "bg-green-100 text-green-500",
-  },
-  {
-    slug: "ssd",
-    label: "Solid State Drive",
-    icon: HardDrive,
-    iconBg: "bg-teal-100 text-teal-500",
-  },
-  { slug: "m2", label: "M.2", icon: Cpu, iconBg: "bg-sky-100 text-sky-500" },
-  {
-    slug: "case",
-    label: "Case",
-    icon: Boxes,
-    iconBg: "bg-blue-100 text-blue-500",
-  },
-  {
-    slug: "cooling",
-    label: "Cooling",
-    icon: Snowflake,
-    iconBg: "bg-cyan-100 text-cyan-500",
-  },
-];
+function getCategoryIconBg(index) {
+  return ICON_BG_PALETTE[index % ICON_BG_PALETTE.length];
+}
 
 function formatPrice(amount) {
   return `${amount.toLocaleString()}.-`;
 }
 
-function SelectedPartRow({ part }) {
+function SelectedPartRow({
+  part,
+  onRemove,
+  onIncreaseQty,
+  onSelectCategory,
+  categoryId,
+  isActive,
+}) {
   return (
-    <li className="relative flex gap-3 border-l-4 border-[#f97316] bg-white p-3 hardware-shadow">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => onSelectCategory?.(categoryId)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelectCategory?.(categoryId);
+        }
+      }}
+      className={`relative flex cursor-pointer gap-3 border-b border-l-4 border-neutral-100 border-l-[#f97316] p-3 last:border-b-0 ${
+        isActive ? "bg-neutral-100" : "bg-white hover:bg-neutral-50"
+      }`}
+    >
       <button
         type="button"
         aria-label="นำออก"
-        // TODO: ยังไม่ผูก remove จริง รอ store/hook
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemove?.(part.id);
+        }}
         className="absolute right-2 top-2 text-neutral-400 hover:text-[#dc2626]"
       >
         <X size={16} />
@@ -113,13 +81,17 @@ function SelectedPartRow({ part }) {
         <div className="flex items-center justify-between">
           <Link
             to="#"
+            onClick={(e) => e.stopPropagation()}
             className="hardware-label normal-case text-secondary hover:text-[#f97316]"
           >
             รายละเอียด
           </Link>
           <button
             type="button"
-            // TODO: ยังไม่ผูกแก้จำนวนจริง รอ store/hook
+            onClick={(e) => {
+              e.stopPropagation();
+              onIncreaseQty?.(part.id);
+            }}
             className="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-700"
           >
             จำนวน x {part.qty}
@@ -127,12 +99,26 @@ function SelectedPartRow({ part }) {
           </button>
         </div>
       </div>
-    </li>
+    </div>
   );
 }
 
-function BuildSidebar({ activeCategory, onSelectCategory }) {
-  const total = MOCK_SELECTED_PARTS.reduce(
+function BuildSidebar({
+  activeCategory,
+  onSelectCategory,
+  selectedParts = [],
+  onRemovePart,
+  onIncreaseQty,
+  onAddAllToCart,
+  isAddingAllToCart = false,
+}) {
+  const {
+    data: categories = [],
+    isLoading,
+    isError,
+  } = useCategories({ includeInactive: false });
+
+  const total = selectedParts.reduce(
     (sum, part) => sum + part.price * part.qty,
     0,
   );
@@ -146,43 +132,79 @@ function BuildSidebar({ activeCategory, onSelectCategory }) {
         </span>
       </div>
 
-      {MOCK_SELECTED_PARTS.length > 0 && (
-        <ul className="flex flex-col gap-2">
-          {MOCK_SELECTED_PARTS.map((part) => (
-            <SelectedPartRow key={part.id} part={part} />
-          ))}
-        </ul>
-      )}
-
       <nav className="hardware-surface flex flex-col overflow-hidden">
-        {CATEGORIES.map((category) => {
-          const Icon = category.icon;
-          const isActive = category.slug === activeCategory;
+        {isLoading &&
+          Array.from({ length: 7 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-4 py-3">
+              <div className="h-8 w-8 shrink-0 animate-pulse rounded-full bg-neutral-100" />
+              <div className="h-3 w-24 animate-pulse rounded bg-neutral-100" />
+            </div>
+          ))}
 
-          return (
-            <button
-              key={category.slug}
-              type="button"
-              onClick={() => onSelectCategory(category.slug)}
-              className={`flex items-center gap-3 border-b border-neutral-100 px-4 py-3 text-left text-sm font-medium last:border-b-0 ${
-                isActive
-                  ? "bg-neutral-100 text-neutral-900"
-                  : "text-neutral-700 hover:bg-neutral-50"
-              }`}
-            >
-              <span
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${category.iconBg}`}
+        {isError && (
+          <p className="px-4 py-3 text-sm text-[#dc2626]">
+            โหลดหมวดหมู่ไม่สำเร็จ
+          </p>
+        )}
+
+        {!isLoading &&
+          !isError &&
+          categories.map((category, index) => {
+            const isActive = String(category.id) === String(activeCategory);
+
+            const selectedPart = selectedParts.find(
+              (part) => String(part.categoryId) === String(category.id),
+            );
+
+            if (selectedPart) {
+              return (
+                <SelectedPartRow
+                  key={category.id}
+                  part={selectedPart}
+                  onRemove={onRemovePart}
+                  onIncreaseQty={onIncreaseQty}
+                  onSelectCategory={onSelectCategory}
+                  categoryId={category.id}
+                  isActive={isActive}
+                />
+              );
+            }
+
+            const Icon = getCategoryIcon(category.name);
+
+            return (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => onSelectCategory(category.id)}
+                className={`flex items-center gap-3 border-b border-neutral-100 px-4 py-3 text-left text-sm font-medium last:border-b-0 ${
+                  isActive
+                    ? "bg-neutral-100 text-neutral-900"
+                    : "text-neutral-700 hover:bg-neutral-50"
+                }`}
               >
-                <Icon size={16} />
-              </span>
-              {category.label}
-            </button>
-          );
-        })}
+                <span
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${getCategoryIconBg(index)}`}
+                >
+                  <Icon size={16} />
+                </span>
+                {category.name}
+              </button>
+            );
+          })}
       </nav>
+
+      <button
+        type="button"
+        onClick={() => onAddAllToCart?.()}
+        disabled={selectedParts.length === 0 || isAddingAllToCart}
+        className="btn btn-accent gap-2 text-sm text-white disabled:opacity-50"
+      >
+        <ShoppingCart size={16} />
+        {isAddingAllToCart ? "กำลังเพิ่มลงตะกร้า..." : "เพิ่มทั้งหมดลงตะกร้า"}
+      </button>
     </aside>
   );
 }
 
 export default BuildSidebar;
-export { CATEGORIES };

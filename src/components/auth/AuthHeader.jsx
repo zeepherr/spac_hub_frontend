@@ -238,7 +238,7 @@ function AuthLinks() {
 function ProfileLink({ user }) {
   return (
     <NavLink
-      to="/user" // TODO: แก้ path ให้ตรงกับ route หน้าโปรไฟล์จริงของคุณ เช่น `/users/${user.id}`
+      to="/user"
       className="flex items-center gap-2 text-neutral-700 hover:text-[#f97316]"
     >
       {user.profileImageUrl ? (
@@ -260,29 +260,13 @@ function ProfileLink({ user }) {
 function MainNav() {
   const user = useAuthStore((store) => store.user);
   const location = useLocation();
-  // ยังไม่ login ก็ยิง useMyCart() ได้อยู่ดี (ไม่มี enabled guard) แต่ retry: false ในตัว hook
-  // เลยไม่ยิงซ้ำรัว ๆ ผลคือ cartItems จะเป็น [] เฉยๆ ตอนไม่ login (ไม่กระทบอะไรเพราะกดแล้วเด้งไป login อยู่แล้ว)
   const { data: cartItems = [] } = useMyCart();
   const cartCount = cartItems.length;
 
-  // ตอนยังไม่ login, to ของปุ่มนี้คือ "/login" เอง เลยเช็ค isActive ของ NavLink ตรงๆ ไม่ได้
-  // เพราะพอ MainNav โดน render บนหน้า /login (ตอน isAuthPage) มันจะ isActive=true ไปโดยบังเอิญ
-  // (path ตรงกับ /login แต่ไม่ได้แปลว่ากำลังอยู่ "ตะกร้า") เลยเช็คจาก pathname จริงแทนว่าอยู่ /cart รึเปล่า
   const isCartActive = location.pathname === "/cart";
 
   return (
     <nav className="flex shrink-0 items-center gap-6 whitespace-nowrap text-sm font-semibold">
-      <NavLink to="/" end className={iconLinkClass}>
-        <RefreshCw size={18} />
-        Compare Products
-      </NavLink>
-
-      <NavLink to="/about" className={iconLinkClass}>
-        <Heart size={18} />
-        Wishlist
-      </NavLink>
-
-      {/* ยังไม่ login -> เด้งไป /login แทนหน้าตะกร้า (CartPage เองก็กันไว้อีกชั้นถ้าพิมพ์ URL ตรงๆ) */}
       <NavLink
         to={user ? "/cart" : "/login"}
         className={() =>
@@ -315,14 +299,16 @@ function Header() {
   return (
     <header>
       <div className="sticky top-0 z-40 w-screen shadow-sm bg-white">
-        <div className="mx-auto grid max-w-8xl grid-cols-[auto_1fr_auto] items-center gap-6 px-4 py-3">
+        <div className="mx-auto grid max-w-8xl grid-cols-[auto_1fr_auto] items-center gap-2 px-4 py-3">
           <Logo />
 
           <div className="flex justify-center">
             {isAuthPage ? <MainNav /> : <SearchForm />}
           </div>
 
-          <div className="justify-self-end">{!isAuthPage && <MainNav />}</div>
+          <div className="justify-center pr-2 sm:pr-4">
+            {!isAuthPage && <MainNav />}
+          </div>
         </div>
       </div>
     </header>

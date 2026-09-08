@@ -1,87 +1,111 @@
+import { useAddCartItem } from "@/hook/cart/useCreateItem";
+import { useCategories } from "@/hook/category/useCategory";
 import { ChevronRight, Search, SlidersHorizontal, Trophy } from "lucide-react";
-import { Link, useSearchParams } from "react-router";
-import BuildSidebar, { CATEGORIES } from "@/components/build/BuildSidebar";
+import { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router";
+import { toast } from "sonner";
+import useAuthStore from "@/stores/auth.store";
+import BuildSidebar from "@/components/build/BuildSidebar";
 import PartPickerCard from "@/components/build/PartPickerCard";
+import { useListingsByCategory } from "@/hook/listing/useListingByCategory";
 
-// UI ล้วนๆ ก่อนตามที่ตกลงกัน - mock ข้อมูลสินค้า/หมวดหมู่ทั้งหมด ยังไม่ต่อ useListingsByCategory หรือ store การจัด
-// สเปคจริง (รอโค้ด store/hook ที่มีอยู่แล้วจากคุณก่อน) โครง route: หน้าเดียว เปลี่ยนหมวดหมู่ด้วย query param
-// ?category=vga (ตามที่เลือกไว้) - คลิกเมนูซ้ายแค่เปลี่ยน query param ไม่ reload ทั้งหน้า
-const MOCK_PRODUCTS = [
-  {
-    id: 1,
-    brand: "Asus",
-    title:
-      "ASUS TUF GAMING GEFORCE RTX 5070 TI 16GB GDDR7 OC EDITION (TUF-RTX5070TI-O16G-GAMING)",
-    price: 44900,
-    imageUrl: null,
-  },
-  {
-    id: 2,
-    brand: "Asus",
-    title:
-      "ASUS PRIME GEFORCE RTX 5070 TI 16GB GDDR7 OC EDITION (PRIME-RTX5070TI-O16G)",
-    price: 42900,
-    imageUrl: null,
-  },
-  {
-    id: 3,
-    brand: "Asus",
-    title:
-      "ASUS TUF GAMING GEFORCE RTX 5080 16GB GDDR7 OC EDITION (TUF-RTX5080-O16G-GAMING)",
-    price: 55900,
-    imageUrl: null,
-  },
-  {
-    id: 4,
-    brand: "Galax",
-    title: "GALAX GEFORCE RTX 5080 1-CLICK OC - 16GB GDDR7",
-    price: 52900,
-    imageUrl: null,
-  },
-  {
-    id: 5,
-    brand: "Gigabyte",
-    title: "GIGABYTE GEFORCE RTX 5070 TI GAMING OC 16G - 16GB GDDR7",
-    price: 43900,
-    imageUrl: null,
-  },
-  {
-    id: 6,
-    brand: "Asus",
-    title: "ASUS ROG ASTRAL GEFORCE RTX 5080 16GB GDDR7 OC EDITION",
-    price: 68900,
-    imageUrl: null,
-  },
-  {
-    id: 7,
-    brand: "Gigabyte",
-    title:
-      "GIGABYTE GEFORCE RTX 5080 AERO OC SFF 16G - 16GB GDDR7 (GV-N5080AERO OC-16GD)",
-    price: 56900,
-    imageUrl: null,
-  },
-  {
-    id: 8,
-    brand: "Gigabyte",
-    title:
-      "GIGABYTE GEFORCE RTX 5080 GAMING OC 16G - 16GB GDDR7 (GV-N5080GAMING OC-16GD)",
-    price: 57900,
-    imageUrl: null,
-  },
-];
+function getCoverImageUrl(product) {
+  const images = product.images ?? [];
+  const cover = images.find((img) => img.isCover) ?? images[0];
+  return cover?.imageUrl ?? null;
+}
 
 export default function BuildPcPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeCategorySlug = searchParams.get("category") ?? "vga";
-  const activeCategory = CATEGORIES.find((c) => c.slug === activeCategorySlug);
+  const categoryIdFromUrl = searchParams.get("category");
+  const user = useAuthStore((store) => store.user);
+  const navigate = useNavigate();
+  const addCartItem = useAddCartItem();
 
-  const handleSelectCategory = (slug) => {
-    setSearchParams({ category: slug });
+  const { data: categories = [] } = useCategories({ includeInactive: false });
+
+  const activeCategoryId = categoryIdFromUrl ?? categories[0]?.id ?? null;
+  const activeCategory = categories.find(
+    (c) => String(c.id) === String(activeCategoryId),
+  );
+
+  const handleSelectCategory = (categoryId) => {
+    setSearchParams({ category: String(categoryId) });
   };
 
-  // TODO: ยังไม่ผูก "จัดชุดสเปค" จริง (เพิ่มเข้ารายการที่เลือกไว้ฝั่งซ้าย) รอ store/hook เดิมของคุณ
+  const {
+    data: products = [],
+    isLoading: isLoadingProducts,
+    isError: isErrorProducts,
+  } = useListingsByCategory(activeCategoryId);
+
+  const [selectedParts, setSelectedParts] = useState([]);
+
   const handleAddToBuild = (product) => {
-    console.log("[build] add to build:", product);
+    setSelectedParts((prev) => {
+      const existingInCategory = prev.find(
+        (part) => String(part.categoryId) === String(activeCategoryId),
+      );
+
+      const newPart = {
+        id: product.id,
+        categoryId: activeCategoryId,
+        title: product.title,
+        price: product.price,
+        qty:
+          existingInCategory?.id === product.id
+            ? existingInCategory.qty + 1
+            : 1,
+        imageUrl: getCoverImageUrl(product),
+      };
+
+      if (existingInCategory) {
+        return prev.map((part) =>
+          String(part.categoryId) === String(activeCategoryId) ? newPart : part,
+        );
+      }
+
+      return [...prev, newPart];
+    });
+
+    toast.success(`เพิ่ม "${product.title}" ลงชุดสเปคแล้ว`, {
+      position: "top-right",
+    });
+  };
+
+  const handleRemovePart = (partId) => {
+    setSelectedParts((prev) => prev.filter((part) => part.id !== partId));
+  };
+
+  const handleIncreaseQty = (partId) => {
+    setSelectedParts((prev) =>
+      prev.map((part) =>
+        part.id === partId ? { ...part, qty: part.qty + 1 } : part,
+      ),
+    );
+  };
+
+  const handleAddAllToCart = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    if (selectedParts.length === 0) return;
+
+    try {
+      for (const part of selectedParts) {
+        for (let i = 0; i < part.qty; i++) {
+          await addCartItem.mutateAsync(part.id);
+        }
+      }
+      toast.success("เพิ่มชิ้นส่วนทั้งหมดลงตะกร้าแล้ว", {
+        position: "top-right",
+      });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "เพิ่มลงตะกร้าไม่สำเร็จ", {
+        position: "top-right",
+      });
+    }
   };
 
   return (
@@ -96,8 +120,13 @@ export default function BuildPcPage() {
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <BuildSidebar
-          activeCategory={activeCategorySlug}
+          activeCategory={activeCategoryId}
           onSelectCategory={handleSelectCategory}
+          selectedParts={selectedParts}
+          onRemovePart={handleRemovePart}
+          onIncreaseQty={handleIncreaseQty}
+          onAddAllToCart={handleAddAllToCart}
+          isAddingAllToCart={addCartItem.isPending}
         />
 
         <div className="flex flex-col gap-4">
@@ -115,7 +144,7 @@ export default function BuildPcPage() {
                 <Search size={16} className="text-neutral-400" />
                 <input
                   type="text"
-                  placeholder={`ค้นหา ${activeCategory?.label ?? ""}`}
+                  placeholder={`ค้นหา ${activeCategory?.name ?? ""}`}
                   className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
                 />
               </div>
@@ -164,19 +193,39 @@ export default function BuildPcPage() {
           </div>
 
           <p className="text-xs text-neutral-400">
-            ทั้งหมด '{activeCategory?.label ?? ""}' : {MOCK_PRODUCTS.length}{" "}
-            รายการ | จำนวน 1 / 3 หน้า | หน้าละ 80 รายการ
+            ทั้งหมด '{activeCategory?.name ?? ""}' : {products.length} รายการ
           </p>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
-            {MOCK_PRODUCTS.map((product) => (
-              <PartPickerCard
-                key={product.id}
-                product={product}
-                onAddToBuild={handleAddToBuild}
-              />
-            ))}
-          </div>
+          {isLoadingProducts ? (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="hardware-surface aspect-[3/4] animate-pulse bg-neutral-100"
+                />
+              ))}
+            </div>
+          ) : isErrorProducts ? (
+            <div className="hardware-surface flex h-40 items-center justify-center">
+              <p className="text-sm text-[#dc2626]">โหลดสินค้าไม่สำเร็จ</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="hardware-surface flex h-40 items-center justify-center">
+              <p className="text-sm text-neutral-400">
+                ยังไม่มีสินค้าในหมวดหมู่นี้
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+              {products.map((product) => (
+                <PartPickerCard
+                  key={product.id}
+                  product={product}
+                  onAddToBuild={handleAddToBuild}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

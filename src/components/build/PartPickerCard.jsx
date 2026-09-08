@@ -3,11 +3,23 @@ import { Link } from "react-router";
 
 // การ์ดสินค้าเวอร์ชันหน้า "จัดสเปค" - ต่างจาก ProductCard.jsx ทั่วไป (ที่มีปุ่มเพิ่มลงตะกร้าไอคอนเดียว) ตรงที่มี
 // ปุ่ม "จัดชุดสเปค" (เพิ่มเข้ารายการที่เลือกไว้ฝั่งซ้าย) กับ "รายละเอียด" (ไปหน้า product detail) แยกกันชัดเจน
+
+// หารูปปกจาก listing.images (isCover ก่อน ถ้าไม่มีเอารูปแรก) - เหมือน getCoverImageUrl ใน ProductCard.jsx
+// (backend คืน imageUrl เต็มมาให้อยู่แล้ว) ตอนเป็น mock ใช้ field product.imageUrl ตรงๆ แต่ listing จริงจาก
+// useListingsByCategory ไม่มี field นี้ มีแต่ images[] แทน
+function getCoverImageUrl(product) {
+  const images = product.images ?? [];
+  const cover = images.find((img) => img.isCover) ?? images[0];
+  return cover?.imageUrl;
+}
+
 function formatPrice(amount) {
   return `${Number(amount).toLocaleString()}.-`;
 }
 
 function PartPickerCard({ product, onAddToBuild }) {
+  const imageUrl = getCoverImageUrl(product);
+
   return (
     <div className="hardware-surface flex flex-col p-4 text-center">
       <span className="mb-1 text-left text-sm font-bold text-[#f97316]">
@@ -18,9 +30,9 @@ function PartPickerCard({ product, onAddToBuild }) {
       </p>
 
       <div className="mb-3 flex aspect-square items-center justify-center overflow-hidden rounded-box bg-neutral-50">
-        {product.imageUrl ? (
+        {imageUrl ? (
           <img
-            src={product.imageUrl}
+            src={imageUrl}
             alt={product.title}
             className="h-full w-full object-contain"
           />

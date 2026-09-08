@@ -22,7 +22,7 @@ import { Link } from "react-router";
  * หา icon ที่เหมาะกับชื่อหมวดหมู่ (จับคู่แบบคร่าวๆ จากชื่อที่ backend ส่งมา)
  * ถ้าไม่ match อะไรเลยจะ fallback เป็น Boxes
  */
-function getCategoryIcon(name = "") {
+export function getCategoryIcon(name = "") {
   const key = name.toLowerCase();
   if (key.includes("cpu")) return Cpu;
   if (key.includes("main") || key.includes("board")) return CircuitBoard;
