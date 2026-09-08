@@ -22,6 +22,7 @@ function SupportChatPanel({
   isAdmin = false,
   initialDraft = "",
   fillAvailableHeight = false,
+  showOrderContext = true,
 }) {
   const currentUserId = useAuthStore((state) => state.user?.id);
 
@@ -360,20 +361,23 @@ function SupportChatPanel({
           </div>
         </div>
 
-        {/* Order context */}
-        <div className="mt-3 grid gap-2 rounded-xl border border-neutral-200 bg-neutral-50 p-3 sm:grid-cols-3">
-          <ContextItem label="Support Case" value={`#${supportCase.id}`} />
+        {showOrderContext && (
+          <div className="mt-3 grid gap-2 rounded-xl border border-neutral-200 bg-neutral-50 p-3 sm:grid-cols-3">
+            <ContextItem label="Support Case" value={`#${supportCase.id}`} />
 
-          <ContextItem
-            label="Order"
-            value={supportCase.order?.orderNumber || `#${supportCase.orderId}`}
-          />
+            <ContextItem
+              label="Order"
+              value={
+                supportCase.order?.orderNumber || `#${supportCase.orderId}`
+              }
+            />
 
-          <ContextItem
-            label="Issue"
-            value={formatEnumLabel(supportCase.issueType)}
-          />
-        </div>
+            <ContextItem
+              label="Issue"
+              value={formatEnumLabel(supportCase.issueType)}
+            />
+          </div>
+        )}
       </header>
 
       {/* Socket error */}

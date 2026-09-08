@@ -10,12 +10,17 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+import {
+  AdminOrderDetailsModal,
+  AdminOrderPreview,
+} from "@/components/admin/support/AdminOrderContext";
 import SupportChatPanel from "@/components/support/SupportChatPanel";
 import {
   hasUnreadSupportMessage,
   SUPPORT_STATUS_META,
 } from "@/components/support/support.constants";
 
+import { useAdminOrderById } from "@/hook/order/useAdminOrderById";
 import { useAdminSupportCaseById } from "@/hook/support/useAdminSupportCaseById";
 import { useAdminSupportCases } from "@/hook/support/useAdminSupportCases";
 import { useUpdateSupportCaseStatus } from "@/hook/support/useUpdateSupportCaseStatus";
@@ -39,6 +44,7 @@ function AdminChats() {
   const currentUser = useAuthStore((state) => state.user);
 
   const [selectedSupportCaseId, setSelectedSupportCaseId] = useState(null);
+  const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
 
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -114,14 +120,9 @@ function AdminChats() {
       });
   }, [supportCases, statusFilter, searchText, currentUser?.id]);
 
-  /*
-   * Select the first visible case automatically.
-   * If the currently selected case is filtered out,
-   * move selection to the first visible case.
-   */
+  /* Close the active conversation if filtering removes it from the queue. */
   useEffect(() => {
-    if (filteredSupportCases.length === 0) {
-      setSelectedSupportCaseId(null);
+    if (!selectedSupportCaseId) {
       return;
     }
 
@@ -130,7 +131,8 @@ function AdminChats() {
     );
 
     if (!selectedCaseStillVisible) {
-      setSelectedSupportCaseId(filteredSupportCases[0].id);
+      setSelectedSupportCaseId(null);
+      setIsOrderDetailOpen(false);
     }
   }, [filteredSupportCases, selectedSupportCaseId]);
 
@@ -141,6 +143,26 @@ function AdminChats() {
     error: detailError,
     refetch: refetchDetail,
   } = useAdminSupportCaseById(selectedSupportCaseId);
+
+  const {
+    data: adminOrder,
+    isPending: isOrderPending,
+    isError: isOrderError,
+    refetch: refetchOrder,
+  } = useAdminOrderById(
+    supportCaseDetail?.order?.id || supportCaseDetail?.orderId,
+  );
+
+  const orderPreview = adminOrder || supportCaseDetail?.order;
+
+  function handleSelectSupportCase(supportCaseId) {
+    setSelectedSupportCaseId(supportCaseId);
+    setIsOrderDetailOpen(false);
+  }
+
+  function handleCloseOrderDetails() {
+    setIsOrderDetailOpen(false);
+  }
 
   return (
     <section className="h-full min-h-0 overflow-hidden bg-[#F5F5F4] px-4 py-4 lg:px-6">
@@ -199,7 +221,7 @@ function AdminChats() {
                       isSelected={
                         Number(selectedSupportCaseId) === Number(supportCase.id)
                       }
-                      onSelect={() => setSelectedSupportCaseId(supportCase.id)}
+                      onSelect={() => handleSelectSupportCase(supportCase.id)}
                     />
                   ))}
                 </div>
@@ -217,6 +239,21 @@ function AdminChats() {
               <ConversationError error={detailError} onRetry={refetchDetail} />
             ) : supportCaseDetail ? (
               <div className="flex h-full min-h-0 flex-col gap-3">
+                <AdminOrderPreview
+                  order={orderPreview}
+                  fallbackOrderNumber={
+                    supportCaseDetail.order?.orderNumber ||
+                    `Order #${supportCaseDetail.orderId}`
+                  }
+                  supportCaseId={supportCaseDetail.id}
+                  issueType={supportCaseDetail.issueType}
+                  isPending={isOrderPending}
+                  isError={isOrderError}
+                  hasFullDetails={Boolean(adminOrder)}
+                  onRetry={refetchOrder}
+                  onViewDetails={() => setIsOrderDetailOpen(true)}
+                />
+
                 <SupportCaseStatusControl supportCase={supportCaseDetail} />
 
                 <SupportChatPanel
@@ -224,6 +261,7 @@ function AdminChats() {
                   supportCase={supportCaseDetail}
                   isAdmin
                   fillAvailableHeight
+                  showOrderContext={false}
                 />
               </div>
             ) : (
@@ -232,6 +270,12 @@ function AdminChats() {
           </main>
         </div>
       </div>
+
+      <AdminOrderDetailsModal
+        isOpen={isOrderDetailOpen}
+        order={adminOrder}
+        onClose={handleCloseOrderDetails}
+      />
     </section>
   );
 }
@@ -303,6 +347,7 @@ function SupportCaseListItem({
     <button
       type="button"
       onClick={onSelect}
+      aria-pressed={isSelected}
       className={`w-full cursor-pointer rounded-xl border p-4 text-left transition ${
         isSelected
           ? "border-orange-300 bg-orange-50 shadow-sm"
@@ -526,7 +571,8 @@ function NoSelectedCase() {
       </h2>
 
       <p className="mt-2 max-w-sm text-sm leading-6 text-neutral-500">
-        Choose a Buyer or Seller case from the queue to view its messages.
+        Choose the order you want to handle. Its details and conversation will
+        open here.
       </p>
     </div>
   );
@@ -575,7 +621,7 @@ function ConversationSkeleton() {
     <div className="h-full min-h-0 animate-pulse rounded-2xl border border-neutral-200 bg-white p-6">
       <div className="h-8 w-48 rounded bg-neutral-100" />
       <div className="mt-5 h-24 rounded-xl bg-neutral-100" />
-      <div className="mt-5 h-115 rounded-xl bg-neutral-50" />
+      <div className="mt-5 h-[460px] rounded-xl bg-neutral-50" />
     </div>
   );
 }
