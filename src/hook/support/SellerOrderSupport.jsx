@@ -11,6 +11,8 @@ export default function SellerOrderSupport({ order }) {
   const [createdSupportCase, setCreatedSupportCase] = useState(null);
   const [pendingDraft, setPendingDraft] = useState("");
 
+  const orderId = order?.id;
+
   const {
     data: supportCases = [],
     isLoading: isListLoading,
@@ -19,14 +21,14 @@ export default function SellerOrderSupport({ order }) {
   } = useMySupportCases();
 
   const listedSupportCase = useMemo(() => {
-    if (!order?.id) return null;
+    if (!orderId) return null;
 
     return (
       supportCases.find(
-        (supportCase) => String(supportCase.orderId) === String(order.id),
+        (supportCase) => String(supportCase.orderId) === String(orderId),
       ) || null
     );
-  }, [supportCases, order?.id]);
+  }, [supportCases, orderId]);
 
   const supportCase = createdSupportCase || listedSupportCase || null;
 
@@ -124,8 +126,10 @@ export default function SellerOrderSupport({ order }) {
 
   return (
     <SupportChatPanel
+      key={activeSupportCase.id}
       supportCase={activeSupportCase}
       initialDraft={pendingDraft}
+      fillAvailableHeight
     />
   );
 }

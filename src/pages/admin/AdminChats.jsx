@@ -143,15 +143,17 @@ function AdminChats() {
   } = useAdminSupportCaseById(selectedSupportCaseId);
 
   return (
-    <section className="min-h-full bg-[#F5F5F4] px-4 py-6 lg:px-6">
-      <div className="mx-auto w-full max-w-[1500px]">
-        <AdminChatsHeader
-          totalCases={supportCases.length}
-          unreadCount={unreadCount}
-          onRefresh={refetchCases}
-        />
+    <section className="h-full min-h-0 overflow-hidden bg-[#F5F5F4] px-4 py-4 lg:px-6">
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-[1500px] flex-col">
+        <div className="shrink-0">
+          <AdminChatsHeader
+            totalCases={supportCases.length}
+            unreadCount={unreadCount}
+            onRefresh={refetchCases}
+          />
+        </div>
 
-        <div className="mt-6 grid min-h-[720px] gap-5 xl:grid-cols-[380px_minmax(0,1fr)]">
+        <div className="mt-4 grid min-h-0 flex-1 grid-rows-[minmax(160px,0.45fr)_minmax(0,1fr)] gap-4 xl:grid-cols-[360px_minmax(0,1fr)] xl:grid-rows-1">
           {/* Left: Support queue */}
           <aside className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
             <div className="border-b border-neutral-200 p-4">
@@ -206,7 +208,7 @@ function AdminChats() {
           </aside>
 
           {/* Right: Selected conversation */}
-          <main className="min-w-0">
+          <main className="min-h-0 min-w-0 overflow-hidden">
             {!selectedSupportCaseId ? (
               <NoSelectedCase />
             ) : isDetailPending && !supportCaseDetail ? (
@@ -214,10 +216,15 @@ function AdminChats() {
             ) : isDetailError ? (
               <ConversationError error={detailError} onRetry={refetchDetail} />
             ) : supportCaseDetail ? (
-              <div className="space-y-4">
+              <div className="flex h-full min-h-0 flex-col gap-3">
                 <SupportCaseStatusControl supportCase={supportCaseDetail} />
 
-                <SupportChatPanel supportCase={supportCaseDetail} isAdmin />
+                <SupportChatPanel
+                  key={supportCaseDetail.id}
+                  supportCase={supportCaseDetail}
+                  isAdmin
+                  fillAvailableHeight
+                />
               </div>
             ) : (
               <NoSelectedCase />
@@ -408,7 +415,7 @@ function SupportCaseStatusControl({ supportCase }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm"
+      className="shrink-0 rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm"
     >
       <div className="grid gap-3 lg:grid-cols-[220px_minmax(0,1fr)_120px]">
         <div>
@@ -509,7 +516,7 @@ function EmptyQueue() {
 
 function NoSelectedCase() {
   return (
-    <div className="flex min-h-[720px] flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-300 bg-white p-8 text-center">
+    <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-300 bg-white p-8 text-center">
       <span className="flex size-16 items-center justify-center rounded-full bg-orange-50 text-orange-500">
         <MessageSquareText size={30} />
       </span>
@@ -527,7 +534,7 @@ function NoSelectedCase() {
 
 function ConversationError({ error, onRetry }) {
   return (
-    <div className="flex min-h-[720px] flex-col items-center justify-center rounded-2xl border border-red-100 bg-white p-8 text-center">
+    <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-2xl border border-red-100 bg-white p-8 text-center">
       <AlertCircle size={38} className="text-red-500" />
 
       <p className="mt-4 font-bold text-neutral-900">
@@ -565,10 +572,10 @@ function CaseListSkeleton() {
 
 function ConversationSkeleton() {
   return (
-    <div className="min-h-[720px] animate-pulse rounded-2xl border border-neutral-200 bg-white p-6">
+    <div className="h-full min-h-0 animate-pulse rounded-2xl border border-neutral-200 bg-white p-6">
       <div className="h-8 w-48 rounded bg-neutral-100" />
       <div className="mt-5 h-24 rounded-xl bg-neutral-100" />
-      <div className="mt-5 h-[460px] rounded-xl bg-neutral-50" />
+      <div className="mt-5 h-115 rounded-xl bg-neutral-50" />
     </div>
   );
 }

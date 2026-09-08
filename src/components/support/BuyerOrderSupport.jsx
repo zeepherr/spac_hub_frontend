@@ -53,14 +53,18 @@ function BuyerOrderSupport({ order }) {
   }
 
   return (
-    <div className="space-y-5">
-      <OrderProgress status={order.status} />
+    <div className="flex h-full min-h-0 flex-col gap-4">
+      <div className="shrink-0">
+        <OrderProgress status={order.status} />
+      </div>
 
       {supportCase ? (
         <SupportChatPanel
+          key={supportCase.id}
           supportCase={supportCase}
           isAdmin={false}
           initialDraft={pendingDraft}
+          fillAvailableHeight
         />
       ) : isPending ? (
         <SupportLoading />

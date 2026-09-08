@@ -17,8 +17,13 @@ import useAuthStore from "@/stores/auth.store";
 
 import { SUPPORT_STATUS_META } from "./support.constants";
 
-function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
-  const currentUser = useAuthStore((state) => state.user);
+function SupportChatPanel({
+  supportCase,
+  isAdmin = false,
+  initialDraft = "",
+  fillAvailableHeight = false,
+}) {
+  const currentUserId = useAuthStore((state) => state.user?.id);
 
   const [draft, setDraft] = useState("");
 
@@ -28,7 +33,7 @@ function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
 
   const messageContainerRef = useRef(null);
 
-  const messagesEndRef = useRef(null);
+  const composerRef = useRef(null);
 
   const isNearBottomRef = useRef(true);
 
@@ -79,14 +84,18 @@ function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
   const lastMessage = messages[messages.length - 1];
 
   const hasUnreadIncomingMessages = useMemo(() => {
-    if (!currentUser?.id) {
+    if (!currentUserId) {
       return false;
     }
 
     return messages.some(
-      (message) => message.senderId !== currentUser.id && !message.readAt,
+      (message) => message.senderId !== currentUserId && !message.readAt,
     );
-  }, [messages, currentUser?.id]);
+  }, [messages, currentUserId]);
+
+  const lastMessageId = lastMessage?.id;
+
+  const lastMessageSenderId = lastMessage?.senderId;
 
   /*
    * Used when POST /support-cases returned
@@ -103,6 +112,26 @@ function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
   }, [initialDraft]);
 
   /*
+   * Start as a compact one-line composer and grow only
+   * when the message needs more room. Long drafts scroll
+   * inside the textarea instead of pushing chat history away.
+   */
+  useEffect(() => {
+    const composer = composerRef.current;
+
+    if (!composer) {
+      return;
+    }
+
+    const maximumHeight = 112;
+
+    composer.style.height = "auto";
+    composer.style.height = `${Math.min(composer.scrollHeight, maximumHeight)}px`;
+    composer.style.overflowY =
+      composer.scrollHeight > maximumHeight ? "auto" : "hidden";
+  }, [draft]);
+
+  /*
    * After initial connection and every reconnect,
    * reload REST history to recover missed messages.
    */
@@ -115,13 +144,19 @@ function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
   }, [isJoined, refetchMessages]);
 
   function scrollToBottom(behavior = "smooth") {
+    const container = messageContainerRef.current;
+
+    if (!container) {
+      return;
+    }
+
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    messagesEndRef.current?.scrollIntoView({
+    container.scrollTo({
+      top: container.scrollHeight,
       behavior: prefersReducedMotion ? "auto" : behavior,
-      block: "end",
     });
 
     isNearBottomRef.current = true;
@@ -138,11 +173,11 @@ function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
    * they are reading older messages.
    */
   useEffect(() => {
-    if (!lastMessage) {
+    if (!lastMessageId) {
       return;
     }
 
-    const isOwnMessage = lastMessage.senderId === currentUser?.id;
+    const isOwnMessage = lastMessageSenderId === currentUserId;
 
     if (
       !initialScrollCompletedRef.current ||
@@ -159,7 +194,7 @@ function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
     }
 
     setShowNewMessageButton(true);
-  }, [lastMessage?.id, currentUser?.id]);
+  }, [lastMessageId, lastMessageSenderId, currentUserId]);
 
   /*
    * Mark messages as read only while
@@ -286,13 +321,17 @@ function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+    <section
+      className={`flex min-h-0 flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm ${
+        fillAvailableHeight ? "h-full" : "h-[min(680px,70dvh)] min-h-[420px]"
+      }`}
+    >
       {/* Header */}
-      <header className="border-b border-neutral-200 px-5 py-4 sm:px-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <header className="shrink-0 border-b border-neutral-200 px-4 py-3 sm:px-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
-              <MessageSquareText size={21} />
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
+              <MessageSquareText size={20} />
             </span>
 
             <div className="min-w-0">
@@ -322,7 +361,7 @@ function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
         </div>
 
         {/* Order context */}
-        <div className="mt-4 grid gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4 sm:grid-cols-3">
+        <div className="mt-3 grid gap-2 rounded-xl border border-neutral-200 bg-neutral-50 p-3 sm:grid-cols-3">
           <ContextItem label="Support Case" value={`#${supportCase.id}`} />
 
           <ContextItem
@@ -339,7 +378,7 @@ function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
 
       {/* Socket error */}
       {socketError && (
-        <div className="flex items-start gap-3 border-b border-red-100 bg-red-50 px-5 py-3 text-sm text-red-700 sm:px-6">
+        <div className="flex shrink-0 items-start gap-3 border-b border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 sm:px-5">
           <WifiOff size={18} className="mt-0.5 shrink-0" />
 
           <div>
@@ -351,11 +390,11 @@ function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
       )}
 
       {/* Message history */}
-      <div className="relative">
+      <div className="relative min-h-0 flex-1">
         <div
           ref={messageContainerRef}
           onScroll={handleMessageScroll}
-          className="scrollbar-hide h-[460px] overflow-y-auto bg-white px-4 py-5 sm:px-6"
+          className="chat-scrollbar h-full overflow-y-auto overscroll-contain bg-white px-4 py-4 sm:px-5"
           aria-live="polite"
         >
           {hasNextPage && (
@@ -408,19 +447,17 @@ function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {messages.map((message) => (
                 <MessageBubble
                   key={message.id}
                   message={message}
                   supportCase={supportCase}
-                  currentUserId={currentUser?.id}
+                  currentUserId={currentUserId}
                 />
               ))}
             </div>
           )}
-
-          <div ref={messagesEndRef} />
         </div>
 
         {showNewMessageButton && (
@@ -437,50 +474,38 @@ function SupportChatPanel({ supportCase, isAdmin = false, initialDraft = "" }) {
       {/* Composer */}
       <form
         onSubmit={handleSendMessage}
-        className="border-t border-neutral-200 bg-neutral-50 p-4 sm:p-5"
+        className="shrink-0 border-t border-neutral-200 bg-neutral-50 p-3"
       >
-        <div className="rounded-xl border border-neutral-200 bg-white p-2 shadow-sm transition focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100">
+        <div className="flex items-end gap-2 rounded-2xl border border-neutral-200 bg-white p-2 shadow-sm transition focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100">
           <textarea
+            ref={composerRef}
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             onKeyDown={handleComposerKeyDown}
             maxLength={2000}
-            rows={3}
+            rows={1}
             disabled={!isJoined || isSending}
+            aria-label="Message"
             placeholder={
               isJoined ? "Write a message..." : "Connecting to support..."
             }
-            className="w-full resize-none bg-transparent px-2 py-2 text-sm leading-6 text-neutral-800 outline-none placeholder:text-neutral-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="chat-scrollbar min-h-10 min-w-0 flex-1 resize-none bg-transparent px-2 py-2 text-sm leading-6 text-neutral-800 outline-none placeholder:text-neutral-400 disabled:cursor-not-allowed disabled:opacity-60"
           />
 
-          <div className="flex items-center justify-between gap-3 px-1 pb-1">
-            <div>
-              {draft.length > 0 && (
-                <span className="text-xs text-neutral-400">
-                  {draft.length}/2000
-                </span>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={!canSend}
-              className="inline-flex min-w-24 cursor-pointer items-center justify-center gap-2 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isSending ? (
-                <LoaderCircle size={17} className="animate-spin" />
-              ) : (
-                <Send size={17} />
-              )}
-
-              {isSending ? "Sending" : "Send"}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={!canSend}
+            aria-label={isSending ? "Sending message" : "Send message"}
+            title={isSending ? "Sending" : "Send"}
+            className="inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-orange-500 text-white transition hover:bg-orange-600 active:scale-95 disabled:cursor-not-allowed disabled:opacity-45"
+          >
+            {isSending ? (
+              <LoaderCircle size={18} className="animate-spin" />
+            ) : (
+              <Send size={18} />
+            )}
+          </button>
         </div>
-
-        <p className="mt-2 text-center text-xs text-neutral-400">
-          Enter to send · Shift + Enter for a new line
-        </p>
       </form>
     </section>
   );

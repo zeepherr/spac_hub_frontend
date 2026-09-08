@@ -227,12 +227,24 @@ function OrderDetail() {
   }
 
   return (
-    <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
-      <div className="mx-auto max-w-6xl">
-        <BackButton fallbackPath="/user/orders" />
+    <section
+      className={`bg-neutral-50 px-5 py-8 lg:px-10 ${
+        activeTab === "support"
+          ? "h-full min-h-0 overflow-hidden"
+          : "min-h-full"
+      }`}
+    >
+      <div
+        className={`mx-auto max-w-6xl ${
+          activeTab === "support" ? "flex h-full min-h-0 flex-col" : ""
+        }`}
+      >
+        <div className="shrink-0">
+          <BackButton fallbackPath="/user/orders" />
+        </div>
         <nav
           aria-label="Order detail sections"
-          className="mb-6 flex gap-1 rounded-xl border border-neutral-200 bg-white p-1 shadow-sm"
+          className="mb-6 flex shrink-0 gap-1 rounded-xl border border-neutral-200 bg-white p-1 shadow-sm"
         >
           <button
             type="button"
@@ -267,24 +279,28 @@ function OrderDetail() {
             )}
           </button>
         </nav>
-        <header className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-orange-500">
-              Order detail
-            </p>
+        {activeTab === "details" && (
+          <header className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wider text-orange-500">
+                Order detail
+              </p>
 
-            <h1 className="mt-1 text-3xl font-bold text-neutral-900">
-              Order Details
-            </h1>
-            <p className="mt-2 text-sm text-neutral-500">{order.orderNumber}</p>
-          </div>
+              <h1 className="mt-1 text-3xl font-bold text-neutral-900">
+                Order Details
+              </h1>
+              <p className="mt-2 text-sm text-neutral-500">
+                {order.orderNumber}
+              </p>
+            </div>
 
-          <span
-            className={`w-fit rounded-full px-4 py-2 text-sm font-semibold ${status.className}`}
-          >
-            {status.label}
-          </span>
-        </header>
+            <span
+              className={`w-fit rounded-full px-4 py-2 text-sm font-semibold ${status.className}`}
+            >
+              {status.label}
+            </span>
+          </header>
+        )}
 
         {activeTab === "details" ? (
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
@@ -452,7 +468,9 @@ function OrderDetail() {
             </aside>
           </div>
         ) : (
-          <BuyerOrderSupport order={order} />
+          <div className="min-h-0 flex-1">
+            <BuyerOrderSupport order={order} />
+          </div>
         )}
       </div>
 
@@ -591,7 +609,7 @@ function InfoRow({ icon: Icon, label, value, emptyText = "-" }) {
         <p className="text-xs text-neutral-400">{label}</p>
 
         <p
-          className={`mt-1 break-words text-sm font-medium ${
+          className={`mt-1 wrap-break-word text-sm font-medium ${
             hasValue ? "text-neutral-800" : "text-neutral-400"
           }`}
         >

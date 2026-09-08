@@ -266,7 +266,7 @@ export default function SellingOrderDetailModal({
             </div>
           </div>
         ) : (
-          <div className="min-h-0 flex-1 overflow-y-auto rounded-2xl">
+          <div className="min-h-0 flex-1 overflow-hidden rounded-2xl">
             <SellerOrderSupport order={order} />
           </div>
         )}
