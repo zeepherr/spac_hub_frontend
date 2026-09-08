@@ -27,15 +27,41 @@ function ReadyToShip() {
     return orders.filter((order) => {
       const listing = order.listing;
 
+      // REJECTED จะยังคงเป็น REJECTED
+      // แม้ Admin จะสร้าง shipment คืน Seller แล้ว
+      // เพราะฉะนั้นต้องเช็ก ADMIN_TO_SELLER เพิ่ม
+      const hasReturnShipment = order.shipments?.some(
+        (shipment) =>
+          shipment.shipmentType ===
+          "ADMIN_TO_SELLER",
+      );
+
+      // คืนสินค้าไปแล้ว -> เอาออกจากหน้าพร้อมจัดส่ง
+      if (
+        order.status === "REJECTED" &&
+        hasReturnShipment
+      ) {
+        return false;
+      }
+
       const matchesSearch =
         !keyword ||
-        order.orderNumber?.toLowerCase().includes(keyword) ||
-        listing?.title?.toLowerCase().includes(keyword) ||
-        listing?.brand?.toLowerCase().includes(keyword) ||
-        listing?.model?.toLowerCase().includes(keyword);
+        order.orderNumber
+          ?.toLowerCase()
+          .includes(keyword) ||
+        listing?.title
+          ?.toLowerCase()
+          .includes(keyword) ||
+        listing?.brand
+          ?.toLowerCase()
+          .includes(keyword) ||
+        listing?.model
+          ?.toLowerCase()
+          .includes(keyword);
 
       const matchesFilter =
-        filter === "ALL" || order.status === filter;
+        filter === "ALL" ||
+        order.status === filter;
 
       return matchesSearch && matchesFilter;
     });
@@ -122,7 +148,6 @@ function ReadyToShip() {
         {/* SEARCH + FILTER */}
         <div className="mb-5 rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm">
           <div className="flex flex-col gap-3 lg:flex-row">
-            {/* SEARCH */}
             <div className="relative flex-1">
               <Search
                 size={17}
@@ -140,7 +165,6 @@ function ReadyToShip() {
               />
             </div>
 
-            {/* FILTER */}
             <div className="flex gap-2">
               <FilterButton
                 active={filter === "ALL"}
@@ -257,7 +281,6 @@ function OrderRow({ order, onOpen }) {
 
   return (
     <tr className="border-b border-neutral-100 last:border-b-0 transition hover:bg-neutral-50/60">
-      {/* ORDER */}
       <td className="px-6 py-4">
         <div className="min-w-[220px]">
           <p className="text-sm font-semibold text-neutral-900">
@@ -270,7 +293,6 @@ function OrderRow({ order, onOpen }) {
         </div>
       </td>
 
-      {/* PRODUCT */}
       <td className="px-6 py-4">
         <div className="flex min-w-[280px] items-center gap-3">
           <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
@@ -305,14 +327,12 @@ function OrderRow({ order, onOpen }) {
         </div>
       </td>
 
-      {/* PRICE */}
       <td className="px-6 py-4">
         <p className="whitespace-nowrap text-sm font-semibold text-neutral-900">
           {formatPrice(order.agreedPrice)}
         </p>
       </td>
 
-      {/* STATUS */}
       <td className="px-6 py-4">
         {isVerified ? (
           <span className="inline-flex whitespace-nowrap rounded-full bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-700">
@@ -325,7 +345,6 @@ function OrderRow({ order, onOpen }) {
         )}
       </td>
 
-      {/* ACTION */}
       <td className="px-6 py-4 text-right">
         {isVerified ? (
           <button

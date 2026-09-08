@@ -1,16 +1,16 @@
 import { useState } from "react";
 import {
   ArrowLeft,
-  ClipboardCheck,
   ImageIcon,
   LoaderCircle,
   MapPin,
   Package,
-  RotateCcw,
-  Truck,
   UserRound,
 } from "lucide-react";
-import { useNavigate, useParams } from "react-router";
+import {
+  useNavigate,
+  useParams,
+} from "react-router";
 
 import { useAdminOrderById } from "@/hook/order/useAdminOrderById";
 import { useShipOrderToBuyer } from "@/hook/order/useShipOrderToBuyer";
@@ -28,13 +28,17 @@ const THAI_CARRIERS = [
 ];
 
 function ShippingDetail() {
-  const { orderId } = useParams();
   const navigate = useNavigate();
+  const { orderId } = useParams();
 
-  const orderQuery = useAdminOrderById(orderId);
+  const orderQuery =
+    useAdminOrderById(orderId);
 
-  const shipMutation = useShipOrderToBuyer();
-  const returnMutation = useReturnOrderToSeller();
+  const shipMutation =
+    useShipOrderToBuyer();
+
+  const returnMutation =
+    useReturnOrderToSeller();
 
   const [form, setForm] = useState({
     carrier: "",
@@ -42,58 +46,6 @@ function ShippingDetail() {
   });
 
   const order = orderQuery.data;
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    if (!order) return;
-
-    const payload = {
-      carrier: form.carrier,
-      trackingNumber: form.trackingNumber.trim(),
-    };
-
-    // ผ่านการตรวจ → ส่งให้ผู้ซื้อ
-    if (order.status === "VERIFIED") {
-      shipMutation.mutate(
-        {
-          orderId: Number(orderId),
-          payload,
-        },
-        {
-          onSuccess: () => {
-            navigate("/admin/orders/ready-to-ship");
-          },
-        },
-      );
-
-      return;
-    }
-
-    // ไม่ผ่านการตรวจ → คืนให้ผู้ขาย
-    if (order.status === "REJECTED") {
-      returnMutation.mutate(
-        {
-          orderId: Number(orderId),
-          payload,
-        },
-        {
-          onSuccess: () => {
-            navigate("/admin/orders/ready-to-ship");
-          },
-        },
-      );
-    }
-  };
 
   if (orderQuery.isPending) {
     return (
@@ -115,46 +67,122 @@ function ShippingDetail() {
       <div className="flex min-h-[500px] items-center justify-center">
         <div className="text-center">
           <p className="text-sm text-red-500">
-            ไม่สามารถโหลดข้อมูลคำสั่งซื้อได้
+            ไม่สามารถโหลดข้อมูล Order ได้
           </p>
 
           <button
             type="button"
             onClick={() =>
-              navigate("/admin/orders/ready-to-ship")
+              navigate(
+                "/admin/orders/ready-to-ship",
+              )
             }
-            className="mt-4 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-orange-600"
+            className="mt-4 rounded-xl bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white"
           >
-            กลับหน้าพร้อมจัดส่ง
+            กลับ
           </button>
         </div>
       </div>
     );
   }
 
-  const listing = order.listing;
-  const seller = order.seller;
-  const buyer = order.buyer;
+  const isVerified =
+    order.status === "VERIFIED";
 
-  const images = listing?.images ?? [];
-
-  const coverImage =
-    images.find((image) => image.isCover)?.imageUrl ||
-    images[0]?.imageUrl ||
-    null;
-
-  const sellerName =
-    `${seller?.firstName ?? ""} ${seller?.lastName ?? ""}`.trim() || "-";
-
-  const buyerName =
-    `${buyer?.firstName ?? ""} ${buyer?.lastName ?? ""}`.trim() || "-";
-
-  const isVerified = order.status === "VERIFIED";
-  const isRejected = order.status === "REJECTED";
+  const isRejected =
+    order.status === "REJECTED";
 
   const isPending =
     shipMutation.isPending ||
     returnMutation.isPending;
+
+  const listing = order.listing;
+
+  const buyer = order.buyer;
+  const seller = order.seller;
+
+  const buyerName = [
+    buyer?.firstName,
+    buyer?.lastName,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const sellerName = [
+    seller?.firstName,
+    seller?.lastName,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const images = listing?.images ?? [];
+
+  const coverImage =
+    images.find((image) => image.isCover) ||
+    images[0];
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const payload = {
+      carrier: form.carrier,
+      trackingNumber:
+        form.trackingNumber.trim(),
+    };
+
+    /*
+     * ===========================
+     * ส่งสินค้าให้ Buyer
+     * ===========================
+     */
+    if (isVerified) {
+      shipMutation.mutate(
+        {
+          orderId: Number(orderId),
+          payload,
+        },
+        {
+          onSuccess: () => {
+            navigate(
+              "/admin/orders/summary",
+            );
+          },
+        },
+      );
+
+      return;
+    }
+
+    /*
+     * ===========================
+     * คืนสินค้าให้ Seller
+     * ===========================
+     */
+    if (isRejected) {
+      returnMutation.mutate(
+        {
+          orderId: Number(orderId),
+          payload,
+        },
+        {
+          onSuccess: () => {
+            navigate(
+              "/admin/orders/summary",
+            );
+          },
+        },
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F5F5F4] px-6 py-6">
@@ -163,106 +191,83 @@ function ShippingDetail() {
         <button
           type="button"
           onClick={() =>
-            navigate("/admin/orders/ready-to-ship")
+            navigate(
+              "/admin/orders/ready-to-ship",
+            )
           }
-          className="mb-5 flex items-center gap-2 text-sm text-neutral-500 transition hover:text-neutral-900"
+          className="mb-5 flex items-center gap-2 text-sm font-medium text-neutral-500 transition hover:text-neutral-900"
         >
           <ArrowLeft size={17} />
-          กลับหน้าพร้อมจัดส่ง
+          กลับไปหน้าพร้อมจัดส่ง
         </button>
 
         {/* HEADER */}
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div
-              className={`flex h-11 w-11 items-center justify-center rounded-xl ${
-                isVerified
-                  ? "bg-orange-100"
-                  : "bg-red-100"
-              }`}
-            >
-              {isVerified ? (
-                <Truck
-                  size={22}
-                  className="text-orange-500"
-                />
-              ) : (
-                <RotateCcw
-                  size={22}
-                  className="text-red-500"
-                />
-              )}
-            </div>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-neutral-900">
+              {isVerified
+                ? "จัดส่งสินค้าให้ผู้ซื้อ"
+                : "คืนสินค้าให้ผู้ขาย"}
+            </h1>
 
-            <div>
-              <h1 className="text-xl font-semibold text-neutral-900">
-                {isVerified
-                  ? "จัดส่งสินค้าให้ผู้ซื้อ"
-                  : "คืนสินค้าให้ผู้ขาย"}
-              </h1>
-
-              <p className="mt-1 text-xs text-neutral-500">
-                {order.orderNumber}
-              </p>
-            </div>
+            <p className="mt-1 text-sm text-neutral-500">
+              {order.orderNumber}
+            </p>
           </div>
 
-          <StatusBadge status={order.status} />
+          <StatusBadge
+            status={order.status}
+          />
         </div>
 
-        <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
-          {/* ================= LEFT ================= */}
-          <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_420px]">
+          {/* ======================
+              LEFT
+          ======================= */}
+          <div className="space-y-5">
             {/* ORDER */}
-            <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <div className="mb-4 flex items-center gap-2 border-b border-neutral-100 pb-3">
-                <ClipboardCheck size={18} />
-
-                <h2 className="text-sm font-semibold text-neutral-900">
-                  ข้อมูลออเดอร์
-                </h2>
-              </div>
-
-              <div className="grid gap-x-12 gap-y-4 md:grid-cols-2">
+            <Card
+              title="ข้อมูลออเดอร์"
+              icon={Package}
+            >
+              <InfoGrid>
                 <Info
-                  label="เลขที่ออเดอร์"
+                  label="Order Number"
                   value={order.orderNumber}
                 />
 
                 <Info
                   label="ราคาซื้อขาย"
-                  value={formatPrice(order.agreedPrice)}
+                  value={formatPrice(
+                    order.agreedPrice,
+                  )}
                 />
 
                 <Info
-                  label="วันที่สร้างออเดอร์"
-                  value={formatDate(order.createdAt)}
+                  label="สถานะ"
+                  value={
+                    isVerified
+                      ? "ผ่านการตรวจ"
+                      : "ไม่ผ่านการตรวจ"
+                  }
                 />
 
-                <div>
-                  <p className="text-xs text-neutral-400">
-                    สถานะ
-                  </p>
-
-                  <div className="mt-1.5">
-                    <StatusBadge status={order.status} />
-                  </div>
-                </div>
-              </div>
-            </section>
+                <Info
+                  label="วันที่สร้าง"
+                  value={formatDate(
+                    order.createdAt,
+                  )}
+                />
+              </InfoGrid>
+            </Card>
 
             {/* BUYER */}
             {isVerified && (
-              <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-                <div className="mb-4 flex items-center gap-2 border-b border-neutral-100 pb-3">
-                  <UserRound size={18} />
-
-                  <h2 className="text-sm font-semibold text-neutral-900">
-                    ข้อมูลผู้ซื้อ
-                  </h2>
-                </div>
-
-                <div className="grid gap-x-12 gap-y-4 md:grid-cols-2">
+              <Card
+                title="ข้อมูลผู้ซื้อ"
+                icon={UserRound}
+              >
+                <InfoGrid>
                   <Info
                     label="ชื่อผู้ซื้อ"
                     value={buyerName}
@@ -271,37 +276,38 @@ function ShippingDetail() {
                   <Info
                     label="ชื่อผู้รับ"
                     value={
-                      order.deliveryAddress?.recipientName
+                      order.deliveryAddress
+                        ?.recipientName
                     }
                   />
 
                   <Info
                     label="เบอร์โทรศัพท์"
-                    value={order.deliveryAddress?.phone}
+                    value={
+                      order.deliveryAddress
+                        ?.phone
+                    }
                   />
 
-                  <div className="md:col-span-2">
-                    <Info
-                      label="ที่อยู่จัดส่ง"
-                      value={order.deliveryAddress?.address}
-                    />
-                  </div>
-                </div>
-              </section>
+                  <Info
+                    label="ที่อยู่จัดส่ง"
+                    value={
+                      order.deliveryAddress
+                        ?.address
+                    }
+                    full
+                  />
+                </InfoGrid>
+              </Card>
             )}
 
             {/* SELLER */}
             {isRejected && (
-              <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-                <div className="mb-4 flex items-center gap-2 border-b border-neutral-100 pb-3">
-                  <UserRound size={18} />
-
-                  <h2 className="text-sm font-semibold text-neutral-900">
-                    ข้อมูลผู้ขาย
-                  </h2>
-                </div>
-
-                <div className="grid gap-x-12 gap-y-4 md:grid-cols-2">
+              <Card
+                title="ข้อมูลผู้ขาย"
+                icon={UserRound}
+              >
+                <InfoGrid>
                   <Info
                     label="ชื่อผู้ขาย"
                     value={sellerName}
@@ -317,37 +323,35 @@ function ShippingDetail() {
                     value={seller?.phone}
                   />
 
-                  <div className="md:col-span-2">
-                    <Info
-                      label="ที่อยู่สำหรับคืนสินค้า"
-                      value={seller?.address}
-                    />
-                  </div>
-                </div>
-              </section>
+                  <Info
+                    label="ที่อยู่สำหรับคืนสินค้า"
+                    value={seller?.address}
+                    full
+                  />
+                </InfoGrid>
+              </Card>
             )}
 
             {/* PRODUCT */}
-            <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <div className="mb-4 flex items-center gap-2 border-b border-neutral-100 pb-3">
-                <Package size={18} />
-
-                <h2 className="text-sm font-semibold text-neutral-900">
-                  ข้อมูลสินค้า
-                </h2>
-              </div>
-
-              <div className="grid gap-5 md:grid-cols-[190px_1fr]">
-                {/* COVER */}
-                <div className="overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
-                  {coverImage ? (
+            <Card
+              title="ข้อมูลสินค้า"
+              icon={Package}
+            >
+              <div className="flex flex-col gap-5 md:flex-row">
+                <div className="h-40 w-40 shrink-0 overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100">
+                  {coverImage?.imageUrl ? (
                     <img
-                      src={coverImage}
-                      alt={listing?.title || "Product"}
-                      className="aspect-[4/3] h-full w-full object-cover"
+                      src={
+                        coverImage.imageUrl
+                      }
+                      alt={
+                        listing?.title ||
+                        "Product"
+                      }
+                      className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="flex aspect-[4/3] items-center justify-center">
+                    <div className="flex h-full items-center justify-center">
                       <ImageIcon
                         size={32}
                         className="text-neutral-300"
@@ -356,20 +360,19 @@ function ShippingDetail() {
                   )}
                 </div>
 
-                {/* PRODUCT DATA */}
-                <div>
-                  <h3 className="text-base font-semibold text-neutral-900">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-neutral-900">
                     {listing?.title || "-"}
                   </h3>
 
-                  <p className="mt-1 text-xs text-neutral-400">
+                  <p className="mt-1 text-sm text-neutral-500">
                     {listing?.brand || "-"}
                     {listing?.category?.name
                       ? ` • ${listing.category.name}`
                       : ""}
                   </p>
 
-                  <div className="mt-5 grid gap-x-10 gap-y-4 sm:grid-cols-2">
+                  <div className="mt-5 grid grid-cols-2 gap-4">
                     <Info
                       label="Brand"
                       value={listing?.brand}
@@ -382,7 +385,10 @@ function ShippingDetail() {
 
                     <Info
                       label="Category"
-                      value={listing?.category?.name}
+                      value={
+                        listing?.category
+                          ?.name
+                      }
                     />
 
                     <Info
@@ -393,7 +399,7 @@ function ShippingDetail() {
                     />
 
                     <Info
-                      label="สภาพก่อนตรวจ"
+                      label="สภาพที่ประเมิน"
                       value={
                         listing?.estimatedCondition
                       }
@@ -402,7 +408,7 @@ function ShippingDetail() {
                     {isVerified && (
                       <>
                         <Info
-                          label="สภาพหลังตรวจ"
+                          label="สภาพที่ตรวจสอบ"
                           value={
                             order.inspection
                               ?.verifiedCondition
@@ -410,73 +416,67 @@ function ShippingDetail() {
                         />
 
                         <Info
-                          label="คะแนนสภาพสินค้า"
+                          label="คะแนน"
                           value={
                             order.inspection
-                              ?.verifiedScore ?? "-"
+                              ?.verifiedScore !==
+                            null
+                              ? `${order.inspection?.verifiedScore}/100`
+                              : "-"
                           }
                         />
                       </>
                     )}
 
                     <Info
-                      label="สถานที่สินค้า"
-                      value={listing?.location}
+                      label="สถานที่"
+                      value={
+                        listing?.location
+                      }
                     />
                   </div>
+
+                  {listing?.description && (
+                    <div className="mt-5">
+                      <p className="text-xs font-medium text-neutral-400">
+                        รายละเอียดสินค้า
+                      </p>
+
+                      <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-neutral-700">
+                        {
+                          listing.description
+                        }
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {listing?.description && (
-                <div className="mt-5 border-t border-neutral-100 pt-4">
-                  <p className="text-xs font-semibold text-neutral-700">
-                    รายละเอียดสินค้า
-                  </p>
-
-                  <p className="mt-2 text-xs leading-5 text-neutral-500">
-                    {listing.description}
-                  </p>
-                </div>
-              )}
-            </section>
+            </Card>
 
             {/* IMAGES */}
-            <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-              <div className="mb-4 flex items-center gap-2 border-b border-neutral-100 pb-3">
-                <ImageIcon size={18} />
-
-                <h2 className="text-sm font-semibold text-neutral-900">
-                  รูปภาพสินค้าทั้งหมด
-                </h2>
-
-                <span className="text-xs text-neutral-400">
-                  ({images.length} รูป)
-                </span>
-              </div>
-
+            <Card
+              title="รูปภาพสินค้า"
+              icon={ImageIcon}
+            >
               {images.length === 0 ? (
-                <div className="flex h-28 items-center justify-center rounded-xl bg-neutral-50">
-                  <span className="text-sm text-neutral-400">
-                    ไม่มีรูปภาพสินค้า
-                  </span>
-                </div>
+                <p className="text-sm text-neutral-400">
+                  ไม่มีรูปภาพสินค้า
+                </p>
               ) : (
                 <div className="flex flex-wrap gap-3">
-                  {images.map((image, index) => (
+                  {images.map((image) => (
                     <div
-                      key={image.id ?? index}
+                      key={image.id}
                       className="relative h-28 w-28 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100"
                     >
                       <img
                         src={image.imageUrl}
-                        alt={`${listing?.title || "Product"} ${
-                          index + 1
-                        }`}
+                        alt="Product"
                         className="h-full w-full object-cover"
                       />
 
                       {image.isCover && (
-                        <span className="absolute bottom-1.5 left-1.5 rounded-md bg-orange-500 px-2 py-1 text-[10px] font-semibold text-white">
+                        <span className="absolute bottom-2 left-2 rounded-md bg-orange-500 px-2 py-1 text-[10px] font-semibold text-white">
                           รูปปก
                         </span>
                       )}
@@ -484,211 +484,251 @@ function ShippingDetail() {
                   ))}
                 </div>
               )}
-            </section>
+            </Card>
           </div>
 
-          {/* ================= RIGHT ================= */}
-          <form
-            onSubmit={handleSubmit}
-            className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm xl:sticky xl:top-6"
-          >
-            {/* FORM HEADER */}
-            <div className="flex items-center gap-2 border-b border-neutral-100 pb-4">
-              {isVerified ? (
-                <Truck
-                  size={19}
-                  className="text-orange-500"
-                />
-              ) : (
-                <RotateCcw
-                  size={19}
-                  className="text-red-500"
-                />
-              )}
-
-              <h2 className="text-sm font-semibold text-neutral-900">
+          {/* ======================
+              RIGHT
+          ======================= */}
+          <div>
+            <form
+              onSubmit={handleSubmit}
+              className="sticky top-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm"
+            >
+              <h2 className="text-lg font-semibold text-neutral-900">
                 {isVerified
                   ? "ข้อมูลการจัดส่ง"
                   : "ข้อมูลการคืนสินค้า"}
               </h2>
-            </div>
 
-            {/* CARRIER */}
-            <div className="mt-5">
-              <label className="text-sm font-medium text-neutral-800">
-                บริษัทขนส่ง
-                <span className="ml-1 text-red-500">
-                  *
-                </span>
-              </label>
-
-              <select
-                name="carrier"
-                value={form.carrier}
-                onChange={handleChange}
-                required
-                className={`mt-2 h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-sm outline-none transition ${
-                  isVerified
-                    ? "focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
-                    : "focus:border-red-400 focus:ring-2 focus:ring-red-100"
-                }`}
-              >
-                <option value="">
-                  เลือกบริษัทขนส่ง
-                </option>
-
-                {THAI_CARRIERS.map((carrier) => (
-                  <option
-                    key={carrier}
-                    value={carrier}
-                  >
-                    {carrier}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* TRACKING */}
-            <div className="mt-5">
-              <label className="text-sm font-medium text-neutral-800">
-                เลขพัสดุ
-                <span className="ml-1 text-red-500">
-                  *
-                </span>
-              </label>
-
-              <textarea
-                name="trackingNumber"
-                value={form.trackingNumber}
-                onChange={handleChange}
-                required
-                minLength={isVerified ? 5 : 3}
-                maxLength={isVerified ? 100 : 150}
-                rows={3}
-                placeholder="เช่น TH123456789"
-                className={`mt-2 w-full resize-none rounded-xl border border-neutral-200 p-3 text-sm outline-none transition placeholder:text-neutral-400 ${
-                  isVerified
-                    ? "focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
-                    : "focus:border-red-400 focus:ring-2 focus:ring-red-100"
-                }`}
-              />
-
-              <p className="mt-1 text-right text-xs text-neutral-400">
-                {form.trackingNumber.length}/
-                {isVerified ? 100 : 150}
+              <p className="mt-1 text-xs text-neutral-500">
+                {isVerified
+                  ? "กรอกข้อมูลพัสดุสำหรับจัดส่งให้ผู้ซื้อ"
+                  : "กรอกข้อมูลพัสดุสำหรับส่งคืนให้ผู้ขาย"}
               </p>
-            </div>
 
-            {/* 
-              แสดงหมายเหตุเฉพาะ REJECTED เท่านั้น
-              และเป็นข้อมูลจากที่ Admin กรอกตอนตรวจสินค้า
-            */}
-            {isRejected && (
-              <div className="mt-5 rounded-xl border border-red-100 bg-red-50 p-4">
-                <p className="text-sm font-semibold text-red-600">
-                  หมายเหตุจากการตรวจสินค้า
-                </p>
+              {/* CARRIER */}
+              <div className="mt-6">
+                <label className="mb-2 block text-sm font-medium text-neutral-700">
+                  บริษัทขนส่ง
+                </label>
 
-                <p className="mt-1 text-xs text-red-400">
-                  หมายเหตุที่ Admin ระบุไว้ตอนตรวจสินค้า
-                </p>
+                <select
+                  name="carrier"
+                  value={form.carrier}
+                  onChange={handleChange}
+                  required
+                  className="h-11 w-full rounded-xl border border-neutral-200 bg-white px-4 text-sm text-neutral-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                >
+                  <option value="">
+                    เลือกบริษัทขนส่ง
+                  </option>
 
-                <div className="mt-3 min-h-24 rounded-lg border border-red-100 bg-white p-3">
-                  <p className="whitespace-pre-wrap text-sm leading-6 text-neutral-700">
-                    {order.inspection?.notes ||
-                      "ไม่มีหมายเหตุ"}
+                  {THAI_CARRIERS.map(
+                    (carrier) => (
+                      <option
+                        key={carrier}
+                        value={carrier}
+                      >
+                        {carrier}
+                      </option>
+                    ),
+                  )}
+                </select>
+              </div>
+
+              {/* TRACKING */}
+              <div className="mt-5">
+                <label className="mb-2 block text-sm font-medium text-neutral-700">
+                  Tracking Number
+                </label>
+
+                <textarea
+                  name="trackingNumber"
+                  value={
+                    form.trackingNumber
+                  }
+                  onChange={handleChange}
+                  required
+                  minLength={
+                    isVerified ? 5 : 3
+                  }
+                  maxLength={
+                    isVerified
+                      ? 100
+                      : 150
+                  }
+                  rows={3}
+                  placeholder="เช่น TH123456789"
+                  className="w-full resize-none rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 outline-none transition placeholder:text-neutral-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                />
+              </div>
+
+              {/* FAILED INSPECTION NOTE */}
+              {isRejected && (
+                <div className="mt-5 rounded-xl border border-red-100 bg-red-50 p-4">
+                  <p className="text-sm font-semibold text-red-600">
+                    หมายเหตุจากการตรวจสินค้า
                   </p>
+
+                  <p className="mt-1 text-xs text-red-400">
+                    หมายเหตุที่ Admin
+                    ระบุไว้ตอนตรวจสินค้า
+                  </p>
+
+                  <div className="mt-3 min-h-24 rounded-lg border border-red-100 bg-white p-3">
+                    <p className="whitespace-pre-wrap text-sm leading-6 text-neutral-700">
+                      {order.inspection
+                        ?.notes ||
+                        "ไม่มีหมายเหตุ"}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* DESTINATION */}
+              <div className="mt-5 rounded-xl bg-neutral-50 p-4">
+                <div className="flex gap-3">
+                  <MapPin
+                    size={18}
+                    className={
+                      isVerified
+                        ? "mt-0.5 shrink-0 text-orange-500"
+                        : "mt-0.5 shrink-0 text-red-500"
+                    }
+                  />
+
+                  <div>
+                    <p className="text-sm font-semibold text-neutral-800">
+                      {isVerified
+                        ? "จัดส่งไปยัง"
+                        : "ส่งคืนไปยัง"}
+                    </p>
+
+                    <p className="mt-2 text-sm font-medium text-neutral-700">
+                      {isVerified
+                        ? order
+                            .deliveryAddress
+                            ?.recipientName ||
+                          buyerName ||
+                          "-"
+                        : sellerName ||
+                          "-"}
+                    </p>
+
+                    <p className="mt-1 text-xs leading-5 text-neutral-500">
+                      {isVerified
+                        ? order
+                            .deliveryAddress
+                            ?.address ||
+                          "-"
+                        : seller?.address ||
+                          "-"}
+                    </p>
+
+                    <p className="mt-1 text-xs text-neutral-500">
+                      {isVerified
+                        ? order
+                            .deliveryAddress
+                            ?.phone ||
+                          "-"
+                        : seller?.phone ||
+                          "-"}
+                    </p>
+                  </div>
                 </div>
               </div>
-            )}
 
-            {/* DESTINATION */}
-            <div className="mt-5 rounded-xl bg-neutral-50 p-4">
-              <div className="mb-2 flex items-center gap-2">
-                <MapPin
-                  size={15}
-                  className="text-neutral-500"
-                />
+              {/* ACTION */}
+              <div className="mt-6 flex gap-3">
+                <button
+                  type="button"
+                  disabled={isPending}
+                  onClick={() =>
+                    navigate(
+                      "/admin/orders/ready-to-ship",
+                    )
+                  }
+                  className="flex-1 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-600 transition hover:bg-neutral-50 disabled:opacity-50"
+                >
+                  ยกเลิก
+                </button>
 
-                <p className="text-xs font-semibold text-neutral-600">
-                  {isVerified
-                    ? "ปลายทางผู้ซื้อ"
-                    : "ปลายทางผู้ขาย"}
-                </p>
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className={`flex-1 rounded-xl px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                    isVerified
+                      ? "bg-orange-500 hover:bg-orange-600"
+                      : "bg-red-500 hover:bg-red-600"
+                  }`}
+                >
+                  {isPending
+                    ? "กำลังดำเนินการ..."
+                    : isVerified
+                      ? "ยืนยันการจัดส่ง"
+                      : "ยืนยันคืนสินค้า"}
+                </button>
               </div>
-
-              {isVerified ? (
-                <>
-                  <p className="text-sm font-semibold text-neutral-900">
-                    {order.deliveryAddress
-                      ?.recipientName || buyerName}
-                  </p>
-
-                  <p className="mt-1 text-xs text-neutral-500">
-                    {order.deliveryAddress?.phone ||
-                      "-"}
-                  </p>
-
-                  <p className="mt-1 text-xs leading-5 text-neutral-500">
-                    {order.deliveryAddress?.address ||
-                      "-"}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm font-semibold text-neutral-900">
-                    {sellerName}
-                  </p>
-
-                  <p className="mt-1 text-xs text-neutral-500">
-                    {seller?.phone || "-"}
-                  </p>
-
-                  <p className="mt-1 text-xs leading-5 text-neutral-500">
-                    {seller?.address || "-"}
-                  </p>
-                </>
-              )}
-            </div>
-
-            {/* ACTION */}
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() =>
-                  navigate(
-                    "/admin/orders/ready-to-ship",
-                  )
-                }
-                disabled={isPending}
-                className="rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                ยกเลิก
-              </button>
-
-              <button
-                type="submit"
-                disabled={
-                  isPending ||
-                  !form.carrier ||
-                  !form.trackingNumber.trim()
-                }
-                className={`rounded-xl px-4 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                  isVerified
-                    ? "bg-orange-500 hover:bg-orange-600"
-                    : "bg-red-500 hover:bg-red-600"
-                }`}
-              >
-                {isPending
-                  ? "กำลังบันทึก..."
-                  : isVerified
-                    ? "ยืนยันการจัดส่ง"
-                    : "ยืนยันคืนสินค้า"}
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function Card({
+  title,
+  icon: Icon,
+  children,
+}) {
+  return (
+    <section className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="mb-5 flex items-center gap-2">
+        {Icon && (
+          <Icon
+            size={18}
+            className="text-orange-500"
+          />
+        )}
+
+        <h2 className="text-base font-semibold text-neutral-900">
+          {title}
+        </h2>
+      </div>
+
+      {children}
+    </section>
+  );
+}
+
+function InfoGrid({ children }) {
+  return (
+    <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+      {children}
+    </div>
+  );
+}
+
+function Info({
+  label,
+  value,
+  full = false,
+}) {
+  return (
+    <div
+      className={
+        full ? "sm:col-span-2" : ""
+      }
+    >
+      <p className="text-xs font-medium text-neutral-400">
+        {label}
+      </p>
+
+      <p className="mt-1 break-words text-sm font-medium text-neutral-800">
+        {value || "-"}
+      </p>
     </div>
   );
 }
@@ -696,7 +736,7 @@ function ShippingDetail() {
 function StatusBadge({ status }) {
   if (status === "VERIFIED") {
     return (
-      <span className="inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+      <span className="rounded-full bg-green-100 px-4 py-2 text-xs font-semibold text-green-700">
         ผ่านการตรวจ
       </span>
     );
@@ -704,30 +744,16 @@ function StatusBadge({ status }) {
 
   if (status === "REJECTED") {
     return (
-      <span className="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-600">
+      <span className="rounded-full bg-red-100 px-4 py-2 text-xs font-semibold text-red-600">
         ไม่ผ่านการตรวจ
       </span>
     );
   }
 
   return (
-    <span className="inline-flex rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-600">
+    <span className="rounded-full bg-neutral-100 px-4 py-2 text-xs font-semibold text-neutral-600">
       {status}
     </span>
-  );
-}
-
-function Info({ label, value }) {
-  return (
-    <div>
-      <p className="text-xs text-neutral-400">
-        {label}
-      </p>
-
-      <p className="mt-1 break-words text-sm font-medium text-neutral-900">
-        {value ?? "-"}
-      </p>
-    </div>
   );
 }
 
