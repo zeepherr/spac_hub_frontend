@@ -213,7 +213,7 @@ function AdminChats() {
               ) : filteredSupportCases.length === 0 ? (
                 <EmptyQueue />
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {filteredSupportCases.map((supportCase) => (
                     <SupportCaseListItem
                       key={supportCase.id}
@@ -355,9 +355,6 @@ function SupportCaseListItem({
 
   const issueLabel = formatEnumLabel(supportCase.issueType);
 
-  const orderNumber =
-    supportCase.order?.orderNumber || `Order #${supportCase.orderId}`;
-
   const latestActivity = latestMessage?.createdAt || supportCase.updatedAt;
 
   return (
@@ -366,122 +363,96 @@ function SupportCaseListItem({
       onClick={onSelect}
       aria-pressed={isSelected}
       className={[
-        "group relative w-full cursor-pointer overflow-hidden rounded-2xl border text-left transition-all duration-200",
+        "group relative w-full rounded-xl border p-2.5 text-left transition-all duration-200",
         isSelected
           ? "border-orange-300 bg-orange-50/80 shadow-sm"
           : hasUnread
-            ? "border-orange-200 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:border-orange-300 hover:bg-orange-50/40"
-            : "border-neutral-200/80 bg-white hover:border-neutral-300 hover:bg-neutral-50/70",
+            ? "border-orange-200 bg-white hover:bg-orange-50/40"
+            : "border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/70",
       ].join(" ")}
     >
-      {isSelected && (
-        <span className="absolute inset-y-3 left-0 w-1 rounded-r-full bg-orange-500" />
-      )}
-
-      <div className="flex gap-3 p-3">
+      <div className="flex gap-3">
         {/* Product image */}
-        <div className="relative size-20 shrink-0 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
+        <div className="relative size-16 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100">
           {productImage ? (
             <img
               src={productImage}
               alt={productTitle}
-              className="size-full object-cover transition-transform duration-200 group-hover:scale-[1.03]"
+              className="size-full object-cover"
             />
           ) : (
             <div className="flex size-full items-center justify-center text-neutral-400">
-              <PackageSearch size={24} />
+              <PackageSearch size={20} />
             </div>
           )}
 
           {hasUnread && (
-            <span className="absolute right-1.5 top-1.5 flex size-3">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-orange-400 opacity-60" />
-              <span className="relative inline-flex size-3 rounded-full border-2 border-white bg-orange-500" />
-            </span>
+            <span className="absolute right-1 top-1 size-2.5 rounded-full border-2 border-white bg-orange-500" />
           )}
         </div>
 
-        {/* Main information */}
+        {/* Content */}
         <div className="min-w-0 flex-1">
           {/* Product + status */}
           <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p
-                className={[
-                  "truncate text-sm text-neutral-900",
-                  hasUnread ? "font-bold" : "font-semibold",
-                ].join(" ")}
-              >
-                {productTitle}
-              </p>
-
-              <p className="mt-0.5 truncate text-[11px] font-medium text-neutral-400">
-                {orderNumber}
-              </p>
-            </div>
+            <p
+              className={[
+                "truncate text-sm text-neutral-900",
+                hasUnread ? "font-bold" : "font-semibold",
+              ].join(" ")}
+            >
+              {productTitle}
+            </p>
 
             <span
-              className={`shrink-0 rounded-full px-2 py-1 text-[10px] font-bold ${statusMeta.className}`}
+              className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${statusMeta.className}`}
             >
               {statusMeta.label}
             </span>
           </div>
 
-          {/* Case + opener role */}
-          <div className="mt-2 flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-medium text-neutral-400">
-              Case #{supportCase.id}
-            </span>
+          {/* User + role */}
+          <div className="mt-1 flex min-w-0 items-center gap-1.5">
+            <p className="truncate text-xs font-medium text-neutral-700">
+              {openedByName}
+            </p>
 
-            <span className="size-1 rounded-full bg-neutral-300" />
-
-            <span className="inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold text-neutral-600">
-              <UserRound size={11} />
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-500">
+              <UserRound size={10} />
               {openedByRole}
             </span>
           </div>
 
-          {/* User */}
-          <p className="mt-2 truncate text-xs font-semibold text-neutral-700">
-            {openedByName}
+          {/* Case + issue */}
+          <p className="mt-1 truncate text-[11px] text-neutral-500">
+            <span className="font-medium">Case #{supportCase.id}</span>
+            <span className="mx-1 text-neutral-300">•</span>
+            <span className={hasUnread ? "font-medium text-orange-600" : ""}>
+              {issueLabel}
+            </span>
           </p>
 
-          {/* Issue */}
-          <p className="mt-0.5 truncate text-xs font-medium text-orange-600">
-            {issueLabel}
-          </p>
+          {/* Latest message + time */}
+          <div className="mt-1.5 flex items-center justify-between gap-3">
+            <p
+              className={[
+                "min-w-0 flex-1 truncate text-[11px]",
+                hasUnread
+                  ? "font-semibold text-neutral-700"
+                  : "text-neutral-400",
+              ].join(" ")}
+            >
+              {latestMessage?.content || "No messages yet"}
+            </p>
 
-          {/* Latest message */}
-          <p
-            className={[
-              "mt-1.5 line-clamp-1 text-xs leading-5",
-              hasUnread
-                ? "font-semibold text-neutral-700"
-                : "font-normal text-neutral-500",
-            ].join(" ")}
-          >
-            {latestMessage?.content || "No messages yet"}
-          </p>
-
-          {/* Footer */}
-          <div className="mt-2 flex items-center justify-between gap-3">
-            <time className="text-[10px] font-medium text-neutral-400">
-              {formatCaseDate(latestActivity)}
-            </time>
-
-            <div className="flex items-center gap-2">
-              {hasUnread && (
-                <span className="rounded-full bg-orange-500 px-2 py-0.5 text-[10px] font-bold text-white">
-                  New
-                </span>
-              )}
+            <div className="flex shrink-0 items-center gap-1.5">
+              <time className="text-[10px] text-neutral-400">
+                {formatCaseDate(latestActivity)}
+              </time>
 
               <ChevronRight
-                size={16}
-                className={[
-                  "shrink-0 transition-transform duration-200 group-hover:translate-x-0.5",
-                  isSelected ? "text-orange-500" : "text-neutral-300",
-                ].join(" ")}
+                size={14}
+                className={isSelected ? "text-orange-500" : "text-neutral-300"}
               />
             </div>
           </div>
@@ -490,7 +461,6 @@ function SupportCaseListItem({
     </button>
   );
 }
-
 function SupportCaseStatusControl({ supportCase }) {
   const [status, setStatus] = useState(supportCase.status);
 

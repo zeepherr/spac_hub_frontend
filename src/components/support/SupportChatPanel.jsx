@@ -586,19 +586,33 @@ function MessageBubble({ message, supportCase, currentUserId }) {
 }
 
 function ConnectionStatus({ isConnected, isJoined }) {
-  if (isConnected && isJoined) {
-    return (
-      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600">
-        <Wifi size={14} />
-        Connected
-      </span>
-    );
-  }
+  const connected = isConnected && isJoined;
 
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-400">
-      <LoaderCircle size={14} className="animate-spin" />
-      Connecting
+    <span
+      className={`inline-flex items-center gap-1.5 text-xs font-medium ${
+        connected ? "text-emerald-600" : "text-neutral-400"
+      }`}
+    >
+      {/* Keep both icons mounted.
+          Only change visibility instead of replacing DOM nodes. */}
+      <span className="relative size-3.5 shrink-0">
+        <Wifi
+          size={14}
+          className={`absolute inset-0 transition-opacity ${
+            connected ? "opacity-100" : "opacity-0"
+          }`}
+        />
+
+        <LoaderCircle
+          size={14}
+          className={`absolute inset-0 transition-opacity ${
+            connected ? "opacity-0" : "animate-spin opacity-100"
+          }`}
+        />
+      </span>
+
+      <span>{connected ? "Connected" : "Connecting"}</span>
     </span>
   );
 }
