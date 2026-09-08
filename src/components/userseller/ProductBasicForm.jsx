@@ -47,8 +47,20 @@ export default function ProductBasicForm({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // 👈 บล็อกไม่ให้กด/พิมพ์ตัวเลขเกิน 9 หลัก หรือ เกิน 999,999,999 ในช่อง Price
+    if (name === "price") {
+      if (value !== "" && Number(value) > 999999999) {
+        return; // ไม่ตัดค่า และไม่อัปเดต state หากพิมพ์เกิน
+      }
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
+
+    // เคลียร์ error ทันทีเมื่อผู้ใช้เริ่มพิมพ์แก้ไข
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
+    }
   };
 
   const handleSelectCategory = (category) => {
@@ -93,22 +105,19 @@ export default function ProductBasicForm({
   const handleFormSubmit = (e) => {
     if (e && e.preventDefault) e.preventDefault();
 
-    const payloadToValidate = {
-      ...formData,
-      categoryId: formData.categoryId ? Number(formData.categoryId) : undefined,
-      price: formData.price !== "" && formData.price !== undefined ? Number(formData.price) : undefined,
-    };
-
-    const result = createListingSchema.safeParse(payloadToValidate);
+    // Safe parsing payload
+    const result = createListingSchema.safeParse(formData);
 
     if (!result.success) {
       const formattedErrors = {};
       result.error.issues.forEach((issue) => {
         const fieldName = issue.path[0];
-        formattedErrors[fieldName] = issue.message;
+        if (!formattedErrors[fieldName]) {
+          formattedErrors[fieldName] = issue.message;
+        }
       });
       setErrors(formattedErrors);
-      notify("Please check the form for errors", "warning");
+      notify("Please fill in all required fields correctly", "warning");
       return;
     }
 
@@ -203,9 +212,9 @@ export default function ProductBasicForm({
             value={formData.title || ""} 
             onChange={handleChange} 
             placeholder="e.g. NVIDIA RTX 4090 Founders Edition" 
-            className={`input w-full rounded-field ${errors.title ? "border-error" : ""}`} 
+            className={`input w-full rounded-field ${errors.title ? "border-error focus:border-error" : ""}`} 
           />
-          {errors.title && <span className="text-xs text-error mt-1">{errors.title}</span>}
+          {errors.title && <span className="text-xs text-error mt-1 font-medium">{errors.title}</span>}
         </div>
 
         {/* หมวดหมู่ & แบรนด์ */}
@@ -218,7 +227,9 @@ export default function ProductBasicForm({
               type="button"
               disabled={isAiLoading || loading}
               onClick={() => setIsCategoryModalOpen(true)}
-              className={`w-full h-12 px-4 rounded-field border bg-base-100 hover:bg-base-200/60 flex items-center justify-between text-left ${errors.categoryId ? "border-error" : "border-base-300"}`}
+              className={`w-full h-12 px-4 rounded-field border bg-base-100 hover:bg-base-200/60 flex items-center justify-between text-left transition-colors ${
+                errors.categoryId ? "border-error focus:border-error" : "border-base-300"
+              }`}
             >
               <div className="flex items-center gap-2.5 overflow-hidden">
                 <Layers className="w-4 h-4 text-accent shrink-0" />
@@ -228,7 +239,7 @@ export default function ProductBasicForm({
               </div>
               <ChevronRight className="w-4 h-4 text-base-content/70 shrink-0" />
             </button>
-            {errors.categoryId && <span className="text-xs text-error mt-1">{errors.categoryId}</span>}
+            {errors.categoryId && <span className="text-xs text-error mt-1 font-medium">{errors.categoryId}</span>}
           </div>
 
           <div className="form-control w-full">
@@ -242,9 +253,9 @@ export default function ProductBasicForm({
               value={formData.brand || ""} 
               onChange={handleChange} 
               placeholder="NVIDIA, ASUS, MSI..." 
-              className={`input w-full rounded-field ${errors.brand ? "border-error" : ""}`} 
+              className={`input w-full rounded-field ${errors.brand ? "border-error focus:border-error" : ""}`} 
             />
-            {errors.brand && <span className="text-xs text-error mt-1">{errors.brand}</span>}
+            {errors.brand && <span className="text-xs text-error mt-1 font-medium">{errors.brand}</span>}
           </div>
         </div>
 
@@ -261,9 +272,9 @@ export default function ProductBasicForm({
               value={formData.model || ""} 
               onChange={handleChange} 
               placeholder="RTX 4090" 
-              className={`input w-full rounded-field ${errors.model ? "border-error" : ""}`} 
+              className={`input w-full rounded-field ${errors.model ? "border-error focus:border-error" : ""}`} 
             />
-            {errors.model && <span className="text-xs text-error mt-1">{errors.model}</span>}
+            {errors.model && <span className="text-xs text-error mt-1 font-medium">{errors.model}</span>}
           </div>
 
           <div className="form-control w-full">
@@ -271,18 +282,20 @@ export default function ProductBasicForm({
               <span className="label-text font-bold text-base-content">Price (THB) <span className="text-error">*</span></span>
             </label>
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold">฿</span>
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-base-content/60">฿</span>
               <input 
                 type="number" 
                 name="price" 
+                min="1"
+                max="999999999" // 👈 กำหนดสูงสุดในระดับ HTML Attribute
                 disabled={isAiLoading || loading}
-                value={formData.price || ""} 
+                value={formData.price ?? ""} 
                 onChange={handleChange} 
                 placeholder="55000" 
-                className={`input w-full pl-8 rounded-field ${errors.price ? "border-error" : ""}`} 
+                className={`input w-full pl-8 rounded-field ${errors.price ? "border-error focus:border-error" : ""}`} 
               />
             </div>
-            {errors.price && <span className="text-xs text-error mt-1">{errors.price}</span>}
+            {errors.price && <span className="text-xs text-error mt-1 font-medium">{errors.price}</span>}
           </div>
         </div>
 
@@ -299,7 +312,7 @@ export default function ProductBasicForm({
             disabled={isAiLoading || loading}
             onClick={() => setIsProvinceModalOpen(true)}
             className={`w-full h-12 px-4 rounded-field border bg-base-100 hover:bg-base-200/60 flex items-center justify-between text-left transition-colors ${
-              errors.location ? "border-error" : "border-base-300 focus:border-accent"
+              errors.location ? "border-error focus:border-error" : "border-base-300 focus:border-accent"
             }`}
           >
             <div className="flex items-center gap-2.5 overflow-hidden">
@@ -325,9 +338,9 @@ export default function ProductBasicForm({
             value={formData.description || ""} 
             onChange={handleChange} 
             placeholder="Specify purchase date, previous usage history, reason for selling..." 
-            className={`textarea w-full rounded-field ${errors.description ? "border-error" : ""}`} 
+            className={`textarea w-full rounded-field ${errors.description ? "border-error focus:border-error" : ""}`} 
           />
-          {errors.description && <span className="text-xs text-error mt-1">{errors.description}</span>}
+          {errors.description && <span className="text-xs text-error mt-1 font-medium">{errors.description}</span>}
         </div>
 
         {/* ปุ่มถัดไป */}
