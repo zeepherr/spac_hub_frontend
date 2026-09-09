@@ -44,7 +44,7 @@ export default function CreateProductPage() {
   
   // Modal States
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
-  const [isConfirmUploadOpen, setIsConfirmUploadOpen] = useState(false); // State สำหรับ Modal เตือนอัปโหลด
+  const [isConfirmUploadOpen, setIsConfirmUploadOpen] = useState(false);
 
   // --- React Query Mutations & Queries ---
   const identifyProductMutation = useIdentifyProduct();
@@ -104,23 +104,24 @@ export default function CreateProductPage() {
 
   // --- AI AUTOFILL HANDLER ---
   const handleAiAutofill = (file) => {
-    if (!file) return;
+    return new Promise((resolve, reject) => {
+      if (!file) return reject("No file provided");
 
-    identifyProductMutation.mutate(file, {
-      onSuccess: (res) => {
-        const aiData = res?.data || res;
-        if (aiData) {
-          setFormData((prev) => ({
-            ...prev,
-            title: aiData.title || prev.title,
-            brand: aiData.brand || prev.brand,
-            model: aiData.model || prev.model,
-            price: aiData.price ? String(aiData.price) : prev.price,
-            description: aiData.description || prev.description,
-            categoryId: aiData.categoryId ? String(aiData.categoryId) : prev.categoryId,
-          }));
-        }
-      },
+      identifyProductMutation.mutate(file, {
+        onSuccess: (res) => {
+          const aiData = res?.data || res;
+          if (aiData?.categoryId) {
+            setFormData((prev) => ({
+              ...prev,
+              categoryId: String(aiData.categoryId),
+            }));
+          }
+          resolve(aiData);
+        },
+        onError: (err) => {
+          reject(err);
+        },
+      });
     });
   };
 
@@ -204,7 +205,7 @@ export default function CreateProductPage() {
     );
   };
 
-  // --- STEP 3 HANDLER: กดเปิด Modal ยืนยันก่อนอัปโหลด ---
+  // --- STEP 3 HANDLER ---
   const handleOpenUploadConfirm = () => {
     if (imageFiles.length === 0) {
       toast.error("กรุณาเลือกรูปภาพสินค้าอย่างน้อย 1 รูป");
@@ -213,7 +214,7 @@ export default function CreateProductPage() {
     setIsConfirmUploadOpen(true);
   };
 
-  // --- STEP 3 SUBMIT: กดยืนยันใน Modal แล้วค่อยทำการอัปโหลดภาพจริง ---
+  // --- STEP 3 SUBMIT ---
   const handleStep3Submit = () => {
     uploadImagesMutation.mutate(
       { listingId, images: imageFiles },
@@ -292,10 +293,12 @@ export default function CreateProductPage() {
         listingId={listingId}
       />
 
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+      {/* 🟢 เปลี่ยนจาก max-w-7xl mx-auto px-4 เป็น w-full px-4 sm:px-6 md:px-8 เพื่อขยายเต็มจอ */}
+      <div className="w-full px-4 sm:px-6 md:px-8">
+        {/* 🟢 ปรับเป็น grid-cols-4 ให้ฝั่ง Form กินพื้นที่ 3 ส่วน และ Sidebar กิน 1 ส่วน */}
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 items-start">
           
-          <div className="xl:col-span-2 space-y-8">
+          <div className="xl:col-span-3 space-y-8">
             
             {/* Step 1: Basic Info */}
             <div ref={step1Ref} className="relative">
