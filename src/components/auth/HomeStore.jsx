@@ -35,7 +35,7 @@ function HeroBanner() {
   const slides = [];
 
   return (
-    <div className="hardware-surface flex h-72 items-center justify-center overflow-hidden">
+    <div className="flex h-64 items-center justify-center rounded-2xl border border-dashed border-neutral-200 bg-neutral-50">
       {slides.length === 0 ? (
         <p className="text-sm text-neutral-400">no banner data available</p>
       ) : (
@@ -54,14 +54,17 @@ function PromoCards() {
   return (
     <div className="flex flex-col gap-4">
       {cards.length === 0 ? (
-        <div className="hardware-surface flex h-72 items-center justify-center">
+        <div className="flex h-64 items-center justify-center rounded-2xl border border-dashed border-neutral-200 bg-neutral-50">
           <p className="text-sm text-neutral-400">
             no promotion data available
           </p>
         </div>
       ) : (
         cards.map((card) => (
-          <div key={card.id} className="hardware-surface p-5">
+          <div
+            key={card.id}
+            className="rounded-2xl border border-neutral-200 bg-white p-5"
+          >
             {/* render promo card */}
           </div>
         ))
@@ -72,21 +75,16 @@ function PromoCards() {
 
 function TrustBar() {
   return (
-    <div className="hardware-surface grid grid-cols-2 divide-x divide-base-300 sm:grid-cols-5">
+    <div className="grid grid-cols-2 gap-y-5 rounded-2xl border border-neutral-200 bg-white px-6 py-6 sm:grid-cols-5 sm:gap-x-4">
       {TRUST_ITEMS.map(({ icon: Icon, title, subtitle }) => (
-        <div
-          key={title}
-          className="flex items-center gap-3 px-4 py-5 first:pl-6"
-        >
+        <div key={title} className="flex items-center gap-3">
           <Icon
-            className="h-8 w-8 shrink-0 text-[#f97316]"
+            className="h-6 w-6 shrink-0 text-[#f97316]"
             strokeWidth={1.75}
           />
           <div className="leading-tight">
-            <p className="text-sm font-bold text-neutral-900">{title}</p>
-            <p className="hardware-label normal-case text-secondary">
-              {subtitle}
-            </p>
+            <p className="text-xs font-semibold text-neutral-900">{title}</p>
+            <p className="text-[11px] text-neutral-500">{subtitle}</p>
           </div>
         </div>
       ))}
@@ -97,14 +95,14 @@ function TrustBar() {
 function ProductSection({ title, products = [], isLoading, isError }) {
   return (
     <section>
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="hardware-label flex items-center gap-2 text-base normal-case text-neutral-900">
-          <span className="h-4 w-1 rounded-full bg-[#f97316]" />
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-sm font-semibold text-neutral-900">
+          <span className="h-3.5 w-1 rounded-full bg-[#f97316]" />
           {title}
         </h2>
         <Link
           to="/products"
-          className="text-sm font-medium text-[#f97316] hover:text-orange-600"
+          className="text-xs font-medium text-neutral-500 hover:text-[#f97316]"
         >
           View All Products &gt;
         </Link>
@@ -115,16 +113,16 @@ function ProductSection({ title, products = [], isLoading, isError }) {
           {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
-              className="hardware-surface aspect-[3/4] animate-pulse bg-neutral-100"
+              className="aspect-[3/4] animate-pulse rounded-2xl border border-neutral-100 bg-neutral-50"
             />
           ))}
         </div>
       ) : isError ? (
-        <div className="hardware-surface flex h-40 items-center justify-center">
+        <div className="flex h-40 items-center justify-center rounded-2xl border border-neutral-100 bg-neutral-50">
           <p className="text-sm text-[#dc2626]">Failed to load products</p>
         </div>
       ) : products.length === 0 ? (
-        <div className="hardware-surface flex h-40 items-center justify-center">
+        <div className="flex h-40 items-center justify-center rounded-2xl border border-neutral-100 bg-neutral-50">
           <p className="text-sm text-neutral-400">No product data available</p>
         </div>
       ) : (
@@ -141,14 +139,14 @@ function ProductSection({ title, products = [], isLoading, isError }) {
 function LatestProductSection({ title, products = [], isLoading, isError }) {
   return (
     <section>
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="hardware-label flex items-center gap-2 text-base normal-case text-neutral-900">
-          <span className="h-4 w-1 rounded-full bg-[#f97316]" />
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-sm font-semibold text-neutral-900">
+          <span className="h-3.5 w-1 rounded-full bg-[#f97316]" />
           {title}
         </h2>
         <Link
           to="/products/lastestProducts"
-          className="text-sm font-medium text-[#f97316] hover:text-orange-600"
+          className="text-xs font-medium text-neutral-500 hover:text-[#f97316]"
         >
           View All Products &gt;
         </Link>
@@ -159,16 +157,16 @@ function LatestProductSection({ title, products = [], isLoading, isError }) {
           {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
-              className="hardware-surface aspect-[3/4] animate-pulse bg-neutral-100"
+              className="aspect-[3/4] animate-pulse rounded-2xl border border-neutral-100 bg-neutral-50"
             />
           ))}
         </div>
       ) : isError ? (
-        <div className="hardware-surface flex h-40 items-center justify-center">
+        <div className="flex h-40 items-center justify-center rounded-2xl border border-neutral-100 bg-neutral-50">
           <p className="text-sm text-[#dc2626]">Failed to load products</p>
         </div>
       ) : products.length === 0 ? (
-        <div className="hardware-surface flex h-40 items-center justify-center">
+        <div className="flex h-40 items-center justify-center rounded-2xl border border-neutral-100 bg-neutral-50">
           <p className="text-sm text-neutral-400">No product data available</p>
         </div>
       ) : (
@@ -187,14 +185,14 @@ function ArticleSection() {
   const articles = [];
 
   return (
-    <div className="hardware-surface p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-neutral-900">
+    <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-neutral-900">
           Articles / Reviews
         </h2>
         <Link
           to="/articles"
-          className="text-xs font-medium text-[#f97316] hover:text-orange-600"
+          className="text-xs font-medium text-neutral-500 hover:text-[#f97316]"
         >
           View All &gt;
         </Link>
@@ -229,8 +227,8 @@ export default function HomeStore() {
   const featured = useMemo(() => pickRandomProducts(listings, 5), [listings]);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-      <div className="flex flex-col gap-6">
+    <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+      <div className="flex flex-col gap-8">
         <HeroBanner />
         <TrustBar />
         <ProductSection
@@ -247,7 +245,7 @@ export default function HomeStore() {
         />
       </div>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PromoCards />
         <ArticleSection />
       </div>

@@ -2,34 +2,19 @@ import { useMyCart } from "@/hook/cart/useMyCart";
 import { useDebounce } from "@/hook/listing/useBounce";
 import { useListingSearch } from "@/hook/listing/useListingSearch";
 import useAuthStore from "@/stores/auth.store";
-// ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง (ผมเดาไว้ที่ @/components/cart/CartFlyAnimationProvider
-// ตาม pattern เดียวกับ CheckoutStep1/CheckoutStep3/CheckoutStepLine)
-import {
-  Cpu,
-  Heart,
-  RefreshCw,
-  Search,
-  ShoppingCart,
-  User,
-  X,
-} from "lucide-react";
+import { Cpu, Search, ShoppingCart, User, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import { useCartFlyAnimation } from "../animation/CartFlyAnimationProvider";
 import { animate } from "motion";
+import { useWebAssets } from "@/hook/webAsset/useWebAssets";
 
 function Logo() {
+  const logo = useWebAssets().data?.homeImageUrl;
+  console.log(logo);
   return (
     <Link to="/" className="flex shrink-0 flex-col items-start">
-      <span className="flex items-center text-2xl font-black tracking-tight">
-        <span className="matte mr-2 flex h-8 w-8 items-center justify-center rounded-lg">
-          <Cpu className="h-5 w-5 text-[#f97316]" strokeWidth={2} />
-        </span>
-        SPEC<span className="text-[#f97316]">HUB</span>
-      </span>
-      <span className="hardware-label ml-10 -mt-1 text-[10px] normal-case text-secondary">
-        Used Tech. Trusted Performance.
-      </span>
+      <img src={logo} alt="SpecHub" className="h-13 w-auto object-contain" />
     </Link>
   );
 }
@@ -106,7 +91,7 @@ function SearchForm() {
     <div ref={searchContainerRef} className="relative w-full max-w-2xl">
       <form
         onSubmit={handleSubmit}
-        className="flex w-full overflow-hidden rounded-full border border-neutral-200 bg-neutral-50"
+        className="flex w-full items-center overflow-hidden rounded-lg border border-neutral-200 bg-white transition focus-within:border-neutral-400"
       >
         <div className="relative min-w-0 flex-1">
           <input
@@ -125,7 +110,7 @@ function SearchForm() {
             }}
             placeholder="Search products, brands, models..."
             autoComplete="off"
-            className="w-full bg-transparent px-5 py-3 pr-10 text-sm text-neutral-800 outline-none placeholder:text-neutral-400"
+            className="w-full bg-transparent px-4 py-2.5 pr-9 text-sm text-neutral-800 outline-none placeholder:text-neutral-400"
           />
 
           {searchTerm && (
@@ -135,7 +120,7 @@ function SearchForm() {
               aria-label="Clear search"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700"
             >
-              <X size={17} />
+              <X size={16} />
             </button>
           )}
         </div>
@@ -143,14 +128,14 @@ function SearchForm() {
         <button
           type="submit"
           aria-label="Search"
-          className="flex w-14 shrink-0 items-center justify-center bg-[#f97316] text-white transition hover:bg-orange-600"
+          className="flex w-11 shrink-0 items-center justify-center text-neutral-400 transition hover:text-[#f97316]"
         >
-          <Search size={20} />
+          <Search size={18} />
         </button>
       </form>
 
       {canShowDropdown && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-xl border border-neutral-200 bg-white p-2 shadow-xl">
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-lg border border-neutral-200 bg-white p-2 shadow-md">
           {isFetching ? (
             <p className="px-3 py-4 text-sm text-neutral-500">Searching...</p>
           ) : isError ? (
@@ -171,9 +156,9 @@ function SearchForm() {
                   key={listing.id}
                   type="button"
                   onClick={() => handleSelectListing(listing.id)}
-                  className="flex w-full items-center gap-3 rounded-lg p-3 text-left transition hover:bg-orange-50"
+                  className="flex w-full items-center gap-3 rounded-md p-2.5 text-left transition hover:bg-neutral-50"
                 >
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-neutral-100">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md bg-neutral-100">
                     {imageUrl ? (
                       <img
                         src={imageUrl}
@@ -181,12 +166,12 @@ function SearchForm() {
                         className="h-full w-full object-contain"
                       />
                     ) : (
-                      <Cpu size={28} className="text-neutral-300" />
+                      <Cpu size={24} className="text-neutral-300" />
                     )}
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-neutral-900">
+                    <p className="truncate text-sm font-medium text-neutral-900">
                       {listing.title}
                     </p>
 
@@ -195,15 +180,9 @@ function SearchForm() {
                         .filter(Boolean)
                         .join(" · ")}
                     </p>
-
-                    {listing.category?.name && (
-                      <p className="mt-1 truncate text-xs text-neutral-400">
-                        {listing.category.name}
-                      </p>
-                    )}
                   </div>
 
-                  <p className="shrink-0 text-sm font-bold text-[#f97316]">
+                  <p className="shrink-0 text-sm font-semibold text-[#f97316]">
                     ฿{price.toLocaleString()}
                   </p>
                 </button>
@@ -217,21 +196,16 @@ function SearchForm() {
 }
 
 const navLinkClass = ({ isActive }) =>
-  `hover:text-[#f97316] ${isActive ? "text-[#f97316]" : "text-neutral-700"}`;
-
-const iconLinkClass = ({ isActive }) =>
-  `flex items-center gap-1.5 hover:text-[#f97316] ${
-    isActive ? "text-[#f97316]" : "text-neutral-700"
-  }`;
+  `hover:text-[#f97316] ${isActive ? "text-[#f97316]" : "text-neutral-500"}`;
 
 function AuthLinks() {
   return (
-    <div className="flex items-center gap-1.5 text-neutral-700">
-      <User size={18} />
+    <div className="flex items-center gap-1.5 text-sm font-medium text-neutral-500">
+      <User size={17} strokeWidth={1.75} />
       <NavLink to="/login" className={navLinkClass}>
-        Sign up
+        Login{" "}
       </NavLink>
-      <span> / </span>
+      <span className="text-neutral-300">/</span>
       <NavLink to="/register" className={navLinkClass}>
         Register
       </NavLink>
@@ -243,17 +217,17 @@ function ProfileLink({ user }) {
   return (
     <NavLink
       to="/user" // TODO: แก้ path ให้ตรงกับ route หน้าโปรไฟล์จริงของคุณ เช่น `/users/${user.id}`
-      className="flex items-center gap-2 text-neutral-700 hover:text-[#f97316]"
+      className="flex items-center gap-2 text-sm font-medium text-neutral-700 hover:text-[#f97316]"
     >
       {user.profileImageUrl ? (
         <img
           src={user.profileImageUrl}
           alt={user.firstName ?? "My Profile "}
-          className="h-8 w-8 rounded-full object-cover ring-2 ring-transparent hover:ring-[#f97316]"
+          className="h-7 w-7 rounded-full object-cover ring-1 ring-transparent hover:ring-[#f97316]"
         />
       ) : (
-        <span className="matte flex h-8 w-8 items-center justify-center rounded-full">
-          <User size={16} className="text-[#f97316]" />
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100">
+          <User size={14} className="text-[#f97316]" />
         </span>
       )}
       <span className="max-w-[100px] truncate">{user.firstName}</span>
@@ -271,8 +245,6 @@ function MainNav() {
 
   const { cartIconRef, cartRingRef } = useCartFlyAnimation();
 
-  // เด้ง (scale bump) ตัวเลขจำนวนสินค้าบน badge ทุกครั้งที่จำนวนเพิ่มขึ้นเทียบกับค่าก่อนหน้า - ใช้ ref
-  // เก็บค่าก่อนหน้าเองแทนการเพิ่ม state ใหม่ เพราะแค่ต้องรู้ว่า "เพิ่มขึ้นไหม" ไม่จำเป็นต้อง re-render เพิ่ม
   const cartBadgeRef = useRef(null);
   const previousCartCountRef = useRef(cartCount);
 
@@ -288,12 +260,12 @@ function MainNav() {
   }, [cartCount]);
 
   return (
-    <nav className="flex shrink-0 items-center gap-6 whitespace-nowrap text-sm font-semibold">
+    <nav className="flex shrink-0 items-center gap-5 whitespace-nowrap text-sm font-medium">
       <NavLink
         to={user ? "/cart" : "/login"}
         className={() =>
           `flex items-center gap-1.5 hover:text-[#f97316] ${
-            isCartActive ? "text-[#f97316]" : "text-neutral-700"
+            isCartActive ? "text-[#f97316]" : "text-neutral-500"
           }`
         }
       >
@@ -302,7 +274,7 @@ function MainNav() {
             ref={cartRingRef}
             className="pointer-events-none absolute -inset-1.5 rounded-full border border-[#f97316] opacity-0"
           />
-          <ShoppingCart size={18} />
+          <ShoppingCart size={18} strokeWidth={1.75} />
           {cartCount > 0 && (
             <span
               ref={cartBadgeRef}
@@ -327,8 +299,8 @@ function Header() {
 
   return (
     <header>
-      <div className="sticky top-0 z-40 w-screen shadow-sm bg-white">
-        <div className="mx-auto grid max-w-8xl grid-cols-[auto_1fr_auto] items-center gap-2 px-4 py-3">
+      <div className="sticky top-0 z-40 w-screen border-b border-neutral-100 bg-white shadow-sm/20">
+        <div className="mx-auto grid max-w-8xl grid-cols-[auto_1fr_auto] items-center gap-2 px-4 py-4">
           <Logo />
 
           <div className="flex justify-center">

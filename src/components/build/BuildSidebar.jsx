@@ -3,23 +3,6 @@ import { Cpu, Pencil, ShoppingCart, X } from "lucide-react";
 import { Link } from "react-router";
 import { getCategoryIcon } from "../auth/CatagorySidebar";
 
-const ICON_BG_PALETTE = [
-  "bg-rose-100 text-rose-500",
-  "bg-amber-100 text-amber-500",
-  "bg-green-100 text-green-500",
-  "bg-teal-100 text-teal-500",
-  "bg-sky-100 text-sky-500",
-  "bg-blue-100 text-blue-500",
-  "bg-cyan-100 text-cyan-500",
-  "bg-purple-100 text-purple-500",
-  "bg-pink-100 text-pink-500",
-  "bg-lime-100 text-lime-500",
-];
-
-function getCategoryIconBg(index) {
-  return ICON_BG_PALETTE[index % ICON_BG_PALETTE.length];
-}
-
 function formatPrice(amount) {
   return `${amount.toLocaleString()}.-`;
 }
@@ -43,8 +26,11 @@ function SelectedPartRow({
           onSelectCategory?.(categoryId);
         }
       }}
-      className={`relative flex cursor-pointer gap-3 border-b border-l-4 border-neutral-100 border-l-[#f97316] p-3 last:border-b-0 ${
-        isActive ? "bg-neutral-100" : "bg-white hover:bg-neutral-50"
+      aria-current={isActive ? "true" : undefined}
+      className={`relative flex cursor-pointer gap-3 border-b border-neutral-100 p-3 last:border-b-0 ${
+        isActive
+          ? "border-l-4 border-l-[#f97316] bg-orange-50/40"
+          : "border-l-2 border-l-[#f97316] bg-white hover:bg-neutral-50"
       }`}
     >
       <button
@@ -54,12 +40,12 @@ function SelectedPartRow({
           e.stopPropagation();
           onRemove?.(part.id);
         }}
-        className="absolute right-2 top-2 text-neutral-400 hover:text-[#dc2626]"
+        className="absolute right-2 top-2 text-neutral-300 hover:text-[#dc2626]"
       >
         <X size={16} />
       </button>
 
-      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-box bg-neutral-50">
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-neutral-50">
         {part.imageUrl ? (
           <img
             src={part.imageUrl}
@@ -82,7 +68,7 @@ function SelectedPartRow({
           <Link
             to="#"
             onClick={(e) => e.stopPropagation()}
-            className="hardware-label normal-case text-secondary hover:text-[#f97316]"
+            className="text-[11px] font-medium text-neutral-400 hover:text-[#f97316]"
           >
             Details
           </Link>
@@ -125,14 +111,14 @@ function BuildSidebar({
 
   return (
     <aside className="flex h-fit flex-col gap-4">
-      <div className="hardware-surface flex items-center justify-between px-4 py-3">
-        <span className="text-sm font-bold text-neutral-900">Total</span>
+      <div className="flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-4 py-3">
+        <span className="text-sm font-semibold text-neutral-900">Total</span>
         <span className="text-xl font-bold text-[#f97316]">
           {formatPrice(total)}
         </span>
       </div>
 
-      <nav className="hardware-surface flex flex-col overflow-hidden">
+      <nav className="flex flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white">
         {isLoading &&
           Array.from({ length: 7 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-4 py-3">
@@ -149,7 +135,7 @@ function BuildSidebar({
 
         {!isLoading &&
           !isError &&
-          categories.map((category, index) => {
+          categories.map((category) => {
             const isActive = String(category.id) === String(activeCategory);
 
             const selectedPart = selectedParts.find(
@@ -177,14 +163,19 @@ function BuildSidebar({
                 key={category.id}
                 type="button"
                 onClick={() => onSelectCategory(category.id)}
-                className={`flex items-center gap-3 border-b border-neutral-100 px-4 py-3 text-left text-sm font-medium last:border-b-0 ${
+                aria-current={isActive ? "true" : undefined}
+                className={`flex items-center gap-3 border-b border-l-2 border-neutral-100 px-4 py-3 text-left text-sm last:border-b-0 ${
                   isActive
-                    ? "bg-neutral-100 text-neutral-900"
-                    : "text-neutral-700 hover:bg-neutral-50"
+                    ? "border-l-[#f97316] bg-neutral-50 font-semibold text-neutral-900"
+                    : "border-l-transparent font-medium text-neutral-700 hover:bg-neutral-50"
                 }`}
               >
                 <span
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${getCategoryIconBg(index)}`}
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+                    isActive
+                      ? "bg-[#f97316]/10 text-[#f97316]"
+                      : "bg-neutral-100 text-neutral-500"
+                  }`}
                 >
                   <Icon size={16} />
                 </span>
@@ -198,7 +189,7 @@ function BuildSidebar({
         type="button"
         onClick={() => onAddAllToCart?.()}
         disabled={selectedParts.length === 0 || isAddingAllToCart}
-        className="btn btn-accent gap-2 text-sm text-white disabled:opacity-50"
+        className="flex items-center justify-center gap-2 rounded-lg bg-[#f97316] py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:opacity-50"
       >
         <ShoppingCart size={16} />
         {isAddingAllToCart ? "Adding to cart..." : "Add All to Cart"}

@@ -44,7 +44,7 @@ function ConditionScoreBar({ score }) {
         : "bg-[#dc2626]";
 
   return (
-    <div className="h-1.5 w-12 shrink-0 overflow-hidden rounded-full bg-neutral-100">
+    <div className="h-1 w-10 shrink-0 overflow-hidden rounded-full bg-neutral-100">
       <div
         className={`h-full rounded-full ${barColor}`}
         style={{ width: `${clamped}%` }}
@@ -88,28 +88,30 @@ function ProductCard({ product }) {
   return (
     <Link
       to={`/products/${product.id}`}
-      className="hardware-surface flex flex-col p-4"
+      className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-4 transition hover:border-neutral-300 hardware-surface"
     >
-      <span className="hardware-label mb-2 w-fit rounded-field bg-neutral-100 px-2 py-1 normal-case text-secondary">
+      <span className="mb-2 w-fit text-[11px] font-medium uppercase tracking-wide text-neutral-400">
         {product.brand}
       </span>
 
       <div
         ref={productImageRef}
-        className="mb-3 flex aspect-square items-center justify-center overflow-hidden rounded-box bg-neutral-50"
+        className="mb-3 aspect-square overflow-hidden rounded-xl bg-neutral-50"
       >
         {imageUrl ? (
           <img
             src={imageUrl}
             alt={product.title}
-            className="h-full w-full object-contain"
+            className="h-full w-full object-cover"
           />
         ) : (
-          <Cpu className="h-12 w-12 text-neutral-300" strokeWidth={1} />
+          <div className="flex h-full w-full items-center justify-center">
+            <Cpu className="h-12 w-12 text-neutral-300" strokeWidth={1} />
+          </div>
         )}
       </div>
 
-      <p className="mb-1 line-clamp-2 text-sm font-semibold text-neutral-900">
+      <p className="mb-1 line-clamp-2 text-sm font-medium text-neutral-900">
         {product.title}
       </p>
       <p className="mb-1 text-lg font-bold text-[#f97316]">
@@ -118,13 +120,11 @@ function ProductCard({ product }) {
 
       {estimatedScore != null && (
         <div className="mb-2 flex items-center gap-1.5">
-          <span className={`hardware-label normal-case ${conditionInfo.color}`}>
+          <span className={`text-[11px] font-medium ${conditionInfo.color}`}>
             {conditionInfo.label}
           </span>
           <ConditionScoreBar score={estimatedScore} />
-          <span className="hardware-label normal-case text-secondary">
-            {estimatedScore}
-          </span>
+          <span className="text-[11px] text-neutral-400">{estimatedScore}</span>
         </div>
       )}
 
@@ -144,9 +144,9 @@ function ProductCard({ product }) {
           aria-label="Add to Cart"
           onClick={handleAddToCart}
           disabled={user ? addCartItem.isPending : false}
-          className="flex h-8 w-8 items-center justify-center rounded-field bg-[#f97316] text-white hover:bg-orange-600 disabled:opacity-50"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f97316] text-white transition hover:bg-orange-600 disabled:opacity-50"
         >
-          <ShoppingCart size={16} />
+          <ShoppingCart size={15} />
         </button>
       </div>
     </Link>

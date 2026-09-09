@@ -9,6 +9,9 @@ import BuildSidebar from "@/components/build/BuildSidebar";
 import PartPickerCard from "@/components/build/PartPickerCard";
 import { useListingsByCategory } from "@/hook/listing/useListingByCategory";
 
+const SELECT_CLASS =
+  "rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm text-neutral-700 outline-none transition focus:border-neutral-400";
+
 function getCoverImageUrl(product) {
   const images = product.images ?? [];
   const cover = images.find((img) => img.isCover) ?? images[0];
@@ -131,17 +134,17 @@ export default function BuildPcPage() {
         />
 
         <div className="flex flex-col gap-4">
-          <div className="hardware-surface flex flex-col gap-3 p-4">
+          <div className="flex flex-col gap-3 rounded-2xl border border-neutral-200 bg-white p-4">
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                className="btn btn-accent gap-2 text-sm text-white"
+                className="flex items-center gap-2 rounded-lg border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-700 transition hover:border-[#f97316] hover:text-[#f97316]"
               >
-                <Trophy size={16} />
+                <Trophy size={16} className="text-[#f97316]" />
                 Build Rankings
               </button>
 
-              <div className="flex min-w-[220px] flex-1 items-center gap-2 rounded-field border border-neutral-200 px-3 py-2">
+              <div className="flex min-w-[220px] flex-1 items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2">
                 <Search size={16} className="text-neutral-400" />
                 <input
                   type="text"
@@ -151,7 +154,7 @@ export default function BuildPcPage() {
               </div>
               <button
                 type="button"
-                className="rounded-field border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:border-[#f97316] hover:text-[#f97316]"
+                className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:border-[#f97316] hover:text-[#f97316]"
               >
                 Search
               </button>
@@ -159,12 +162,12 @@ export default function BuildPcPage() {
               <div className="ml-auto flex items-center gap-3">
                 <button
                   type="button"
-                  className="flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-[#f97316]"
+                  className="flex items-center gap-1.5 text-sm font-medium text-neutral-500 transition hover:text-[#f97316]"
                 >
                   <SlidersHorizontal size={16} />
                   filter
                 </button>
-                <select className="select select-bordered select-sm">
+                <select className={SELECT_CLASS}>
                   <option>Sort by</option>
                   <option>Price: Low to High</option>
                   <option>Price: High to Low</option>
@@ -178,7 +181,7 @@ export default function BuildPcPage() {
                 <label className="text-sm font-medium text-neutral-700">
                   Brand
                 </label>
-                <select className="select select-bordered select-sm w-full">
+                <select className={`${SELECT_CLASS} w-full`}>
                   <option>Please select</option>
                 </select>
               </div>
@@ -186,7 +189,7 @@ export default function BuildPcPage() {
                 <label className="text-sm font-medium text-neutral-700">
                   Series
                 </label>
-                <select className="select select-bordered select-sm w-full">
+                <select className={`${SELECT_CLASS} w-full`}>
                   <option>Please select</option>
                 </select>
               </div>
@@ -202,16 +205,16 @@ export default function BuildPcPage() {
               {Array.from({ length: 8 }).map((_, i) => (
                 <div
                   key={i}
-                  className="hardware-surface aspect-[3/4] animate-pulse bg-neutral-100"
+                  className="aspect-[3/4] animate-pulse rounded-2xl border border-neutral-100 bg-neutral-50"
                 />
               ))}
             </div>
           ) : isErrorProducts ? (
-            <div className="hardware-surface flex h-40 items-center justify-center">
+            <div className="flex h-40 items-center justify-center rounded-2xl border border-neutral-100 bg-neutral-50">
               <p className="text-sm text-[#dc2626]">Failed to load products</p>
             </div>
           ) : products.length === 0 ? (
-            <div className="hardware-surface flex h-40 items-center justify-center">
+            <div className="flex h-40 items-center justify-center rounded-2xl border border-neutral-100 bg-neutral-50">
               <p className="text-sm text-neutral-400">
                 No products in this category yet
               </p>

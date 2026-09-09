@@ -15,8 +15,8 @@ function LatestProduct() {
       </h1>
 
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}
               className="hardware-surface aspect-[3/4] animate-pulse bg-neutral-100"
@@ -34,7 +34,7 @@ function LatestProduct() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {listings.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
