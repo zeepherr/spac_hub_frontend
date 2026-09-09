@@ -12,36 +12,57 @@ import MyListingItemCard from "@/components/userSellerDashboard/MyListingItemCar
 import EditListingModal from "@/components/userSellerDashboard/EditListingModal";
 import DeleteConfirmModal from "@/components/userSellerDashboard/DeleteConfirmModal";
 import ListingDetailModal from "@/components/userSellerDashboard/ListingDetailModal";
+// import { useDeleteListing } from "@/hook/listing/useDeleteListing";
+// // เปลี่ยน path hook ให้ตรงกับโปรเจกต์ของคุณ (เช่น useMyListings)
+// import { useMyListings } from "@/hook/listing/useMyListings"; 
+
+// import EditListingModal from "@/components/sell/EditListingModal";
+// import DeleteConfirmModal from "@/components/sell/DeleteConfirmModal";
+// import ListingDetailModal from "@/components/sell/ListingDetailModal";
+// import MyListingItemCard from "@/components/sell/MyListingItemCard";
+// 🟢 ตัวแปร FILTER_TABS พร้อมการแยกสีแต่ละสถานะ
 const FILTER_TABS = [
-  {
-    id: "ALL",
+  { 
+    id: "ALL", 
     label: "All Items",
-    activeClass: "bg-orange-500 text-white shadow-md shadow-orange-500/20",
+    activeClass: "bg-slate-800 text-white shadow-slate-800/20",
     badgeActive: "bg-white/20 text-white",
+    badgeInactive: "bg-slate-100 text-slate-600"
   },
-  {
-    id: "ACTIVE",
+  { 
+    id: "ACTIVE", 
     label: "Active",
-    activeClass: "bg-emerald-500 text-white shadow-md shadow-emerald-500/20",
+    activeClass: "bg-emerald-500 text-white shadow-emerald-500/20",
     badgeActive: "bg-white/20 text-white",
+    badgeInactive: "bg-emerald-50 text-emerald-700"
   },
-  {
-    id: "RESERVED",
+  { 
+    id: "RESERVED", 
     label: "Reserved",
-    activeClass: "bg-amber-500 text-white shadow-md shadow-amber-500/20",
+    activeClass: "bg-amber-500 text-white shadow-amber-500/20",
     badgeActive: "bg-white/20 text-white",
+    badgeInactive: "bg-amber-50 text-amber-700"
   },
-  {
-    id: "DRAFT",
+  { 
+    id: "DRAFT", 
     label: "Draft",
-    activeClass: "bg-sky-500 text-white shadow-md shadow-sky-500/20",
+    activeClass: "bg-sky-500 text-white shadow-sky-500/20",
     badgeActive: "bg-white/20 text-white",
+    badgeInactive: "bg-sky-50 text-sky-700"
   },
-  {
-    id: "SOLD",
+  { 
+    id: "SOLD", 
     label: "Sold",
-    activeClass: "bg-neutral-600 text-white shadow-md shadow-neutral-600/20",
+    activeClass: "bg-neutral-600 text-white shadow-neutral-600/20",
     badgeActive: "bg-white/20 text-white",
+    badgeInactive: "bg-neutral-100 text-neutral-600"
+  },
+  { 
+    id: "ARCHIVED", 
+    label: "Archived",
+    activeClass: "bg-rose-500 text-white shadow-rose-500/20",
+    badgeActive: "bg-white/20 text-white",
+    badgeInactive: "bg-rose-50 text-rose-700"
   },
 ];
 
@@ -64,7 +85,7 @@ export default function MyListingsPage() {
   const [selectedListingIdForDetail, setSelectedListingIdForDetail] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
-  // Filter listings
+  // Filter listings base on Status and Search Query
   const filteredListings = useMemo(() => {
     if (!listings) return [];
     return listings.filter((item) => {
@@ -78,6 +99,7 @@ export default function MyListingsPage() {
     });
   }, [listings, activeTab, searchQuery]);
 
+  // Handlers
   const handleOpenDetailModal = (listingId) => {
     setSelectedListingIdForDetail(listingId);
     setIsDetailModalOpen(true);
@@ -107,22 +129,23 @@ export default function MyListingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-50 p-4 lg:p-8">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <div className="min-h-screen bg-base-200/50 p-4 lg:p-6 w-full">
+      {/* 🟢 เปลี่ยนจาก max-w-7xl เป็น w-full เพื่อขยายกว้างเต็มจอ */}
+      <div className="w-full space-y-6">
         {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-neutral-500 transition-colors hover:text-orange-500"
+              className="inline-flex items-center gap-2 text-sm text-base-content/70 hover:text-primary transition-colors mb-1 font-semibold"
             >
-              <ArrowLeft className="h-4 w-4" /> Back
+              <ArrowLeft className="w-4 h-4" /> Back
             </button>
-            <h1 className="text-3xl font-extrabold text-neutral-900">
+            <h1 className="text-3xl font-extrabold text-base-content">
               My Listings
             </h1>
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-base-content/60">
               Manage all your listed products, drafts, and sold items
             </p>
           </div>
@@ -130,16 +153,16 @@ export default function MyListingsPage() {
           <button
             type="button"
             onClick={() => navigate("/user/sell/create")}
-            className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-600"
+            className="btn btn-primary text-white font-bold rounded-xl gap-2 shadow-lg shadow-primary/20"
           >
-            <Plus className="h-5 w-5" /> Create Listing
+            <Plus className="w-5 h-5" /> Create Listing
           </button>
         </div>
 
         {/* Filter Controls Card */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm space-y-4">
-          {/* Status Filter Tabs - ปรับขนาดและแต่งสีที่นี่ */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-neutral-100 scrollbar-none">
+        <div className="card hardware-surface p-4 space-y-4 w-full">
+          {/* Status Tabs แบบแยกสี */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-base-200">
             {FILTER_TABS.map((tab) => {
               const count =
                 tab.id === "ALL"
@@ -153,18 +176,16 @@ export default function MyListingsPage() {
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full shrink-0 transition-all cursor-pointer ${
+                  className={`btn btn-sm rounded-xl font-bold transition-all shrink-0 border-none ${
                     isActive
-                      ? tab.activeClass
-                      : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200/70"
+                      ? `${tab.activeClass} shadow-md`
+                      : "bg-base-200/60 text-base-content/70 hover:bg-base-200"
                   }`}
                 >
-                  <span>{tab.label}</span>
+                  {tab.label}
                   <span
-                    className={`inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold ${
-                      isActive
-                        ? tab.badgeActive
-                        : "bg-neutral-200/80 text-neutral-700"
+                    className={`badge badge-sm border-none ml-1 font-extrabold ${
+                      isActive ? tab.badgeActive : tab.badgeInactive
                     }`}
                   >
                     {count}
@@ -176,37 +197,38 @@ export default function MyListingsPage() {
 
           {/* Search Box */}
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+            <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-base-content/40" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by title, brand, or model..."
-              className="w-full rounded-full border border-neutral-200 bg-neutral-50/50 py-2.5 pl-11 pr-4 text-sm text-neutral-900 outline-none transition focus:border-orange-500 focus:bg-white focus:ring-2 focus:ring-orange-100"
+              className="input input-bordered w-full pl-11 rounded-xl bg-base-100 text-sm focus:border-primary focus:outline-none"
             />
           </div>
         </div>
 
-        {/* Listings Content */}
-        <div className="space-y-4">
+        {/* Listings Content Area */}
+        <div className="w-full">
           {isLoading ? (
-            <ListingsListSkeleton />
+            <ListingsGridSkeleton />
           ) : isError ? (
-            <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center text-red-500 shadow-sm space-y-2">
+            <div className="card hardware-surface p-8 text-center text-error space-y-2 w-full">
               <p className="font-bold">Failed to load listings data.</p>
               <button
                 type="button"
                 onClick={() => refetch && refetch()}
-                className="mt-2 rounded-lg border border-red-500 px-4 py-2 text-sm font-semibold text-red-500 hover:bg-red-50"
+                className="btn btn-sm btn-outline btn-error mt-2"
               >
                 Try Again
               </button>
             </div>
           ) : filteredListings.length === 0 ? (
-            <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center text-neutral-400 shadow-sm space-y-3">
-              <PackageX className="mx-auto h-16 w-16 stroke-1" />
-              <p className="text-lg font-bold text-neutral-700">No listings found</p>
-              <p className="mx-auto max-w-sm text-sm text-neutral-400">
+            <div className="card hardware-surface p-12 text-center text-base-content/50 space-y-3 w-full">
+              <PackageX className="w-16 h-16 mx-auto stroke-1" />
+              <p className="text-lg font-bold">No listings found</p>
+
+              <p className="text-sm text-base-content/40 max-w-sm mx-auto">
                 {searchQuery
                   ? `No items match "${searchQuery}"`
                   : `There are no listings under "${
@@ -215,15 +237,18 @@ export default function MyListingsPage() {
               </p>
             </div>
           ) : (
-            filteredListings.map((item) => (
-              <MyListingItemCard
-                key={item.id}
-                item={item}
-                onOpenDetail={handleOpenDetailModal}
-                onOpenEdit={handleOpenEdit}
-                onOpenDelete={handleOpenDeleteModal}
-              />
-            ))
+            /* 🟢 Grid ปรับการกระจายตามขนาดจอ ขยายได้สูงสุดถึง 6 คอลัมน์บนจอใหญ่ */
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 w-full">
+              {filteredListings.map((item) => (
+                <MyListingItemCard
+                  key={item.id}
+                  item={item}
+                  onOpenDetail={handleOpenDetailModal}
+                  onOpenEdit={handleOpenEdit}
+                  onOpenDelete={handleOpenDeleteModal}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>
@@ -263,21 +288,28 @@ export default function MyListingsPage() {
   );
 }
 
-function ListingsListSkeleton() {
+/* Skeleton แสดงสถานะ Loading */
+function ListingsGridSkeleton() {
   return (
-    <div className="space-y-4">
-      {[1, 2, 3, 4].map((i) => (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 w-full">
+      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
         <div
           key={i}
-          className="flex items-center justify-between rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm"
+          className="flex flex-col justify-between bg-white border border-neutral-200/80 rounded-2xl p-3.5 min-h-[310px] space-y-3"
         >
-          <div className="flex items-center gap-5 w-full">
-            <div className="h-[110px] w-[110px] shrink-0 animate-pulse rounded-xl bg-neutral-200" />
-            <div className="w-full space-y-3">
-              <div className="h-6 w-2/3 animate-pulse rounded bg-neutral-200" />
-              <div className="h-5 w-1/3 animate-pulse rounded bg-neutral-200" />
-              <div className="h-4 w-1/4 animate-pulse rounded bg-neutral-200" />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="skeleton h-3 w-16" />
+              <div className="skeleton h-3.5 w-12 rounded" />
             </div>
+            <div className="skeleton w-full aspect-square rounded-xl" />
+            <div className="skeleton h-4 w-full" />
+            <div className="skeleton h-3 w-3/4" />
+            <div className="skeleton h-5 w-1/2" />
+          </div>
+          <div className="pt-2 border-t border-neutral-100 flex items-center justify-between">
+            <div className="skeleton h-3 w-16" />
+            <div className="skeleton h-7 w-14 rounded-lg" />
           </div>
         </div>
       ))}

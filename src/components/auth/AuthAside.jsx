@@ -1,4 +1,6 @@
-import { ShieldCheck, Wallet, Users, CheckCircle2, Layers } from "lucide-react";
+import { useWebAssets } from "@/hook/webAsset/useWebAssets";
+import { ShieldCheck, Users, Wallet } from "lucide-react";
+import GlobalLoading from "../loading/GlobalLoading";
 
 const FEATURES = [
   {
@@ -19,6 +21,11 @@ const FEATURES = [
 ];
 
 export default function AuthAside() {
+  const { data: webassents, isLoading } = useWebAssets();
+
+  const logoUrl = webassents?.bannerImageUrl;
+  if (isLoading) return <GlobalLoading />;
+
   return (
     <div className="hidden flex-col justify-center px-10 py-12 lg:flex">
       <div className="mx-auto flex w-full max-w-lg flex-col gap-8">
@@ -45,9 +52,9 @@ export default function AuthAside() {
           ))}
         </div>
 
-        <div className="hardware-shadow relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-box">
+        <div className="hardware-shadow relative flex aspect-4/3 items-center justify-center overflow-hidden rounded-box">
           <img
-            src="https://dlcdnwebimgs.asus.com/files/media/f39b732e-8739-4a6d-b1ce-c826273832d3/v2/img/kv/pd.png"
+            src={logoUrl}
             alt="RTX 4070 Super"
             className="absolute z-0 w-5/6 drop-shadow-[0_25px_10px_rgba(0,0,0,0.5)]"
           />

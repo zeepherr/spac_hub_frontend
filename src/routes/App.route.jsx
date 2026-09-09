@@ -47,6 +47,7 @@ import SellingOrdersPage from "@/pages/seller/SellingOrdersPage";
 import BuildPcPage from "@/pages/build/BuildPcPage";
 import SupportInbox from "@/pages/public/user/SupportInbox";
 import LatestProduct from "@/components/auth/LastestProduct";
+import WebAssets from "@/pages/admin/WebAssets";
 
 const router = createBrowserRouter([
   {
@@ -216,6 +217,10 @@ const router = createBrowserRouter([
               {
                 path: "categories",
                 Component: Categories,
+              },
+              {
+                path: "web-assets",
+                Component: WebAssets,
               },
               {
                 path: "profile",

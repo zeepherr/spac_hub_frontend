@@ -39,6 +39,7 @@ export default function SellingOrdersPage() {
       ]),
     );
   }, [supportCases]);
+
   // Filters & Search
   const [activeTab, setActiveTab] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState("");
@@ -105,6 +106,7 @@ export default function SellingOrdersPage() {
     setSelectedOrder(order);
     setIsDetailModalOpen(true);
   };
+
   const handleOpenShipModal = () => {
     setIsDetailModalOpen(false);
     setIsShipModalOpen(true);
@@ -118,16 +120,18 @@ export default function SellingOrdersPage() {
     selectedSupportCase,
     currentUser?.id,
   );
+
   return (
-    <div className="min-h-screen bg-neutral-50 p-4 lg:p-8">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <div className="min-h-screen w-full bg-neutral-50 p-4 sm:p-6 md:p-8">
+      {/* 🟢 เปลี่ยนจาก mx-auto max-w-6xl เป็น w-full เพื่อขยายให้เต็มจอ */}
+      <div className="w-full space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-neutral-500 transition-colors hover:text-orange-500"
+              className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-neutral-500 transition-colors hover:text-orange-500 cursor-pointer"
             >
               <ArrowLeft className="h-4 w-4" /> Back
             </button>
@@ -149,7 +153,7 @@ export default function SellingOrdersPage() {
           validOrders={validOrders}
         />
 
-        {/* Orders List Component (ใช้ OrderItemCard เดิม) */}
+        {/* Orders List Component */}
         <div className="space-y-4">
           {isLoading ? (
             <SellingOrdersSkeleton />
@@ -159,7 +163,7 @@ export default function SellingOrdersPage() {
               <button
                 type="button"
                 onClick={() => refetch && refetch()}
-                className="mt-2 rounded-lg border border-red-500 px-4 py-2 text-sm font-semibold text-red-500 hover:bg-red-50"
+                className="mt-2 rounded-lg border border-red-500 px-4 py-2 text-sm font-semibold text-red-500 hover:bg-red-50 cursor-pointer"
               >
                 Try Again
               </button>
@@ -237,7 +241,7 @@ function SellingOrdersSkeleton() {
             <div className="h-6 w-20 animate-pulse rounded-full bg-neutral-200" />
           </div>
           <div className="flex gap-5 items-center">
-            <div className="h-22.5 w-22.5 shrink-0 animate-pulse rounded-xl bg-neutral-200" />
+            <div className="h-[90px] w-[90px] shrink-0 animate-pulse rounded-xl bg-neutral-200" />
             <div className="w-full space-y-3">
               <div className="h-5 w-2/3 animate-pulse rounded bg-neutral-200" />
               <div className="h-6 w-1/3 animate-pulse rounded bg-neutral-200" />
