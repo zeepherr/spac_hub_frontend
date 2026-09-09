@@ -1,22 +1,13 @@
-import {
-  AlertCircle,
-  ChevronRight,
-  ImageIcon,
-  MessageSquareText,
-  RefreshCw,
-  Search,
-} from "lucide-react";
+import { Search } from "lucide-react";
 import { useMemo } from "react";
 
+import { hasUnreadSupportMessage } from "./support.constants";
+import SupportOrderItem from "./inbox/SupportOrderItem";
 import {
-  SUPPORT_STATUS_META,
-  hasUnreadSupportMessage,
-} from "./support.constants";
-import {
-  formatSupportOrderDate,
-  getSupportOrderImage,
-  getSupportOrderName,
-} from "./supportOrder.utils";
+  EmptyOrderList,
+  OrderListError,
+  OrderListSkeleton,
+} from "./inbox/SupportOrderListStates";
 
 function UserSupportOrderList({
   orders,
@@ -39,7 +30,6 @@ function UserSupportOrderList({
         if (!normalizedSearch) {
           return true;
         }
-
         return [
           order.orderNumber,
           order.id,
@@ -56,7 +46,6 @@ function UserSupportOrderList({
       .sort((firstOrder, secondOrder) => {
         const firstCase = supportCaseByOrderId.get(String(firstOrder.id));
         const secondCase = supportCaseByOrderId.get(String(secondOrder.id));
-
         const firstUnread = hasUnreadSupportMessage(firstCase, currentUserId);
         const secondUnread = hasUnreadSupportMessage(secondCase, currentUserId);
 
@@ -116,7 +105,6 @@ function UserSupportOrderList({
           <div className="space-y-1.5">
             {filteredOrders.map((order) => {
               const supportCase = supportCaseByOrderId.get(String(order.id));
-
               return (
                 <SupportOrderItem
                   key={order.id}
@@ -132,151 +120,6 @@ function UserSupportOrderList({
         )}
       </div>
     </aside>
-  );
-}
-
-function SupportOrderItem({
-  order,
-  supportCase,
-  currentUserId,
-  isSelected,
-  onSelect,
-}) {
-  const productName = getSupportOrderName(order);
-  const imageUrl = getSupportOrderImage(order);
-  const latestMessage = supportCase?.conversation?.messages?.[0];
-  const hasUnread = hasUnreadSupportMessage(supportCase, currentUserId);
-  const supportStatus = supportCase
-    ? SUPPORT_STATUS_META[supportCase.status] || {
-        label: supportCase.status,
-        className: "bg-neutral-100 text-neutral-600",
-      }
-    : null;
-
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      aria-pressed={isSelected}
-      className={`grid w-full cursor-pointer grid-cols-[58px_minmax(0,1fr)_16px] items-center gap-3 rounded-xl border p-2.5 text-left transition ${
-        isSelected
-          ? "border-orange-300 bg-orange-50 shadow-sm"
-          : hasUnread
-            ? "border-orange-100 bg-white hover:bg-orange-50/60"
-            : "border-transparent bg-white hover:border-neutral-200 hover:bg-neutral-50"
-      }`}
-    >
-      <div className="flex size-[58px] shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
-        {imageUrl ? (
-          <img src={imageUrl} alt={productName} className="size-full object-cover" />
-        ) : (
-          <ImageIcon size={22} className="text-neutral-300" />
-        )}
-      </div>
-
-      <div className="min-w-0">
-        <div className="flex min-w-0 items-center gap-2">
-          {hasUnread && (
-            <span className="relative flex size-2 shrink-0">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-orange-400 opacity-60" />
-              <span className="relative inline-flex size-2 rounded-full bg-orange-500" />
-            </span>
-          )}
-
-          <p className="truncate text-sm font-bold text-neutral-900">
-            {productName}
-          </p>
-        </div>
-
-        <div className="mt-0.5 flex min-w-0 items-center justify-between gap-2 text-[10px] text-neutral-400">
-          <p className="min-w-0 flex-1 truncate">
-            {order.orderNumber || `Order #${order.id}`}
-          </p>
-          <time className="shrink-0">
-            {formatSupportOrderDate(
-              latestMessage?.createdAt ||
-                supportCase?.updatedAt ||
-                order.updatedAt,
-            )}
-          </time>
-        </div>
-
-        <div className="mt-1.5 flex min-w-0 items-center gap-2">
-          {supportStatus ? (
-            <span
-              className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${supportStatus.className}`}
-            >
-              {supportStatus.label}
-            </span>
-          ) : (
-            <span className="shrink-0 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-bold text-neutral-500">
-              Start chat
-            </span>
-          )}
-
-          <p className="min-w-0 flex-1 truncate text-[11px] text-neutral-500">
-            {latestMessage?.content || "Select this order for support"}
-          </p>
-        </div>
-      </div>
-
-      <ChevronRight
-        size={16}
-        className={isSelected ? "text-orange-500" : "text-neutral-300"}
-      />
-    </button>
-  );
-}
-
-function OrderListSkeleton() {
-  return (
-    <div className="space-y-2">
-      {[1, 2, 3, 4, 5].map((item) => (
-        <div
-          key={item}
-          className="h-[82px] animate-pulse rounded-xl bg-neutral-100"
-        />
-      ))}
-    </div>
-  );
-}
-
-function OrderListError({ onRetry }) {
-  return (
-    <div className="flex min-h-64 flex-col items-center justify-center p-5 text-center">
-      <AlertCircle size={30} className="text-red-500" />
-      <p className="mt-3 text-sm font-bold text-neutral-800">
-        Unable to load orders
-      </p>
-      <button
-        type="button"
-        onClick={() => onRetry()}
-        className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-xs font-bold text-red-600 transition hover:bg-red-50"
-      >
-        <RefreshCw size={14} />
-        Try Again
-      </button>
-    </div>
-  );
-}
-
-function EmptyOrderList({ hasSearch, mode }) {
-  return (
-    <div className="flex min-h-64 flex-col items-center justify-center p-5 text-center">
-      <span className="flex size-12 items-center justify-center rounded-full bg-orange-50 text-orange-500">
-        <MessageSquareText size={22} />
-      </span>
-      <p className="mt-3 text-sm font-bold text-neutral-800">
-        {hasSearch
-          ? "No matching orders"
-          : `No ${mode === "buying" ? "buying" : "selling"} orders yet`}
-      </p>
-      <p className="mt-1 text-xs leading-5 text-neutral-400">
-        {hasSearch
-          ? "Try another order number or product name."
-          : "Orders will appear here when they are available."}
-      </p>
-    </div>
   );
 }
 

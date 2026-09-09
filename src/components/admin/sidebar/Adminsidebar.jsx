@@ -1,104 +1,175 @@
+import { logout } from "@/api/auth/auth.api";
+import { useUserProfile } from "@/hook/user/useUserProfile";
+import { clearClientSession } from "@/lib/clear.client.session";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router";
+import { toast } from "sonner";
+
+import SidebarContent from "./AdminSidebarContent";
 import {
-  ClipboardCheck,
-  ClipboardList,
-  LayoutGrid,
-  ListTree,
-  MessageSquareText,
-  PackageCheck,
-  ScanLine,
-} from "lucide-react";
-import { NavLink } from "react-router";
+  desktopSidebarTransition,
+  mobileDrawerTransition,
+} from "./adminSidebar.constants";
 
-import AdminProfileMenu from "@/components/admin/sidebar/AdminProfileMenu";
+function AdminSidebar({
+  isMobileOpen = false,
+  collapsed = false,
+  onMobileClose,
+  onToggleCollapsed,
+}) {
+  const navigate = useNavigate();
+  const sidebarRootRef = useRef(null);
 
-const menuItems = [
-  {
-    name: "Dashboard",
-    path: "/admin",
-    icon: LayoutGrid,
-  },
-  {
-    name: "Categories",
-    path: "/admin/categories",
-    icon: ListTree,
-  },
-  {
-    name: "Awaiting Receipt",
-    path: "/admin/orders/awaiting-receipt",
-    icon: ScanLine,
-  },
-  {
-    name: "Inspection",
-    path: "/admin/orders/inspection",
-    icon: ClipboardCheck,
-  },
-  {
-    name: "Ready to Ship",
-    path: "/admin/orders/ready-to-ship",
-    icon: PackageCheck,
-  },
-  {
-    name: "Shipping Summary",
-    path: "/admin/orders/summary",
-    icon: ClipboardList,
-  },
-  {
-    name: "Chat",
-    path: "/admin/chats",
-    icon: MessageSquareText,
-  },
-];
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-function AdminSidebar() {
+  const profileQuery = useUserProfile();
+  const user = profileQuery.data?.user;
+
+  const fullName =
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") ||
+    "System Admin";
+
+  useEffect(() => {
+    if (!isProfileMenuOpen) {
+      return undefined;
+    }
+
+    function handlePointerDown(event) {
+      if (!sidebarRootRef.current?.contains(event.target)) {
+        setIsProfileMenuOpen(false);
+      }
+    }
+
+    function handleEscape(event) {
+      if (event.key === "Escape") {
+        setIsProfileMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isProfileMenuOpen]);
+
+  function closeMobileSidebar() {
+    setIsProfileMenuOpen(false);
+    onMobileClose?.();
+  }
+
+  function toggleDesktopSidebar() {
+    setIsProfileMenuOpen(false);
+    onToggleCollapsed?.();
+  }
+
+  function handleProfileNavigation(isMobile) {
+    setIsProfileMenuOpen(false);
+
+    if (isMobile) {
+      onMobileClose?.();
+    }
+
+    navigate("/admin/profile");
+  }
+
+  async function handleLogout() {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setIsProfileMenuOpen(false);
+
+    try {
+      setIsLoggingOut(true);
+
+      const data = await logout();
+
+      toast.success(data?.message || "Logged out successfully", {
+        position: "top-center",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+
+      toast.warning(
+        "Unable to connect to the server, but you have been logged out on this device.",
+        {
+          position: "top-center",
+        },
+      );
+    } finally {
+      await clearClientSession({
+        explicit: true,
+      });
+
+      onMobileClose?.();
+
+      navigate("/login", {
+        replace: true,
+      });
+
+      setIsLoggingOut(false);
+    }
+  }
+
+  const sharedProfileProps = {
+    user,
+    fullName,
+    isProfileLoading: profileQuery.isPending,
+    isProfileMenuOpen,
+    isLoggingOut,
+    onToggleProfileMenu: () =>
+      setIsProfileMenuOpen((currentValue) => !currentValue),
+    onLogout: handleLogout,
+  };
+
   return (
-    <aside className="flex h-full w-60 shrink-0 flex-col bg-[#1F1F1F] px-4 py-6">
-      {/* LOGO */}
-      <div className="mb-10">
-        <h1 className="text-xl font-bold text-white">
-          SPEC
-          <span className="text-orange-500">
-            HUB
-          </span>
-        </h1>
+    <div ref={sidebarRootRef} className="contents">
+      {/* Desktop sidebar */}
+      <motion.aside
+        initial={false}
+        animate={{
+          width: collapsed ? 72 : 240,
+        }}
+        transition={desktopSidebarTransition}
+        className="relative z-30 hidden h-dvh shrink-0 flex-col bg-[#1F1F1F] shadow-sm xl:flex"
+      >
+        <SidebarContent
+          collapsed={collapsed}
+          isMobile={false}
+          onToggle={toggleDesktopSidebar}
+          onNavigate={() => setIsProfileMenuOpen(false)}
+          onProfile={() => handleProfileNavigation(false)}
+          {...sharedProfileProps}
+        />
+      </motion.aside>
 
-        <p className="text-xs text-gray-500">
-          ADMIN PANEL
-        </p>
-      </div>
-
-      {/* MENU */}
-      <nav className="scrollbar-hide min-h-0 flex-1 space-y-2 overflow-y-auto">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.path === "/admin"}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition ${
-                  isActive
-                    ? "bg-[#D96A26] text-white"
-                    : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
-                }`
-              }
-            >
-              <Icon size={18} />
-
-              <span>
-                {item.name}
-              </span>
-            </NavLink>
-          );
-        })}
-      </nav>
-
-      {/* ADMIN PROFILE MENU */}
-      <div className="shrink-0 pt-4">
-        <AdminProfileMenu />
-      </div>
-    </aside>
+      {/* Mobile drawer */}
+      <AnimatePresence initial={false}>
+        {isMobileOpen && (
+          <motion.aside
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={mobileDrawerTransition}
+            className="fixed bottom-0 left-0 top-14 z-50 flex w-[min(20rem,calc(100vw-3rem))] flex-col bg-[#1F1F1F] shadow-2xl xl:hidden"
+          >
+            <SidebarContent
+              collapsed={false}
+              isMobile
+              onClose={closeMobileSidebar}
+              onNavigate={closeMobileSidebar}
+              onProfile={() => handleProfileNavigation(true)}
+              {...sharedProfileProps}
+            />
+          </motion.aside>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
