@@ -1,68 +1,69 @@
 import { useAdminSupportRealtime } from "@/hook/support/useAdminSupportRealitme";
-import { Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 
-import AdminSidebar from "../components/admin/sidebar/Adminsidebar";
+import AdminSidebar from "@/components/admin/sidebar/Adminsidebar";
 
 const SIDEBAR_STORAGE_KEY = "admin-sidebar-collapsed";
 
-function getInitialCollapsedState() {
+function readCollapsedPreference() {
   if (typeof window === "undefined") {
     return false;
   }
 
-  return localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true";
+  try {
+    return localStorage.getItem(SIDEBAR_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
 }
 
 function AdminLayout() {
   useAdminSupportRealtime();
 
+  const location = useLocation();
+
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(
-    getInitialCollapsedState,
+    readCollapsedPreference,
   );
 
-  function handleOpenMobileSidebar() {
-    setIsMobileSidebarOpen(true);
-  }
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_STORAGE_KEY, String(isSidebarCollapsed));
+    } catch {
+      // The sidebar still works when browser storage is unavailable.
+    }
+  }, [isSidebarCollapsed]);
 
-  function handleCloseMobileSidebar() {
+  useEffect(() => {
     setIsMobileSidebarOpen(false);
-  }
-
-  function handleToggleDesktopSidebar() {
-    setIsSidebarCollapsed((currentValue) => {
-      const nextValue = !currentValue;
-
-      localStorage.setItem(SIDEBAR_STORAGE_KEY, String(nextValue));
-
-      return nextValue;
-    });
-  }
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!isMobileSidebarOpen) {
       return undefined;
     }
 
-    function handleKeyDown(event) {
+    function handleEscape(event) {
       if (event.key === "Escape") {
-        handleCloseMobileSidebar();
+        setIsMobileSidebarOpen(false);
       }
     }
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleEscape);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keydown", handleEscape);
     };
   }, [isMobileSidebarOpen]);
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden xl:flex-row">
+    <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-[#F5F5F4] xl:flex-row">
       {/* Mobile header */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-neutral-800 bg-[#1F1F1F] px-4 xl:hidden">
+      <header className="relative z-60 flex h-14 shrink-0 items-center justify-between border-b border-neutral-800 bg-[#1F1F1F] px-4 xl:hidden">
         <div>
           <p className="text-lg font-bold leading-none text-white">
             SPEC<span className="text-orange-500">HUB</span>
@@ -75,33 +76,43 @@ function AdminLayout() {
 
         <button
           type="button"
-          onClick={handleOpenMobileSidebar}
+          onClick={() =>
+            setIsMobileSidebarOpen((currentValue) => !currentValue)
+          }
           aria-label="Open admin navigation"
           aria-expanded={isMobileSidebarOpen}
-          className="inline-flex size-11 cursor-pointer items-center justify-center rounded-xl text-zinc-300 transition hover:bg-zinc-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-orange-400"
+          className="ml-auto inline-flex size-11 cursor-pointer items-center justify-center rounded-xl text-zinc-300 transition-colors hover:bg-zinc-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-orange-400"
         >
-          <Menu size={22} />
+          {isMobileSidebarOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </header>
 
       {/* Mobile backdrop */}
-      {isMobileSidebarOpen && (
-        <button
-          type="button"
-          onClick={handleCloseMobileSidebar}
-          aria-label="Close admin navigation"
-          className="fixed inset-0 z-40 cursor-default bg-neutral-950/55 xl:hidden"
-        />
-      )}
+      <AnimatePresence>
+        {isMobileSidebarOpen && (
+          <motion.button
+            type="button"
+            aria-label="Close admin navigation"
+            onClick={() => setIsMobileSidebarOpen(false)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-x-0 bottom-0 top-14 z-40 cursor-default bg-neutral-950/60 backdrop-blur-[1px] xl:hidden"
+          />
+        )}
+      </AnimatePresence>
 
       <AdminSidebar
-        isOpen={isMobileSidebarOpen}
+        isMobileOpen={isMobileSidebarOpen}
         collapsed={isSidebarCollapsed}
-        onClose={handleCloseMobileSidebar}
-        onToggle={handleToggleDesktopSidebar}
+        onMobileClose={() => setIsMobileSidebarOpen(false)}
+        onToggleCollapsed={() =>
+          setIsSidebarCollapsed((currentValue) => !currentValue)
+        }
       />
 
-      {/* Independent page scrolling */}
+      {/* Only the page content scrolls */}
       <main className="scrollbar-hide min-h-0 min-w-0 flex-1 overflow-y-auto bg-[#F5F5F4]">
         <Outlet />
       </main>
