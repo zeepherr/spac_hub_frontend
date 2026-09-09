@@ -2,6 +2,8 @@ import { useMyCart } from "@/hook/cart/useMyCart";
 import { useDebounce } from "@/hook/listing/useBounce";
 import { useListingSearch } from "@/hook/listing/useListingSearch";
 import useAuthStore from "@/stores/auth.store";
+// ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง (ผมเดาไว้ที่ @/components/cart/CartFlyAnimationProvider
+// ตาม pattern เดียวกับ CheckoutStep1/CheckoutStep3/CheckoutStepLine)
 import {
   Cpu,
   Heart,
@@ -13,6 +15,8 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
+import { useCartFlyAnimation } from "../animation/CartFlyAnimationProvider";
+import { animate } from "motion";
 
 function Logo() {
   return (
@@ -265,6 +269,24 @@ function MainNav() {
 
   const isCartActive = location.pathname === "/cart";
 
+  const { cartIconRef, cartRingRef } = useCartFlyAnimation();
+
+  // เด้ง (scale bump) ตัวเลขจำนวนสินค้าบน badge ทุกครั้งที่จำนวนเพิ่มขึ้นเทียบกับค่าก่อนหน้า - ใช้ ref
+  // เก็บค่าก่อนหน้าเองแทนการเพิ่ม state ใหม่ เพราะแค่ต้องรู้ว่า "เพิ่มขึ้นไหม" ไม่จำเป็นต้อง re-render เพิ่ม
+  const cartBadgeRef = useRef(null);
+  const previousCartCountRef = useRef(cartCount);
+
+  useEffect(() => {
+    if (cartCount > previousCartCountRef.current && cartBadgeRef.current) {
+      animate(
+        cartBadgeRef.current,
+        { scale: [1, 1.5, 1] },
+        { duration: 0.35, ease: "easeOut" },
+      );
+    }
+    previousCartCountRef.current = cartCount;
+  }, [cartCount]);
+
   return (
     <nav className="flex shrink-0 items-center gap-6 whitespace-nowrap text-sm font-semibold">
       <NavLink
@@ -275,10 +297,17 @@ function MainNav() {
           }`
         }
       >
-        <span className="relative">
+        <span ref={cartIconRef} className="relative">
+          <span
+            ref={cartRingRef}
+            className="pointer-events-none absolute -inset-1.5 rounded-full border border-[#f97316] opacity-0"
+          />
           <ShoppingCart size={18} />
           {cartCount > 0 && (
-            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#f97316] text-[10px] text-white">
+            <span
+              ref={cartBadgeRef}
+              className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#f97316] text-[10px] text-white"
+            >
               {cartCount > 99 ? "99+" : cartCount}
             </span>
           )}

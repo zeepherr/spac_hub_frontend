@@ -1,3 +1,4 @@
+import { useCartFlyAnimation } from "@/components/animation/CartFlyAnimationProvider";
 import { useAddCartItem } from "@/hook/cart/useCreateItem";
 import { usePublicListingDetail } from "@/hook/listing/usePublicListingDetail";
 import useAuthStore from "@/stores/auth.store"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
@@ -12,8 +13,9 @@ import {
   ShoppingCart,
   Thermometer,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
+// ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
 
 function DetailSkeleton() {
   return (
@@ -47,8 +49,6 @@ function DetailError() {
   );
 }
 
-// label ภาษาไทยของ estimatedCondition - schema ยืนยันเจอค่า "FAIR" จริงจาก backend
-// ค่าอื่นเป็นการเดาตามรูปแบบทั่วไป (LIKE_NEW/GOOD/FAIR/POOR) ถ้าใช้ enum คนละชื่อปรับ key ตรงนี้ให้ตรง
 const CONDITION_LABELS = {
   LIKE_NEW: { label: "Like New", color: "text-green-600" },
   GOOD: { label: "Good", color: "text-green-600" },
@@ -65,7 +65,6 @@ function getConditionInfo(condition) {
   );
 }
 
-// สีของหลอดคะแนนไล่ตามช่วงคะแนน (เขียว/ส้ม/แดง) ให้เห็นภาพเร็วๆ ว่าสภาพสินค้าอยู่ระดับไหน
 function ConditionScoreBar({ score }) {
   const clamped = Math.min(100, Math.max(0, score));
   const barColor =
@@ -93,6 +92,9 @@ export default function ListingDetailPage() {
   const user = useAuthStore((store) => store.user);
   const navigate = useNavigate();
   const addCartItem = useAddCartItem();
+  // อ้างอิงกล่องรูปสินค้าหลัก (ตัวใหญ่ด้านซ้าย) ไว้เป็นจุดเริ่มบินของแอนิเมชัน "บินเข้าตะกร้า"
+  const productImageRef = useRef(null);
+  const { flyToCart } = useCartFlyAnimation();
 
   if (isLoading) return <DetailSkeleton />;
   if (isError || !listing) return <DetailError />;
@@ -100,7 +102,6 @@ export default function ListingDetailPage() {
   const images = listing.images ?? [];
   const activeImage = images[activeImageIndex]?.imageUrl;
   const price = Number(listing.price);
-  // schema ยังไม่ยืนยัน field ราคาเดิม/originalPrice ตรงๆ เว้นไว้เผื่อมี ถ้าไม่มีจะไม่โชว์ราคาขีดฆ่า
   const originalPrice = listing.originalPrice
     ? Number(listing.originalPrice)
     : null;
@@ -109,21 +110,16 @@ export default function ListingDetailPage() {
   const estimatedScore =
     listing.estimatedScore != null ? Number(listing.estimatedScore) : null;
 
-  // เหมือนปุ่ม "เพิ่มลงตะกร้า" ใน ProductCard.jsx เป๊ะ: ไม่ login เด้งไป /login แทนการ add เลย
   const handleAddToCart = () => {
     if (!user) {
       navigate("/login");
       return;
     }
 
+    flyToCart(productImageRef.current, activeImage);
     addCartItem.mutate(listing.id);
   };
 
-  // "ซื้อเลย" - ข้ามตะกร้าไปหน้า checkout ตรงๆ เลย ไม่ต้อง add เข้าตะกร้าก่อน
-  // CheckoutStep1Page.jsx อ่าน items จาก location.state โดยคาดหวัง shape เดียวกับ cart item จริง
-  // ({ id, listingId, listing: { title, price, ... } }) เพราะปกติมันมาจาก useMyCart() ตอนมาจากหน้าตะกร้า
-  // ตรงนี้เลยต้องประกอบ object หลอกให้ตรง shape เดียวกันเอง (ไม่ได้มาจาก useMyCart จริงๆ)
-  // (เปลี่ยนจาก /cart/checkout เป็น /checkoutstep1 เพราะแยก step 1/3 ออกเป็น route จริงคนละหน้าแล้ว)
   const handleBuyNow = () => {
     if (!user) {
       navigate("/login");
@@ -149,7 +145,6 @@ export default function ListingDetailPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
-      {/* Breadcrumb */}
       <nav className="hardware-label mb-4 flex flex-wrap items-center gap-2 normal-case text-secondary">
         <Link to="/" className="hover:text-[#f97316]">
           Home
@@ -176,9 +171,11 @@ export default function ListingDetailPage() {
       </nav>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_420px]">
-        {/* LEFT: รูปสินค้า */}
         <div>
-          <div className="hardware-surface relative mb-3 flex aspect-square items-center justify-center overflow-hidden bg-neutral-50">
+          <div
+            ref={productImageRef}
+            className="hardware-surface relative mb-3 flex aspect-square items-center justify-center overflow-hidden bg-neutral-50"
+          >
             <span className="hardware-shadow absolute left-3 top-3 flex items-center gap-1 rounded-field bg-white/90 px-3 py-1 text-xs font-semibold text-neutral-700">
               <ShieldCheck size={14} className="text-[#f97316]" />
               Verified by SpecHub
@@ -216,10 +213,8 @@ export default function ListingDetailPage() {
           )}
         </div>
 
-        {/* RIGHT: ข้อมูล + ซื้อ */}
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">
-            {/* field เกรดสภาพสินค้ายังไม่ยืนยันชื่อจริงจาก backend ปรับ listing.grade ให้ตรงถ้าใช้ชื่ออื่น */}
             {listing.grade && (
               <span className="hardware-label rounded-field bg-neutral-100 px-3 py-1 normal-case text-secondary">
                 Grade {listing.grade}
@@ -273,7 +268,6 @@ export default function ListingDetailPage() {
             </p>
           </div>
 
-          {/* คะแนนประเมินสภาพสินค้า - estimatedScore/estimatedCondition มาจาก listing จริง (ยืนยันจาก response แล้ว) */}
           {estimatedScore != null && (
             <div className="hardware-surface p-5">
               <div className="mb-3 flex items-center justify-between">
@@ -296,7 +290,6 @@ export default function ListingDetailPage() {
             </div>
           )}
 
-          {/* สรุปผลตรวจสอบ - อิงจาก Inspection model ใน schema ปรับชื่อ field ตามจริง */}
           {listing.inspection && (
             <div className="hardware-surface p-5">
               <div className="mb-3 flex items-center justify-between">
@@ -347,7 +340,6 @@ export default function ListingDetailPage() {
             </div>
           )}
 
-          {/* ผู้ขาย */}
           {listing.seller && (
             <div className="hardware-surface flex items-center gap-3 p-4">
               <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-neutral-100">
@@ -381,15 +373,12 @@ export default function ListingDetailPage() {
         </div>
       </div>
 
-      {/* ข้อมูลจำเพาะ + ขั้นตอนการซื้อขาย */}
       <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_360px]">
         <div>
           <h2 className="mb-4 text-lg font-bold text-neutral-900">
             Specifications
           </h2>
           <div className="hardware-surface divide-y divide-base-300">
-            {/* schema ยังไม่ยืนยันว่าสเปคมาเป็น array แบบไหน ปรับ listing.specs ให้ตรงจริง
-                ระหว่างนี้ fallback ไปโชว์ brand/model ที่มีอยู่แน่ๆ ก่อน */}
             {(listing.specs ?? []).length > 0 ? (
               listing.specs.map((spec) => (
                 <div
