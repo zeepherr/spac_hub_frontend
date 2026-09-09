@@ -12,9 +12,9 @@ export const useAddCartItem = () => {
     mutationFn: addCartItem,
 
     onSuccess: (data) => {
-      toast.success(data.message, {
-        position: "top-right",
-      });
+      // toast.success(data.message, {
+      //   position: "top-right",
+      // });
 
       queryClient.invalidateQueries({
         queryKey: cartKeys.mine(),

@@ -1,144 +1,177 @@
+import { useAddCartItem } from "@/hook/cart/useCreateItem";
+import { useCategories } from "@/hook/category/useCategory";
 import { ChevronRight, Search, SlidersHorizontal, Trophy } from "lucide-react";
-import { Link, useSearchParams } from "react-router";
-import BuildSidebar, { CATEGORIES } from "@/components/build/BuildSidebar";
+import { useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router";
+import { toast } from "sonner";
+import useAuthStore from "@/stores/auth.store";
+import BuildSidebar from "@/components/build/BuildSidebar";
 import PartPickerCard from "@/components/build/PartPickerCard";
+import { useListingsByCategory } from "@/hook/listing/useListingByCategory";
 
-// UI ล้วนๆ ก่อนตามที่ตกลงกัน - mock ข้อมูลสินค้า/หมวดหมู่ทั้งหมด ยังไม่ต่อ useListingsByCategory หรือ store การจัด
-// สเปคจริง (รอโค้ด store/hook ที่มีอยู่แล้วจากคุณก่อน) โครง route: หน้าเดียว เปลี่ยนหมวดหมู่ด้วย query param
-// ?category=vga (ตามที่เลือกไว้) - คลิกเมนูซ้ายแค่เปลี่ยน query param ไม่ reload ทั้งหน้า
-const MOCK_PRODUCTS = [
-  {
-    id: 1,
-    brand: "Asus",
-    title:
-      "ASUS TUF GAMING GEFORCE RTX 5070 TI 16GB GDDR7 OC EDITION (TUF-RTX5070TI-O16G-GAMING)",
-    price: 44900,
-    imageUrl: null,
-  },
-  {
-    id: 2,
-    brand: "Asus",
-    title:
-      "ASUS PRIME GEFORCE RTX 5070 TI 16GB GDDR7 OC EDITION (PRIME-RTX5070TI-O16G)",
-    price: 42900,
-    imageUrl: null,
-  },
-  {
-    id: 3,
-    brand: "Asus",
-    title:
-      "ASUS TUF GAMING GEFORCE RTX 5080 16GB GDDR7 OC EDITION (TUF-RTX5080-O16G-GAMING)",
-    price: 55900,
-    imageUrl: null,
-  },
-  {
-    id: 4,
-    brand: "Galax",
-    title: "GALAX GEFORCE RTX 5080 1-CLICK OC - 16GB GDDR7",
-    price: 52900,
-    imageUrl: null,
-  },
-  {
-    id: 5,
-    brand: "Gigabyte",
-    title: "GIGABYTE GEFORCE RTX 5070 TI GAMING OC 16G - 16GB GDDR7",
-    price: 43900,
-    imageUrl: null,
-  },
-  {
-    id: 6,
-    brand: "Asus",
-    title: "ASUS ROG ASTRAL GEFORCE RTX 5080 16GB GDDR7 OC EDITION",
-    price: 68900,
-    imageUrl: null,
-  },
-  {
-    id: 7,
-    brand: "Gigabyte",
-    title:
-      "GIGABYTE GEFORCE RTX 5080 AERO OC SFF 16G - 16GB GDDR7 (GV-N5080AERO OC-16GD)",
-    price: 56900,
-    imageUrl: null,
-  },
-  {
-    id: 8,
-    brand: "Gigabyte",
-    title:
-      "GIGABYTE GEFORCE RTX 5080 GAMING OC 16G - 16GB GDDR7 (GV-N5080GAMING OC-16GD)",
-    price: 57900,
-    imageUrl: null,
-  },
-];
+const SELECT_CLASS =
+  "rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm text-neutral-700 outline-none transition focus:border-neutral-400";
+
+function getCoverImageUrl(product) {
+  const images = product.images ?? [];
+  const cover = images.find((img) => img.isCover) ?? images[0];
+  return cover?.imageUrl ?? null;
+}
 
 export default function BuildPcPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeCategorySlug = searchParams.get("category") ?? "vga";
-  const activeCategory = CATEGORIES.find((c) => c.slug === activeCategorySlug);
+  const categoryIdFromUrl = searchParams.get("category");
+  const user = useAuthStore((store) => store.user);
+  const navigate = useNavigate();
+  const addCartItem = useAddCartItem();
 
-  const handleSelectCategory = (slug) => {
-    setSearchParams({ category: slug });
+  const { data: categories = [] } = useCategories({ includeInactive: false });
+
+  const activeCategoryId = categoryIdFromUrl ?? categories[0]?.id ?? null;
+  const activeCategory = categories.find(
+    (c) => String(c.id) === String(activeCategoryId),
+  );
+
+  const handleSelectCategory = (categoryId) => {
+    setSearchParams({ category: String(categoryId) });
   };
 
-  // TODO: ยังไม่ผูก "จัดชุดสเปค" จริง (เพิ่มเข้ารายการที่เลือกไว้ฝั่งซ้าย) รอ store/hook เดิมของคุณ
+  const {
+    data: products = [],
+    isLoading: isLoadingProducts,
+    isError: isErrorProducts,
+  } = useListingsByCategory(activeCategoryId);
+
+  const [selectedParts, setSelectedParts] = useState([]);
+
   const handleAddToBuild = (product) => {
-    console.log("[build] add to build:", product);
+    setSelectedParts((prev) => {
+      const existingInCategory = prev.find(
+        (part) => String(part.categoryId) === String(activeCategoryId),
+      );
+
+      const newPart = {
+        id: product.id,
+        categoryId: activeCategoryId,
+        title: product.title,
+        price: product.price,
+        qty:
+          existingInCategory?.id === product.id
+            ? existingInCategory.qty + 1
+            : 1,
+        imageUrl: getCoverImageUrl(product),
+      };
+
+      if (existingInCategory) {
+        return prev.map((part) =>
+          String(part.categoryId) === String(activeCategoryId) ? newPart : part,
+        );
+      }
+
+      return [...prev, newPart];
+    });
+
+    toast.success(`Added "${product.title}" to your build`, {
+      position: "top-right",
+    });
+  };
+
+  const handleRemovePart = (partId) => {
+    setSelectedParts((prev) => prev.filter((part) => part.id !== partId));
+  };
+
+  const handleIncreaseQty = (partId) => {
+    setSelectedParts((prev) =>
+      prev.map((part) =>
+        part.id === partId ? { ...part, qty: part.qty + 1 } : part,
+      ),
+    );
+  };
+
+  const handleAddAllToCart = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    if (selectedParts.length === 0) return;
+
+    try {
+      for (const part of selectedParts) {
+        for (let i = 0; i < part.qty; i++) {
+          await addCartItem.mutateAsync(part.id);
+        }
+      }
+      toast.success("All parts added to cart", {
+        position: "top-right",
+      });
+      setSelectedParts([]);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to add to cart", {
+        position: "top-right",
+      });
+    }
   };
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-6">
       <div className="mb-4 flex items-center gap-1.5 text-xs text-neutral-400">
         <Link to="/" className="hover:text-[#f97316]">
-          หน้าแรก
+          Home
         </Link>
         <ChevronRight size={12} />
-        <span className="font-medium text-neutral-700">จัดสเปค</span>
+        <span className="font-medium text-neutral-700">Build PC</span>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <BuildSidebar
-          activeCategory={activeCategorySlug}
+          activeCategory={activeCategoryId}
           onSelectCategory={handleSelectCategory}
+          selectedParts={selectedParts}
+          onRemovePart={handleRemovePart}
+          onIncreaseQty={handleIncreaseQty}
+          onAddAllToCart={handleAddAllToCart}
+          isAddingAllToCart={addCartItem.isPending}
         />
 
         <div className="flex flex-col gap-4">
-          <div className="hardware-surface flex flex-col gap-3 p-4">
+          <div className="flex flex-col gap-3 rounded-2xl border border-neutral-200 bg-white p-4">
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                className="btn btn-accent gap-2 text-sm text-white"
+                className="flex items-center gap-2 rounded-lg border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-700 transition hover:border-[#f97316] hover:text-[#f97316]"
               >
-                <Trophy size={16} />
-                จัดอันดับสเปคคอม
+                <Trophy size={16} className="text-[#f97316]" />
+                Build Rankings
               </button>
 
-              <div className="flex min-w-[220px] flex-1 items-center gap-2 rounded-field border border-neutral-200 px-3 py-2">
+              <div className="flex min-w-[220px] flex-1 items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2">
                 <Search size={16} className="text-neutral-400" />
                 <input
                   type="text"
-                  placeholder={`ค้นหา ${activeCategory?.label ?? ""}`}
+                  placeholder={`Search ${activeCategory?.name ?? ""}`}
                   className="w-full bg-transparent text-sm outline-none placeholder:text-neutral-400"
                 />
               </div>
               <button
                 type="button"
-                className="rounded-field border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:border-[#f97316] hover:text-[#f97316]"
+                className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:border-[#f97316] hover:text-[#f97316]"
               >
-                ค้นหา
+                Search
               </button>
 
               <div className="ml-auto flex items-center gap-3">
                 <button
                   type="button"
-                  className="flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-[#f97316]"
+                  className="flex items-center gap-1.5 text-sm font-medium text-neutral-500 transition hover:text-[#f97316]"
                 >
                   <SlidersHorizontal size={16} />
                   filter
                 </button>
-                <select className="select select-bordered select-sm">
-                  <option>จัดเรียงโดย</option>
-                  <option>ราคาต่ำ-สูง</option>
-                  <option>ราคาสูง-ต่ำ</option>
-                  <option>ใหม่ล่าสุด</option>
+                <select className={SELECT_CLASS}>
+                  <option>Sort by</option>
+                  <option>Price: Low to High</option>
+                  <option>Price: High to Low</option>
+                  <option>Newest</option>
                 </select>
               </div>
             </div>
@@ -148,35 +181,55 @@ export default function BuildPcPage() {
                 <label className="text-sm font-medium text-neutral-700">
                   Brand
                 </label>
-                <select className="select select-bordered select-sm w-full">
-                  <option>กรุณาเลือก</option>
+                <select className={`${SELECT_CLASS} w-full`}>
+                  <option>Please select</option>
                 </select>
               </div>
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-neutral-700">
                   Series
                 </label>
-                <select className="select select-bordered select-sm w-full">
-                  <option>กรุณาเลือก</option>
+                <select className={`${SELECT_CLASS} w-full`}>
+                  <option>Please select</option>
                 </select>
               </div>
             </div>
           </div>
 
           <p className="text-xs text-neutral-400">
-            ทั้งหมด '{activeCategory?.label ?? ""}' : {MOCK_PRODUCTS.length}{" "}
-            รายการ | จำนวน 1 / 3 หน้า | หน้าละ 80 รายการ
+            All '{activeCategory?.name ?? ""}': {products.length} items
           </p>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
-            {MOCK_PRODUCTS.map((product) => (
-              <PartPickerCard
-                key={product.id}
-                product={product}
-                onAddToBuild={handleAddToBuild}
-              />
-            ))}
-          </div>
+          {isLoadingProducts ? (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="aspect-[3/4] animate-pulse rounded-2xl border border-neutral-100 bg-neutral-50"
+                />
+              ))}
+            </div>
+          ) : isErrorProducts ? (
+            <div className="flex h-40 items-center justify-center rounded-2xl border border-neutral-100 bg-neutral-50">
+              <p className="text-sm text-[#dc2626]">Failed to load products</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="flex h-40 items-center justify-center rounded-2xl border border-neutral-100 bg-neutral-50">
+              <p className="text-sm text-neutral-400">
+                No products in this category yet
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+              {products.map((product) => (
+                <PartPickerCard
+                  key={product.id}
+                  product={product}
+                  onAddToBuild={handleAddToBuild}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

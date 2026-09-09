@@ -35,14 +35,12 @@ function PaymentSuccessPage() {
           </div>
 
           <div className="flex flex-col items-center gap-1.5">
-            <span className="hardware-label text-[#f97316]">
-              กำลังดำเนินการ
-            </span>
+            <span className="hardware-label text-[#f97316]">Processing</span>
             <h2 className="text-xl font-bold text-neutral-900">
-              กำลังยืนยันคำสั่งซื้อ
+              Confirming Your Order
             </h2>
             <p className="max-w-sm text-sm text-neutral-500">
-              จ่ายสำเร็จแล้ว กำลังนำคุณไปยังหน้ายืนยันคำสั่งซื้อ
+              Payment successful. Redirecting you to the confirmation page.
             </p>
           </div>
 
@@ -50,7 +48,7 @@ function PaymentSuccessPage() {
             <>
               <div className="hardware-divider w-full" />
               <div className="flex w-full items-center justify-between gap-3 text-sm">
-                <span className="text-neutral-500">เลขอ้างอิงการชำระเงิน</span>
+                <span className="text-neutral-500">Payment Reference</span>
                 <span className="truncate font-mono text-xs font-medium text-neutral-900">
                   {sessionId}
                 </span>

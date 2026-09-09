@@ -46,6 +46,7 @@ import SellingOrdersPage from "@/pages/seller/SellingOrdersPage";
 
 import BuildPcPage from "@/pages/build/BuildPcPage";
 import SupportInbox from "@/pages/public/user/SupportInbox";
+import LatestProduct from "@/components/auth/LastestProduct";
 import WebAssets from "@/pages/admin/WebAssets";
 
 const router = createBrowserRouter([
@@ -57,6 +58,7 @@ const router = createBrowserRouter([
         index: true,
         Component: HomePage,
       },
+
       {
         path: "products",
         Component: ListingPage,
@@ -64,6 +66,10 @@ const router = createBrowserRouter([
           {
             index: true, // 👈 เพิ่มใหม่ - ตรงกับ path "/products" เป๊ะๆ
             Component: AllProduct,
+          },
+          {
+            path: "lastestProducts",
+            Component: LatestProduct,
           },
           {
             path: "categories",

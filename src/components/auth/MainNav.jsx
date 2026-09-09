@@ -2,18 +2,18 @@ import { ChevronDown } from "lucide-react";
 import { NavLink } from "react-router";
 
 const TOP_NAV = [
-  { label: "หน้าหลัก", to: "/" },
-  { label: "คอมประกอบ", to: "/build", hasDropdown: true },
-  { label: "โปรโมชั่น", to: "/promotions" },
-  { label: "สินค้า", to: "/products" },
-  { label: "รีวิว", to: "/reviews" },
-  { label: "บริการ", to: "/services" },
-  { label: "ติดต่อเรา", to: "/contact" },
+  { label: "Home", to: "/" },
+  { label: "Build PC", to: "/build", hasDropdown: true },
+  { label: "Promotions", to: "/promotions" },
+  { label: "Products", to: "/products" },
+  { label: "Reviews", to: "/reviews" },
+  { label: "Services", to: "/services" },
+  { label: "Contact", to: "/contact" },
 ];
 
 function MainNav() {
   return (
-    <nav className="border-t border-neutral-100 bg-white shadow-lg">
+    <nav className=" bg-white shadow-lg">
       <div className="mx-auto flex max-w-8xl items-center gap-1 px-4">
         {TOP_NAV.map(({ label, to, hasDropdown }) => (
           <NavLink
@@ -21,10 +21,10 @@ function MainNav() {
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `flex items-center gap-1 px-4 py-3 text-sm font-semibold transition ${
+              `flex items-center gap-1  px-4 py-3 text-sm font-medium transition ${
                 isActive
-                  ? "bg-[#f97316] text-white"
-                  : "text-neutral-700 hover:text-[#f97316]"
+                  ? "border-[#f97316] text-[#ffffff] bg-[#f97316] inset-shadow-sm/55"
+                  : "border-transparent text-neutral-500 hover:text-[#f97316]"
               }`
             }
           >

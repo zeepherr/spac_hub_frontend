@@ -1,23 +1,18 @@
 import ProductCard from "./ProductCard"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
+// ใช้ hook เดียวกับ HomeStore.jsx (useListings) แทนที่จะเดา hook ใหม่ - backend เรียง createdAt
+// desc มาให้อยู่แล้ว (คอมเมนต์เดิมใน HomeStore.jsx ก็ยืนยันแบบนี้) เลยไม่ต้อง sort/slice เพิ่มเอง
+// แค่โชว์ listings ทั้งหมดตามลำดับที่ backend ส่งมาตรงๆ (หน้านี้คือหน้า "ดูทั้งหมด" ของ Latest Products
+// เลยไม่ต้อง .slice(0, 5) เหมือนตอนอยู่ใน section บนหน้า HomeStore)
 import { useListings } from "@/hook/listing/useListingForHomePage";
-import { useMemo } from "react";
 
-// สลับลำดับสินค้าทั้งหมดแบบสุ่ม (ไม่แก้ array เดิม) - แพทเทิร์นเดียวกับ pickRandomProducts
-// ใน HomeStore.jsx แต่ตรงนี้สุ่มสลับทั้งลิสต์แทนการสุ่มหยิบมาแค่บางส่วน เพราะหน้านี้คือ "All Products"
-function shuffleProducts(list) {
-  return [...list].sort(() => Math.random() - 0.5);
-}
-
-function AllProduct() {
+function LatestProduct() {
   const { data: listings = [], isLoading, isError } = useListings();
-
-  // ใช้ useMemo ผูกกับ listings เพื่อไม่ให้สุ่มสลับใหม่ทุกครั้งที่ re-render
-  // (สุ่มใหม่เฉพาะตอนข้อมูล listings เปลี่ยนจริงๆ เช่น fetch เสร็จ/refetch)
-  const shuffledListings = useMemo(() => shuffleProducts(listings), [listings]);
 
   return (
     <div>
-      <h1 className="mb-4 text-lg font-bold text-neutral-900">All Products</h1>
+      <h1 className="mb-4 text-lg font-bold text-neutral-900">
+        Latest Products
+      </h1>
 
       {isLoading ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
@@ -32,7 +27,7 @@ function AllProduct() {
         <div className="hardware-surface flex h-40 items-center justify-center">
           <p className="text-sm text-[#dc2626]">Failed to load products</p>
         </div>
-      ) : shuffledListings.length === 0 ? (
+      ) : listings.length === 0 ? (
         <div className="hardware-surface flex h-40 items-center justify-center">
           <p className="text-sm text-neutral-400">
             No product information available
@@ -40,7 +35,7 @@ function AllProduct() {
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {shuffledListings.map((product) => (
+          {listings.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
@@ -49,4 +44,4 @@ function AllProduct() {
   );
 }
 
-export default AllProduct;
+export default LatestProduct;

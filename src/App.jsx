@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { RouterProvider } from "react-router";
 import { Toaster } from "sonner";
 import AuthInitializer from "./components/auth/AuthInitializer";
+import { CartFlyAnimationProvider } from "./components/animation/CartFlyAnimationProvider";
 import BrandIntro from "./components/branding/BrandIntro";
 import router from "./routes/App.route";
 
@@ -15,20 +16,26 @@ function App() {
   useEffect(() => {
     if (!showIntro) return;
 
-    const timer = setTimeout(() => {
-      sessionStorage.setItem("spechub:intro-seen", "true");
+    const timer = setTimeout(
+      () => {
+        sessionStorage.setItem("spechub:intro-seen", "true");
 
-      setShowIntro(false);
-    }, shouldReduceMotion ? 600 : 1850);
+        setShowIntro(false);
+      },
+      shouldReduceMotion ? 600 : 1850,
+    );
 
     return () => clearTimeout(timer);
   }, [showIntro, shouldReduceMotion]);
   return (
     <main>
       <Toaster />
-      <AuthInitializer>
-        <RouterProvider router={router} />
-      </AuthInitializer>
+      <CartFlyAnimationProvider>
+        <AuthInitializer>
+          <RouterProvider router={router} />
+        </AuthInitializer>
+      </CartFlyAnimationProvider>
+
       <AnimatePresence>
         {showIntro && <BrandIntro key="brand-intro" />}
       </AnimatePresence>

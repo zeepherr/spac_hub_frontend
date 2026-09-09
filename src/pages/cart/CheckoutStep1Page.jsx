@@ -26,18 +26,18 @@ function formatPrice(amount) {
 }
 
 const shippingSchema = z.object({
-  firstName: z.string().trim().min(1, "กรุณากรอกชื่อ"),
-  lastName: z.string().trim().min(1, "กรุณากรอกนามสกุล"),
+  firstName: z.string().trim().min(1, "Please enter your first name"),
+  lastName: z.string().trim().min(1, "Please enter your last name"),
   phone: z
     .string()
     .trim()
-    .min(1, "กรุณากรอกเบอร์โทรศัพท์")
-    .regex(/^0[0-9]{8,9}$/, "เบอร์โทรศัพท์ไม่ถูกต้อง"),
+    .min(1, "Please enter your phone number")
+    .regex(/^0[0-9]{8,9}$/, "Invalid phone number"),
   address: z
     .string()
     .trim()
-    .min(1, "กรุณากรอกที่อยู่")
-    .max(500, "ที่อยู่ต้องไม่เกิน 500 ตัวอักษร"),
+    .min(1, "Please enter your address")
+    .max(500, "Address must not exceed 500 characters"),
 });
 
 function OrderSummary({
@@ -56,7 +56,7 @@ function OrderSummary({
 
   return (
     <div className="matte sticky top-24 p-6 text-white">
-      <h2 className="mb-4 text-lg font-bold">สรุปคำสั่งซื้อ</h2>
+      <h2 className="mb-4 text-lg font-bold">Order Summary</h2>
 
       <div className="mb-4 flex flex-col gap-3 border-b border-white/10 pb-4 text-sm">
         {items.map((item) => (
@@ -77,13 +77,13 @@ function OrderSummary({
       {hasItems && isQuoteError ? (
         <p className="mb-4 text-sm text-red-300">
           {quoteError?.response?.data?.message ||
-            "คำนวณยอดไม่สำเร็จ กรุณาลองใหม่อีกครั้ง"}
+            "Failed to calculate total. Please try again."}
         </p>
       ) : (
         <div className="flex flex-col gap-2 text-sm text-neutral-300">
           {isPending ? (
             <div className="flex items-center justify-between">
-              <span>กำลังคำนวณยอด...</span>
+              <span>Calculating total...</span>
             </div>
           ) : (
             (quote?.feeLines ?? []).map((fee) => (
@@ -97,7 +97,7 @@ function OrderSummary({
           )}
           {includeAssembly && (
             <div className="flex items-center justify-between">
-              <span>บริการประกอบเครื่อง</span>
+              <span>Assembly Service</span>
               <span className="font-medium text-white">
                 {formatPrice(ASSEMBLY_SERVICE_FEE)}
               </span>
@@ -108,7 +108,7 @@ function OrderSummary({
               <ShieldCheck size={14} />
               SpecHub Escrow
             </span>
-            <span>รวมอยู่แล้ว</span>
+            <span>Included</span>
           </div>
         </div>
       )}
@@ -116,7 +116,7 @@ function OrderSummary({
       <div className="my-4 h-px bg-white/10" />
 
       <div className="mb-5 flex items-end justify-between">
-        <span className="text-base font-bold">รวมทั้งหมด</span>
+        <span className="text-base font-bold">Total</span>
         <span className="text-2xl font-bold">
           {isPending ? "..." : formatPrice(grandTotal)}
         </span>
@@ -128,13 +128,13 @@ function OrderSummary({
         disabled={submitting}
         className="btn btn-accent w-full gap-2 text-white disabled:opacity-50"
       >
-        ดำเนินการชำระเงิน
+        Proceed to Checkout
         <ArrowRight size={18} />
       </button>
 
       <p className="mt-3 flex items-center justify-center gap-1 text-xs text-neutral-400">
         <Lock size={12} />
-        เข้ารหัสข้อมูลตลอดเส้นทาง
+        End-to-end encrypted
       </p>
     </div>
   );
@@ -220,7 +220,7 @@ export default function CheckoutStep1Page() {
               checkout,
             );
             throw new Error(
-              "ไม่พบ checkoutId จาก response ของ /api/checkouts (ดู console.log ว่า id อยู่ตรงไหนจริงๆ)",
+              "checkoutId not found in the /api/checkouts response (check console.log for where the id actually is)",
             );
           }
 
@@ -228,7 +228,7 @@ export default function CheckoutStep1Page() {
         } catch (error) {
           console.error("[checkout] failed:", error);
           setPaymentError(
-            error?.response?.data?.message || error?.message || "ไม่ทราบสาเหตุ",
+            error?.response?.data?.message || error?.message || "Unknown error",
           );
           setIsProcessingPayment(false);
         }
@@ -264,7 +264,7 @@ export default function CheckoutStep1Page() {
               <AlertTriangle className="h-7 w-7 text-red-500" />
             </span>
             <h2 className="text-lg font-bold text-neutral-900">
-              ดำเนินการชำระเงินไม่สำเร็จ
+              Checkout Failed
             </h2>
             <p className="max-w-sm rounded-lg bg-red-50 px-3 py-2 font-mono text-xs text-red-600">
               {paymentError}
@@ -275,7 +275,7 @@ export default function CheckoutStep1Page() {
               className="btn btn-accent mt-2 gap-2 text-white"
             >
               <ArrowLeft size={16} />
-              ลองใหม่อีกครั้ง
+              Try Again
             </button>
           </div>
         </div>
@@ -294,7 +294,7 @@ export default function CheckoutStep1Page() {
         className="mb-4 flex items-center gap-1.5 rounded-field border border-neutral-200 bg-white px-3 py-1.5 text-sm font-semibold text-neutral-700 hardware-shadow hover:border-[#f97316] hover:text-[#f97316] disabled:cursor-not-allowed disabled:opacity-50"
       >
         <ArrowLeft size={16} />
-        ย้อนกลับ
+        Back
       </button>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">

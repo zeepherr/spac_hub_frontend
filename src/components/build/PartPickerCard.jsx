@@ -1,26 +1,32 @@
 import { Cpu } from "lucide-react";
 import { Link } from "react-router";
 
-// การ์ดสินค้าเวอร์ชันหน้า "จัดสเปค" - ต่างจาก ProductCard.jsx ทั่วไป (ที่มีปุ่มเพิ่มลงตะกร้าไอคอนเดียว) ตรงที่มี
-// ปุ่ม "จัดชุดสเปค" (เพิ่มเข้ารายการที่เลือกไว้ฝั่งซ้าย) กับ "รายละเอียด" (ไปหน้า product detail) แยกกันชัดเจน
+function getCoverImageUrl(product) {
+  const images = product.images ?? [];
+  const cover = images.find((img) => img.isCover) ?? images[0];
+  return cover?.imageUrl;
+}
+
 function formatPrice(amount) {
   return `${Number(amount).toLocaleString()}.-`;
 }
 
 function PartPickerCard({ product, onAddToBuild }) {
+  const imageUrl = getCoverImageUrl(product);
+
   return (
-    <div className="hardware-surface flex flex-col p-4 text-center">
-      <span className="mb-1 text-left text-sm font-bold text-[#f97316]">
+    <div className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-4 text-center transition hover:border-neutral-300">
+      <span className="mb-1 text-left text-[11px] font-medium uppercase tracking-wide text-neutral-400">
         {product.brand}
       </span>
-      <p className="mb-3 line-clamp-2 text-left text-sm font-bold text-neutral-900">
+      <p className="mb-3 line-clamp-2 text-left text-sm font-medium text-neutral-900">
         {product.title}
       </p>
 
-      <div className="mb-3 flex aspect-square items-center justify-center overflow-hidden rounded-box bg-neutral-50">
-        {product.imageUrl ? (
+      <div className="mb-3 flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-neutral-50">
+        {imageUrl ? (
           <img
-            src={product.imageUrl}
+            src={imageUrl}
             alt={product.title}
             className="h-full w-full object-contain"
           />
@@ -29,7 +35,9 @@ function PartPickerCard({ product, onAddToBuild }) {
         )}
       </div>
 
-      <span className="hardware-label normal-case text-secondary">ราคา</span>
+      <span className="text-[11px] font-medium uppercase tracking-wide text-neutral-400">
+        Price
+      </span>
       <p className="mb-4 text-xl font-bold text-[#f97316]">
         {formatPrice(product.price)}
       </p>
@@ -38,15 +46,15 @@ function PartPickerCard({ product, onAddToBuild }) {
         <button
           type="button"
           onClick={() => onAddToBuild?.(product)}
-          className="btn btn-accent flex-1 text-xs text-white sm:text-sm"
+          className="flex-1 rounded-lg bg-[#f97316] py-2 text-xs font-semibold text-white transition hover:bg-orange-600 sm:text-sm"
         >
-          จัดชุดสเปค
+          Add to Build
         </button>
         <Link
           to={`/products/${product.id}`}
-          className="btn flex-1 border-none bg-blue-600 text-xs text-white hover:bg-blue-700 sm:text-sm"
+          className="flex flex-1 items-center justify-center rounded-lg border border-neutral-200 py-2 text-xs font-semibold text-neutral-700 transition hover:border-neutral-300 sm:text-sm"
         >
-          รายละเอียด
+          Details
         </Link>
       </div>
     </div>
