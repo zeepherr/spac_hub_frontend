@@ -1,6 +1,8 @@
+import { useCartFlyAnimation } from "@/components/animation/CartFlyAnimationProvider";
 import { useAddCartItem } from "@/hook/cart/useCreateItem";
 import useAuthStore from "@/stores/auth.store";
 import { Cpu, ShoppingCart, Star } from "lucide-react";
+import { useRef } from "react";
 import { Link, useNavigate } from "react-router";
 
 // แก้สแลชซ้อน (เช่น "r2.dev//listings/...") ที่เกิดจากฝั่ง backend ต่อ URL พลาด
@@ -57,6 +59,9 @@ function ProductCard({ product }) {
   const user = useAuthStore((store) => store.user);
   const navigate = useNavigate();
   const addCartItem = useAddCartItem();
+  // อ้างอิงกล่องรูปสินค้าในการ์ดนี้ไว้เป็นจุดเริ่มบินของแอนิเมชัน "บินเข้าตะกร้า"
+  const productImageRef = useRef(null);
+  const { flyToCart } = useCartFlyAnimation();
 
   const conditionInfo = getConditionInfo(product.estimatedCondition);
   const estimatedScore =
@@ -73,6 +78,8 @@ function ProductCard({ product }) {
       return;
     }
 
+    flyToCart(productImageRef.current, imageUrl);
+
     // TODO: ปรับ payload ให้ตรงกับที่ addCartItem ต้องการจริงๆ
     // ตอนนี้เดาว่าส่งแค่ listingId เฉยๆ ถ้า backend ต้องการ shape อื่น (เช่น { listingId, qty }) ปรับตรงนี้
     addCartItem.mutate(product.id);
@@ -87,7 +94,10 @@ function ProductCard({ product }) {
         {product.brand}
       </span>
 
-      <div className="mb-3 flex aspect-square items-center justify-center overflow-hidden rounded-box bg-neutral-50">
+      <div
+        ref={productImageRef}
+        className="mb-3 flex aspect-square items-center justify-center overflow-hidden rounded-box bg-neutral-50"
+      >
         {imageUrl ? (
           <img
             src={imageUrl}

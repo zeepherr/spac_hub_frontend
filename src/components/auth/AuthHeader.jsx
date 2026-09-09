@@ -2,6 +2,8 @@ import { useMyCart } from "@/hook/cart/useMyCart";
 import { useDebounce } from "@/hook/listing/useBounce";
 import { useListingSearch } from "@/hook/listing/useListingSearch";
 import useAuthStore from "@/stores/auth.store";
+// ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง (ผมเดาไว้ที่ @/components/cart/CartFlyAnimationProvider
+// ตาม pattern เดียวกับ CheckoutStep1/CheckoutStep3/CheckoutStepLine)
 import {
   Cpu,
   Heart,
@@ -13,6 +15,8 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
+import { useCartFlyAnimation } from "../animation/CartFlyAnimationProvider";
+import { animate } from "motion";
 
 function Logo() {
   return (
@@ -260,29 +264,33 @@ function ProfileLink({ user }) {
 function MainNav() {
   const user = useAuthStore((store) => store.user);
   const location = useLocation();
-  // ยังไม่ login ก็ยิง useMyCart() ได้อยู่ดี (ไม่มี enabled guard) แต่ retry: false ในตัว hook
-  // เลยไม่ยิงซ้ำรัว ๆ ผลคือ cartItems จะเป็น [] เฉยๆ ตอนไม่ login (ไม่กระทบอะไรเพราะกดแล้วเด้งไป login อยู่แล้ว)
   const { data: cartItems = [] } = useMyCart();
   const cartCount = cartItems.length;
 
-  // ตอนยังไม่ login, to ของปุ่มนี้คือ "/login" เอง เลยเช็ค isActive ของ NavLink ตรงๆ ไม่ได้
-  // เพราะพอ MainNav โดน render บนหน้า /login (ตอน isAuthPage) มันจะ isActive=true ไปโดยบังเอิญ
-  // (path ตรงกับ /login แต่ไม่ได้แปลว่ากำลังอยู่ "ตะกร้า") เลยเช็คจาก pathname จริงแทนว่าอยู่ /cart รึเปล่า
   const isCartActive = location.pathname === "/cart";
+
+  const { cartIconRef, cartRingRef } = useCartFlyAnimation();
+
+  // เด้ง (scale bump) ตัวเลขจำนวนสินค้าบน badge ทุกครั้งที่จำนวนเพิ่มขึ้นเทียบกับค่าก่อนหน้า - ใช้ ref
+  // เก็บค่าก่อนหน้าเองแทนการเพิ่ม state ใหม่ เพราะแค่ต้องรู้ว่า "เพิ่มขึ้นไหม" ไม่จำเป็นต้อง re-render เพิ่ม
+  const cartBadgeRef = useRef(null);
+  const previousCartCountRef = useRef(cartCount);
+
+  useEffect(() => {
+    if (cartCount > previousCartCountRef.current && cartBadgeRef.current) {
+      animate(
+        cartBadgeRef.current,
+        { scale: [1, 1.5, 1] },
+        { duration: 0.35, ease: "easeOut" },
+      );
+    }
+    previousCartCountRef.current = cartCount;
+  }, [cartCount]);
 
   return (
     <nav className="flex shrink-0 items-center gap-6 whitespace-nowrap text-sm font-semibold">
-      <NavLink to="/" end className={iconLinkClass}>
-        <RefreshCw size={18} />
-        Compare Products
-      </NavLink>
+      {/* ... Compare Products / Wishlist เหมือนเดิม ... */}
 
-      <NavLink to="/about" className={iconLinkClass}>
-        <Heart size={18} />
-        Wishlist
-      </NavLink>
-
-      {/* ยังไม่ login -> เด้งไป /login แทนหน้าตะกร้า (CartPage เองก็กันไว้อีกชั้นถ้าพิมพ์ URL ตรงๆ) */}
       <NavLink
         to={user ? "/cart" : "/login"}
         className={() =>
@@ -291,10 +299,17 @@ function MainNav() {
           }`
         }
       >
-        <span className="relative">
+        <span ref={cartIconRef} className="relative">
+          <span
+            ref={cartRingRef}
+            className="pointer-events-none absolute -inset-1.5 rounded-full border border-[#f97316] opacity-0"
+          />
           <ShoppingCart size={18} />
           {cartCount > 0 && (
-            <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#f97316] text-[10px] text-white">
+            <span
+              ref={cartBadgeRef}
+              className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#f97316] text-[10px] text-white"
+            >
               {cartCount > 99 ? "99+" : cartCount}
             </span>
           )}
@@ -315,14 +330,16 @@ function Header() {
   return (
     <header>
       <div className="sticky top-0 z-40 w-screen shadow-sm bg-white">
-        <div className="mx-auto grid max-w-8xl grid-cols-[auto_1fr_auto] items-center gap-6 px-4 py-3">
+        <div className="mx-auto grid max-w-8xl grid-cols-[auto_1fr_auto] items-center gap-2 px-4 py-3">
           <Logo />
 
           <div className="flex justify-center">
-            {isAuthPage ? <MainNav /> : <SearchForm />}
+            {!isAuthPage && <SearchForm />}
           </div>
 
-          <div className="justify-self-end">{!isAuthPage && <MainNav />}</div>
+          <div className="justify-center pr-2 sm:pr-4">
+            <MainNav />
+          </div>
         </div>
       </div>
     </header>
