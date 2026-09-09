@@ -7,12 +7,17 @@ import {
   Cpu,
   Fan,
   Gamepad2,
+  Gpu,
   HardDrive,
-  Layers,
+  Headphones,
+  Keyboard as KeyboardIcon,
+  Laptop,
   MemoryStick,
   Menu,
   Monitor,
+  Mouse as MouseIcon,
   Network,
+  PcCase,
   Plug,
   RefreshCw,
 } from "lucide-react";
@@ -21,18 +26,33 @@ import { Link } from "react-router";
 /**
  * หา icon ที่เหมาะกับชื่อหมวดหมู่ (จับคู่แบบคร่าวๆ จากชื่อที่ backend ส่งมา)
  * ถ้าไม่ match อะไรเลยจะ fallback เป็น Boxes
+ *
+ * หมายเหตุ: เช็ค "keyboard" ก่อนเช็ค mainboard เสมอ เพราะคำว่า "keyboard" มีคำว่า
+ * "board" อยู่ในตัวเอง ไม่งั้นหมวด Keyboard จะโดนจับเป็นไอคอน Mainboard ไปก่อน
  */
 export function getCategoryIcon(name = "") {
   const key = name.toLowerCase();
   if (key.includes("cpu")) return Cpu;
-  if (key.includes("main") || key.includes("board")) return CircuitBoard;
+  if (key.includes("keyboard") || key.includes("คีย์บอร์ด"))
+    return KeyboardIcon;
+  if (
+    key.includes("main") ||
+    key.includes("motherboard") ||
+    key.includes("board")
+  )
+    return CircuitBoard;
+  if (key.includes("graphic") || key.includes("vga") || key.includes("gpu"))
+    return Gpu;
   if (key.includes("ram") || key.includes("memory")) return MemoryStick;
-  if (key.includes("vga") || key.includes("gpu")) return Layers;
-  if (key.includes("ssd") || key.includes("hdd")) return HardDrive;
+  if (key.includes("storage") || key.includes("ssd") || key.includes("hdd"))
+    return HardDrive;
   if (key.includes("psu") || key.includes("power")) return Plug;
-  if (key.includes("case")) return Boxes;
+  if (key.includes("case")) return PcCase;
+  if (key.includes("laptop") || key.includes("notebook")) return Laptop;
+  if (key.includes("headphone") || key.includes("หูฟัง")) return Headphones;
   if (key.includes("cool") || key.includes("fan")) return Fan;
   if (key.includes("monitor") || key.includes("จอ")) return Monitor;
+  if (key.includes("mouse") || key.includes("เมาส์")) return MouseIcon;
   if (key.includes("gaming") || key.includes("gear")) return Gamepad2;
   if (key.includes("network") || key.includes("เน็ต")) return Network;
   if (key.includes("เสริม") || key.includes("accessor")) return Cable;

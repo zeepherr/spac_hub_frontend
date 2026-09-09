@@ -11,9 +11,17 @@ const TRUST_ITEMS = [
     subtitle: "Official Warranty on Every Item",
   },
   { icon: Truck, title: "Nationwide Delivery", subtitle: "Fast and Reliable" },
-  { icon: Wrench, title: "After-Sales Warranty", subtitle: "Confidence in Every Use" },
+  {
+    icon: Wrench,
+    title: "After-Sales Warranty",
+    subtitle: "Confidence in Every Use",
+  },
   { icon: Percent, title: "0% Installment Plan", subtitle: "Up to 10 Months" },
-  { icon: Headset, title: "After-Sales Support", subtitle: "Support Throughout Your Usage" },
+  {
+    icon: Headset,
+    title: "After-Sales Support",
+    subtitle: "Support Throughout Your Usage",
+  },
 ];
 
 // สุ่มหยิบสินค้ามา n ชิ้นจากที่มีทั้งหมด (ไม่แก้ array เดิม)
@@ -47,7 +55,9 @@ function PromoCards() {
     <div className="flex flex-col gap-4">
       {cards.length === 0 ? (
         <div className="hardware-surface flex h-72 items-center justify-center">
-          <p className="text-sm text-neutral-400">no promotion data available</p>
+          <p className="text-sm text-neutral-400">
+            no promotion data available
+          </p>
         </div>
       ) : (
         cards.map((card) => (
@@ -128,6 +138,50 @@ function ProductSection({ title, products = [], isLoading, isError }) {
   );
 }
 
+function LatestProductSection({ title, products = [], isLoading, isError }) {
+  return (
+    <section>
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="hardware-label flex items-center gap-2 text-base normal-case text-neutral-900">
+          <span className="h-4 w-1 rounded-full bg-[#f97316]" />
+          {title}
+        </h2>
+        <Link
+          to="/products/lastestProducts"
+          className="text-sm font-medium text-[#f97316] hover:text-orange-600"
+        >
+          View All Products &gt;
+        </Link>
+      </div>
+
+      {isLoading ? (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="hardware-surface aspect-[3/4] animate-pulse bg-neutral-100"
+            />
+          ))}
+        </div>
+      ) : isError ? (
+        <div className="hardware-surface flex h-40 items-center justify-center">
+          <p className="text-sm text-[#dc2626]">Failed to load products</p>
+        </div>
+      ) : products.length === 0 ? (
+        <div className="hardware-surface flex h-40 items-center justify-center">
+          <p className="text-sm text-neutral-400">No product data available</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function ArticleSection() {
   // TODO: fetch บทความ/รีวิวจาก backend แล้ว .map() แทน placeholder นี้
   const articles = [];
@@ -135,7 +189,9 @@ function ArticleSection() {
   return (
     <div className="hardware-surface p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-bold text-neutral-900">Articles / Reviews</h2>
+        <h2 className="text-sm font-bold text-neutral-900">
+          Articles / Reviews
+        </h2>
         <Link
           to="/articles"
           className="text-xs font-medium text-[#f97316] hover:text-orange-600"
@@ -183,7 +239,7 @@ export default function HomeStore() {
           isLoading={isLoading}
           isError={isError}
         />
-        <ProductSection
+        <LatestProductSection
           title="Latest Products"
           products={newest}
           isLoading={isLoading}
