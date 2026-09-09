@@ -9,6 +9,7 @@ import {
   MessageSquareText,
   PackageOpen,
   Search,
+  ShoppingBag,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
@@ -276,13 +277,36 @@ function BuyingOrders() {
       <div className="mx-auto max-w-7xl">
         <BackButton />
         {/* หัวข้อของหน้า */}
-        <header className="mb-7">
-          <h1 className="text-3xl font-bold text-neutral-900">My Orders</h1>
+        <header className="relative mb-7 overflow-hidden rounded-2xl border border-orange-100 bg-gradient-to-r from-orange-50 via-white to-white px-6 py-6 shadow-sm">
+  {/* ลายตกแต่งด้านขวา */}
+  <div className="pointer-events-none absolute -right-10 -top-14 size-40 rounded-full border-[24px] border-orange-100/60" />
+  <div className="pointer-events-none absolute right-24 top-5 size-3 rounded-full bg-orange-300/70" />
 
-          <p className="mt-2 text-sm text-neutral-500">
-            View and track all your purchases
-          </p>
-        </header>
+  <div className="relative flex items-center gap-4">
+    {/* Icon */}
+    <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-lg shadow-orange-200">
+      <ShoppingBag size={26} strokeWidth={2.2} />
+    </span>
+
+    {/* Title */}
+    <div className="min-w-0">
+      <p className="mb-1 text-xs font-black uppercase tracking-[0.18em] text-orange-500">
+        Purchase Center
+      </p>
+
+      <h1 className="text-2xl font-black tracking-tight text-neutral-900 md:text-3xl">
+        My Orders
+      </h1>
+
+      <p className="mt-1 text-sm text-neutral-500">
+        View, manage and track all your purchases
+      </p>
+    </div>
+  </div>
+
+  {/* เส้นสีด้านล่าง */}
+  <div className="absolute bottom-0 left-0 h-1 w-28 rounded-r-full bg-orange-500" />
+</header>
 
         {/* แถบเลือกหมวดหมู่ */}
         <div className="overflow-x-auto rounded-2xl border border-neutral-200 bg-white p-2 shadow-sm">
