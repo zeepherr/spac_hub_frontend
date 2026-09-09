@@ -3,18 +3,19 @@ import { useDebounce } from "@/hook/listing/useBounce";
 import { useListingSearch } from "@/hook/listing/useListingSearch";
 import useAuthStore from "@/stores/auth.store";
 import { Cpu, Search, ShoppingCart, User, X } from "lucide-react";
+import { animate } from "motion";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import { useCartFlyAnimation } from "../animation/CartFlyAnimationProvider";
-import { animate } from "motion";
-import { useWebAssets } from "@/hook/webAsset/useWebAssets";
 
 function Logo() {
-  const logo = useWebAssets().data?.homeImageUrl;
-  console.log(logo);
   return (
     <Link to="/" className="flex shrink-0 flex-col items-start">
-      <img src={logo} alt="SpecHub" className="h-13 w-auto object-contain" />
+      <img
+        src="/spechub-logo.png"
+        alt="SpecHub"
+        className="h-13 w-auto object-contain"
+      />
     </Link>
   );
 }
