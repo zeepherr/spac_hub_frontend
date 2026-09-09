@@ -6,6 +6,7 @@ import {
   MessageSquareText,
   PackageCheck,
   ScanLine,
+  Images
 } from "lucide-react";
 
 const menuItems = [
@@ -44,6 +45,11 @@ const menuItems = [
     name: "Chat",
     path: "/admin/chats",
     icon: MessageSquareText,
+  },
+  {
+    name: "Web Assets",
+    path: "/admin/web-assets",
+    icon: Images,
   },
 ];
 

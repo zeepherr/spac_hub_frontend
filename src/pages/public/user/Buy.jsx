@@ -7,7 +7,7 @@ import {
   Truck,
 } from "lucide-react";
 import { useNavigate } from "react-router";
-
+import { useMyCart } from "../../../hook/cart/useMyCart"
 import DashboardStatCard from "@/components/userDashboard/DashboardStatCard";
 import PendingReceipt from "@/components/userDashboard/PendingReceipt";
 import RecentOrders from "@/components/userDashboard/RecentOrders";
@@ -145,8 +145,8 @@ function Buy() {
     {
       id: "cart",
       label: "Cart",
-      value: 0,
-      unit: "รายการ",
+      value: useMyCart().data.length,
+      unit: "Items",
       icon: ShoppingCart,
 
       cardClassName:
@@ -167,7 +167,7 @@ function Buy() {
       id: "all-orders",
       label: "Total Orders",
       value: totalOrders,
-      unit: "รายการ",
+      unit: "Items",
       icon: PackageOpen,
 
       cardClassName:
@@ -189,7 +189,7 @@ function Buy() {
       id: "processing",
       label: "Processing",
       value: processingOrders,
-      unit: "รายการ",
+      unit: "Items",
       icon: Clock3,
 
       cardClassName:
@@ -213,7 +213,7 @@ function Buy() {
       id: "shipping",
       label: "Shipping",
       value: shippingOrders,
-      unit: "รายการ",
+      unit: "Items",
       icon: Truck,
 
       cardClassName:
