@@ -1,6 +1,6 @@
-import { Outlet } from "react-router";
 import AuthAside from "../components/auth/AuthAside";
 import Header from "../components/auth/AuthHeader";
+import AuthPageTransition from "../components/motion/AuthPageTransition";
 
 function AuthLayout() {
   return (
@@ -9,7 +9,7 @@ function AuthLayout() {
       <div className="grid min-h-0 flex-1 lg:grid-cols-2">
         <AuthAside />
         <div className="flex items-center justify-center overflow-y-auto p-4">
-          <Outlet />
+          <AuthPageTransition />
         </div>
       </div>
     </div>
