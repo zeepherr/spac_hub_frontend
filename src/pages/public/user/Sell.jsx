@@ -23,7 +23,7 @@ export default function SellerDashboard() {
   const userName = user?.firstName || user?.lastName ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : "USER";
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
+    <div className="w-full p-4 sm:p-6 md:p-8 space-y-6">
       {isProfileLoading ? (
         <DashboardHeaderSkeleton />
       ) : (
@@ -45,9 +45,8 @@ export default function SellerDashboard() {
         <div className="lg:col-span-6">
           <ActionRequiredSection />
         </div>
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-6">
           <SalesSummarySection />
-          <HelpSection />
         </div>
       </div>
     </div>

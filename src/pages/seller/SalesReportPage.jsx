@@ -118,7 +118,8 @@ export default function SalesReportPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-6xl mx-auto p-6 space-y-6">
+      /* 🟢 ปรับเปลี่ยน Skeleton Container เป็น w-full */
+      <div className="w-full p-4 sm:p-6 md:p-8 space-y-6">
         <div className="skeleton h-8 w-48 rounded-lg" />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
@@ -131,11 +132,12 @@ export default function SalesReportPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
+    /* 🟢 เปลี่ยนจาก max-w-6xl mx-auto เป็น w-full เพื่อขยายเต็มหน้าจอ */
+    <div className="w-full p-4 sm:p-6 md:p-8 space-y-6">
       {/* Header Bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button type="button" onClick={() => navigate(-1)} className="btn btn-circle btn-ghost btn-sm">
+          <button type="button" onClick={() => navigate(-1)} className="btn btn-circle btn-ghost btn-sm cursor-pointer">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>

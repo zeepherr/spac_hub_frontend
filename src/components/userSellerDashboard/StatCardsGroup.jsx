@@ -15,25 +15,25 @@ export default function StatCardsGroup() {
   const { data: buyingOrders = [], isLoading: isLoadingBuying } = useBuyingOrders();
   const { data: sellingOrders = [], isLoading: isLoadingSelling } = useSellingOrders();
 
-  // 1. Buying: แก้ไขให้ดึงจาก buyingOrders จริง และรองรับสถานะสำเร็จ
+  // 1. Buying count
   const buyingCount = sellingOrders.filter((order) => {
     const status = String(order.status || "").toUpperCase();
     return ["COMPLETED", "DELIVERED", "RECEIVED", "SUCCESS"].includes(status);
   }).length;
 
-  // 2. Selling: ออเดอร์ฝั่งขายที่ยังดำเนินอยู่ (ไม่ยกเลิก/ไม่โดนปฏิเสธ)
+  // 2. Selling count
   const sellingCount = sellingOrders.filter((order) => {
     const status = String(order.status || "").toUpperCase();
     return status !== "CANCELLED" && status !== "REJECTED";
   }).length;
 
-  // 3. Pending Verification: สินค้าฝั่งขายที่อยู่ระหว่างตรวจ SPEC
+  // 3. Pending Verification count
   const pendingVerificationCount = sellingOrders.filter((order) => {
     const status = String(order.status || "").toUpperCase();
     return ["INSPECTION_PENDING", "INSPECTING", "NEEDS_REVIEW"].includes(status);
   }).length;
 
-  // 4. Rejected: รายการที่โดน Reject
+  // 4. Rejected count
   const rejectedCount = sellingOrders.filter((order) => {
     const status = String(order.status || "").toUpperCase();
     return status === "REJECTED";
@@ -44,45 +44,45 @@ export default function StatCardsGroup() {
       label: "Buying",
       value: buyingCount,
       icon: ShoppingBag,
-      color: "text-blue-500 dark:text-blue-400",
-      bgColor: "bg-blue-500/10",
-      borderColor: "group-hover:border-blue-500/40",
-      glowColor: "group-hover:shadow-blue-500/10",
+      actionText: "View completed →",
       path: "/user/sell/selling-orders",
-      filterTab: "COMPLETED", // ส่ง Tab state ปลายทาง
+      filterTab: "COMPLETED",
+      cardStyle: "bg-amber-50/50 border-orange-200/70 hover:border-orange-300",
+      iconStyle: "bg-orange-100/70 text-orange-600",
+      textStyle: "text-orange-500 group-hover:text-orange-600",
     },
     {
       label: "Selling",
       value: sellingCount,
       icon: Tag,
-      color: "text-emerald-500 dark:text-emerald-400",
-      bgColor: "bg-emerald-500/10",
-      borderColor: "group-hover:border-emerald-500/40",
-      glowColor: "group-hover:shadow-emerald-500/10",
+      actionText: "View orders →",
       path: "/user/sell/selling-orders",
       filterTab: "ALL",
+      cardStyle: "bg-white border-neutral-100 hover:border-neutral-200",
+      iconStyle: "bg-neutral-100/80 text-neutral-800",
+      textStyle: "text-orange-500 group-hover:text-orange-600",
     },
     {
       label: "Pending Verification",
       value: pendingVerificationCount,
       icon: ShieldCheck,
-      color: "text-amber-500 dark:text-amber-400",
-      bgColor: "bg-amber-500/10",
-      borderColor: "group-hover:border-amber-500/40",
-      glowColor: "group-hover:shadow-amber-500/10",
+      actionText: "View details →",
       path: "/user/sell/selling-orders",
       filterTab: "INSPECTION",
+      cardStyle: "bg-amber-50/50 border-orange-200/70 hover:border-orange-300",
+      iconStyle: "bg-orange-100/70 text-orange-600",
+      textStyle: "text-orange-500 group-hover:text-orange-600",
     },
     {
       label: "Rejected Items",
       value: rejectedCount,
       icon: XCircle,
-      color: "text-rose-500 dark:text-rose-400",
-      bgColor: "bg-rose-500/10",
-      borderColor: "group-hover:border-rose-500/40",
-      glowColor: "group-hover:shadow-rose-500/10",
+      actionText: "View items →",
       path: "/user/sell/selling-orders",
       filterTab: "CANCELLED",
+      cardStyle: "bg-rose-50/60 border-rose-200/70 hover:border-rose-300", // 🔴 การ์ดสีแดง
+      iconStyle: "bg-rose-100 text-rose-600",                            // 🔴 ไอคอนสีแดง
+      textStyle: "text-rose-600 group-hover:text-rose-700",              // 🔴 ข้อความสีแดง
     },
   ];
 
@@ -91,7 +91,7 @@ export default function StatCardsGroup() {
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
       {stats.map((item, idx) => {
         const IconComponent = item.icon;
         return (
@@ -100,31 +100,36 @@ export default function StatCardsGroup() {
             onClick={() =>
               navigate(item.path, { state: { activeTab: item.filterTab } })
             }
-            className={`group relative card bg-base-100 border border-base-200/80 p-4 rounded-2xl flex flex-row items-center justify-between cursor-pointer shadow-sm hover:shadow-xl ${item.glowColor} ${item.borderColor} transition-all duration-300 hover:-translate-y-0.5 overflow-hidden`}
+            className={`group relative rounded-3xl p-5 md:p-6 transition-all duration-300 cursor-pointer flex items-center gap-4 border shadow-sm hover:shadow-md ${item.cardStyle}`}
           >
-            {/* Background Glow */}
+            {/* Left Icon Container */}
             <div
-              className={`absolute -right-6 -bottom-6 w-20 h-20 ${item.bgColor} rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}
-            />
-
-            <div className="flex items-center gap-3.5 relative z-10 min-w-0">
-              <div
-                className={`p-3 rounded-xl ${item.bgColor} ${item.color} group-hover:scale-110 transition-transform duration-300 shrink-0`}
-              >
-                <IconComponent className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <span className="text-xs font-semibold text-base-content/60 block truncate">
-                  {item.label}
-                </span>
-                <span className="text-2xl font-black text-base-content tracking-tight mt-0.5 block">
-                  {item.value}
-                </span>
-              </div>
+              className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 ${item.iconStyle}`}
+            >
+              <IconComponent className="w-7 h-7 md:w-8 md:h-8 stroke-[1.8]" />
             </div>
 
-            <div className="p-1 rounded-full bg-base-200/50 group-hover:bg-primary/10 group-hover:text-primary text-base-content/40 transition-colors shrink-0 z-10">
-              <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            {/* Right Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl md:text-4xl font-extrabold text-neutral-900 tracking-tight">
+                  {item.value}
+                </span>
+                <span className="text-xs font-semibold text-neutral-400">
+                  items
+                </span>
+              </div>
+
+              <p className="text-sm font-bold text-neutral-700 truncate mt-0.5">
+                {item.label}
+              </p>
+
+              {/* Action Link */}
+              <div
+                className={`inline-flex items-center gap-1 text-xs font-bold transition-colors mt-2 ${item.textStyle}`}
+              >
+                <span>{item.actionText}</span>
+              </div>
             </div>
           </div>
         );
@@ -135,18 +140,17 @@ export default function StatCardsGroup() {
 
 export function StatCardsGroupSkeleton() {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
       {[1, 2, 3, 4].map((i) => (
         <div
           key={i}
-          className="card bg-base-100 border border-base-200 p-4 rounded-2xl flex items-center justify-between"
+          className="rounded-3xl bg-neutral-50 border border-neutral-200/60 p-5 flex items-center gap-4 animate-pulse"
         >
-          <div className="flex items-center gap-3.5 w-full">
-            <div className="skeleton w-11 h-11 rounded-xl shrink-0" />
-            <div className="space-y-2 w-full">
-              <div className="skeleton h-3 w-16 rounded-md" />
-              <div className="skeleton h-6 w-8 rounded-md" />
-            </div>
+          <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-neutral-200 shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="h-7 w-12 bg-neutral-200 rounded-lg" />
+            <div className="h-4 w-24 bg-neutral-200 rounded-md" />
+            <div className="h-3 w-16 bg-neutral-200 rounded-md" />
           </div>
         </div>
       ))}

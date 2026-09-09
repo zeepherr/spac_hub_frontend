@@ -1,10 +1,58 @@
 import React, { useState, useEffect } from "react";
 import { ChevronRight, Layers, Sparkles, Upload, X, Loader2, Image as ImageIcon, CheckCircle2, MapPin } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import CategorySelectModal from "./CategorySelectModal";
 import ProvinceSelectModal from "./ProvinceSelectModal";
 import AiProcessingCard from "./AiProcessingCard";
 import { createListingSchema } from "@/validations/listing.schema";
 import { useCategories } from "@/hook/category/useCategory";
+
+// ----------------------------------------------------
+// 1. Component แสดง Text & Dots Animation ด้านบนช่อง Input
+// ----------------------------------------------------
+function SkeletonLoadingText({ text = "AI is typing" }) {
+  return (
+    <div className="flex items-center gap-1.5 text-amber-600 font-semibold text-xs py-1">
+      <span>{text}</span>
+      <span className="flex items-center gap-0.5">
+        <motion.span
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ repeat: Infinity, duration: 1.2, delay: 0 }}
+          className="w-1.5 h-1.5 bg-amber-500 rounded-full inline-block"
+        />
+        <motion.span
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ repeat: Infinity, duration: 1.2, delay: 0.2 }}
+          className="w-1.5 h-1.5 bg-amber-500 rounded-full inline-block"
+        />
+        <motion.span
+          animate={{ opacity: [0, 1, 0] }}
+          transition={{ repeat: Infinity, duration: 1.2, delay: 0.4 }}
+          className="w-1.5 h-1.5 bg-amber-500 rounded-full inline-block"
+        />
+      </span>
+    </div>
+  );
+}
+
+// ----------------------------------------------------
+// 2. Helper Function สำหรับสตรีมตัวอักษรพิมพ์เข้า Input (Typewriter)
+// ----------------------------------------------------
+const typeEffect = (text, callback, speed = 25) => {
+  return new Promise((resolve) => {
+    if (!text) return resolve();
+    let index = 0;
+    const timer = setInterval(() => {
+      if (index < text.length) {
+        callback(text.slice(0, index + 1));
+        index++;
+      } else {
+        clearInterval(timer);
+        resolve();
+      }
+    }, speed);
+  });
+};
 
 export default function ProductBasicForm({ 
   formData, 
@@ -21,13 +69,12 @@ export default function ProductBasicForm({
   const [selectedFile, setSelectedFile] = useState(null);
   const [aiImagePreview, setAiImagePreview] = useState(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false); // สถานะขณะกำลัง Typing ลง Input
   const [isAiSuccess, setIsAiSuccess] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // ดึงรายการหมวดหมู่เพื่อใช้จับคู่ชื่อหมวดหมู่
   const { data: categoriesData } = useCategories({ includeInactive: false });
 
-  // อัปเดตชื่อหมวดหมู่แสดงบน UI ทันทีเมื่อ formData.categoryId มีการเปลี่ยนแปลง
   useEffect(() => {
     if (formData.categoryId) {
       const list = Array.isArray(categoriesData) ? categoriesData : categoriesData?.data || [];
@@ -47,17 +94,12 @@ export default function ProductBasicForm({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // 👈 บล็อกไม่ให้กด/พิมพ์ตัวเลขเกิน 9 หลัก หรือ เกิน 999,999,999 ในช่อง Price
     if (name === "price") {
-      if (value !== "" && Number(value) > 999999999) {
-        return; // ไม่ตัดค่า และไม่อัปเดต state หากพิมพ์เกิน
-      }
+      if (value !== "" && Number(value) > 999999999) return;
     }
 
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // เคลียร์ error ทันทีเมื่อผู้ใช้เริ่มพิมพ์แก้ไข
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
@@ -82,17 +124,56 @@ export default function ProductBasicForm({
     setIsAiSuccess(false);
   };
 
+  // ----------------------------------------------------
+  // 3. ฟังก์ชันสแกน AI + Typewriter Animation ลงทุก Input
+  // ----------------------------------------------------
   const handleConfirmAiAutofill = async () => {
     if (!selectedFile || !onAiAutofill) return;
     try {
       setIsAiLoading(true);
-      await onAiAutofill(selectedFile);
+      setIsAiSuccess(false);
+      
+      // เรียก API ถอดข้อมูลจากรูป
+      const aiResult = await onAiAutofill(selectedFile);
+      const data = aiResult?.data || aiResult || {};
+
+      setIsAiLoading(false);
+      setIsTyping(true); // เริ่มเข้าสู่โหมดพิมพ์ข้อมูล
+
+      // ล้างข้อมูลเดิมเตรียมพิมพ์ใหม่
+      setFormData((prev) => ({
+        ...prev,
+        title: "",
+        brand: "",
+        model: "",
+        price: "",
+        description: "",
+      }));
+
+      // ลำดับการพิมพ์ลงกล่องข้อความทีละช่อง
+      if (data.title) {
+        await typeEffect(data.title, (val) => setFormData((prev) => ({ ...prev, title: val })), 20);
+      }
+      if (data.brand) {
+        await typeEffect(data.brand, (val) => setFormData((prev) => ({ ...prev, brand: val })), 25);
+      }
+      if (data.model) {
+        await typeEffect(data.model, (val) => setFormData((prev) => ({ ...prev, model: val })), 25);
+      }
+      if (data.price) {
+        await typeEffect(String(data.price), (val) => setFormData((prev) => ({ ...prev, price: val })), 40);
+      }
+      if (data.description) {
+        await typeEffect(data.description, (val) => setFormData((prev) => ({ ...prev, description: val })), 10);
+      }
+
       setIsAiSuccess(true);
     } catch (error) {
       console.error("AI Autofill Failed:", error);
       notify("Failed to extract data from image. Please try again.", "error");
     } finally {
       setIsAiLoading(false);
+      setIsTyping(false);
     }
   };
 
@@ -105,7 +186,6 @@ export default function ProductBasicForm({
   const handleFormSubmit = (e) => {
     if (e && e.preventDefault) e.preventDefault();
 
-    // Safe parsing payload
     const result = createListingSchema.safeParse(formData);
 
     if (!result.success) {
@@ -125,6 +205,8 @@ export default function ProductBasicForm({
     if (onSubmit) onSubmit(e);
   };
 
+  const isFormDisabled = isAiLoading || isTyping || loading;
+
   return (
     <>
       <div className="hardware-surface p-6 rounded-box space-y-6 bg-base-100 border border-base-300 shadow-sm">
@@ -133,7 +215,7 @@ export default function ProductBasicForm({
           <span className="hardware-indicator" />
         </div>
 
-        {/* AI AUTOFILL BOX */}
+        {/* AI AUTOFILL BANNER */}
         <div className="relative overflow-hidden rounded-2xl p-5 md:p-6 transition-all duration-300 bg-linear-to-br from-amber-500/10 via-base-100 to-orange-500/5 border border-amber-500/30 shadow-md hover:shadow-lg hover:border-amber-500/50 group">
           <div className="relative z-10 space-y-4">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -168,7 +250,12 @@ export default function ProductBasicForm({
                 <div className="flex items-center gap-4">
                   <div className="relative shrink-0">
                     <img src={aiImagePreview} alt="AI Scan Preview" className="w-20 h-20 rounded-xl border-2 border-amber-500/60 object-cover" />
-                    <button type="button" onClick={handleClearAiImage} disabled={isAiLoading || loading} className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full p-1.5 hover:bg-rose-700 transition-colors">
+                    <button 
+                      type="button" 
+                      onClick={handleClearAiImage} 
+                      disabled={isFormDisabled} 
+                      className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full p-1.5 hover:bg-rose-700 transition-colors"
+                    >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -187,9 +274,14 @@ export default function ProductBasicForm({
                     <CheckCircle2 className="w-4.5 h-4.5" /> Analysis Complete
                   </div>
                 ) : (
-                  <button type="button" onClick={handleConfirmAiAutofill} disabled={isAiLoading || loading} className="btn border-none bg-linear-to-r from-[#f97316] to-[#d97706] text-white font-extrabold rounded-xl">
-                    {isAiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    <span>{isAiLoading ? "Analyzing..." : "Confirm AI Scan"}</span>
+                  <button 
+                    type="button" 
+                    onClick={handleConfirmAiAutofill} 
+                    disabled={isFormDisabled} 
+                    className="btn border-none bg-linear-to-r from-[#f97316] to-[#d97706] text-white font-extrabold rounded-xl"
+                  >
+                    {isAiLoading || isTyping ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    <span>{isAiLoading ? "Analyzing Image..." : isTyping ? "Typing..." : "Confirm AI Scan"}</span>
                   </button>
                 )}
               </div>
@@ -197,44 +289,53 @@ export default function ProductBasicForm({
           </div>
         </div>
 
-        {/* การ์ดแสดงสถานะ */}
-        <AiProcessingCard isAiLoading={isAiLoading} isSaving={loading} />
+        {/* AI PROCESSING / SAVING INDICATOR CARD */}
+        <AiProcessingCard isAiLoading={isAiLoading || isTyping} isSaving={loading} />
 
-        {/* INPUT: ชื่อสินค้า */}
+        {/* INPUT: TITLE */}
         <div className="form-control w-full">
-          <label className="label py-1">
+          <label className="label py-1 flex items-center justify-between">
             <span className="label-text font-bold text-base-content">Product Title <span className="text-error">*</span></span>
+            {(isAiLoading || isTyping) && <SkeletonLoadingText text={isTyping ? "AI typing title" : "Analyzing title"} />}
           </label>
-          <input 
-            type="text" 
-            name="title" 
-            disabled={isAiLoading || loading}
-            value={formData.title || ""} 
-            onChange={handleChange} 
-            placeholder="e.g. NVIDIA RTX 4090 Founders Edition" 
-            className={`input w-full rounded-field ${errors.title ? "border-error focus:border-error" : ""}`} 
-          />
+          <motion.div
+            animate={isTyping || isAiLoading ? { scale: [1, 1.005, 1] } : {}}
+            transition={{ repeat: Infinity, duration: 1.2 }}
+          >
+            <input 
+              type="text" 
+              name="title" 
+              disabled={isFormDisabled}
+              value={formData.title || ""} 
+              onChange={handleChange} 
+              placeholder={isAiLoading ? "AI is analyzing title..." : "e.g. NVIDIA RTX 4090 Founders Edition"} 
+              className={`input w-full rounded-field transition-all duration-300 ${
+                isTyping || isAiLoading ? "border-amber-500 ring-2 ring-amber-500/20 bg-amber-500/5 text-amber-900 font-medium" : ""
+              } ${errors.title ? "border-error focus:border-error" : ""}`} 
+            />
+          </motion.div>
           {errors.title && <span className="text-xs text-error mt-1 font-medium">{errors.title}</span>}
         </div>
 
-        {/* หมวดหมู่ & แบรนด์ */}
+        {/* CATEGORY & BRAND */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="form-control w-full">
-            <label className="label py-1">
+            <label className="label py-1 flex items-center justify-between">
               <span className="label-text font-bold text-base-content">Category <span className="text-error">*</span></span>
+              {(isAiLoading || isTyping) && <SkeletonLoadingText text="AI is generating. Please wait… " />}
             </label>
             <button
               type="button"
-              disabled={isAiLoading || loading}
+              disabled={isFormDisabled}
               onClick={() => setIsCategoryModalOpen(true)}
               className={`w-full h-12 px-4 rounded-field border bg-base-100 hover:bg-base-200/60 flex items-center justify-between text-left transition-colors ${
-                errors.categoryId ? "border-error focus:border-error" : "border-base-300"
-              }`}
+                isTyping || isAiLoading ? "border-amber-500 ring-2 ring-amber-500/20 bg-amber-500/5" : "border-base-300"
+              } ${errors.categoryId ? "border-error focus:border-error" : ""}`}
             >
               <div className="flex items-center gap-2.5 overflow-hidden">
-                <Layers className="w-4 h-4 text-accent shrink-0" />
+                <Layers className={`w-4 h-4 shrink-0 ${isAiLoading || isTyping ? "text-amber-500 animate-spin" : "text-accent"}`} />
                 <span className={`text-sm truncate font-semibold ${selectedCategoryName ? "text-base-content font-bold" : "text-base-content/60"}`}>
-                  {selectedCategoryName || "Click to select category"}
+                  {selectedCategoryName || (isAiLoading ? "AI is generating. Please wait…" : "Click to select category")}
                 </span>
               </div>
               <ChevronRight className="w-4 h-4 text-base-content/70 shrink-0" />
@@ -243,63 +344,86 @@ export default function ProductBasicForm({
           </div>
 
           <div className="form-control w-full">
-            <label className="label py-1">
+            <label className="label py-1 flex items-center justify-between">
               <span className="label-text font-bold text-base-content">Brand <span className="text-error">*</span></span>
+              {(isAiLoading || isTyping) && <SkeletonLoadingText text={isTyping ? "AI typing brand" : "Detecting brand"} />}
             </label>
-            <input 
-              type="text" 
-              name="brand" 
-              disabled={isAiLoading || loading}
-              value={formData.brand || ""} 
-              onChange={handleChange} 
-              placeholder="NVIDIA, ASUS, MSI..." 
-              className={`input w-full rounded-field ${errors.brand ? "border-error focus:border-error" : ""}`} 
-            />
+            <motion.div
+              animate={isTyping || isAiLoading ? { scale: [1, 1.005, 1] } : {}}
+              transition={{ repeat: Infinity, duration: 1.2, delay: 0.1 }}
+            >
+              <input 
+                type="text" 
+                name="brand" 
+                disabled={isFormDisabled}
+                value={formData.brand || ""} 
+                onChange={handleChange} 
+                placeholder={isAiLoading ? "AI detecting brand..." : "NVIDIA, ASUS, MSI..."} 
+                className={`input w-full rounded-field transition-all duration-300 ${
+                  isTyping || isAiLoading ? "border-amber-500 ring-2 ring-amber-500/20 bg-amber-500/5 text-amber-900 font-medium" : ""
+                } ${errors.brand ? "border-error focus:border-error" : ""}`} 
+              />
+            </motion.div>
             {errors.brand && <span className="text-xs text-error mt-1 font-medium">{errors.brand}</span>}
           </div>
         </div>
 
-        {/* รุ่น & ราคา */}
+        {/* MODEL & PRICE */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="form-control w-full">
-            <label className="label py-1">
+            <label className="label py-1 flex items-center justify-between">
               <span className="label-text font-bold text-base-content">Model <span className="text-error">*</span></span>
+              {(isAiLoading || isTyping) && <SkeletonLoadingText text={isTyping ? "AI typing model" : "Detecting model"} />}
             </label>
-            <input 
-              type="text" 
-              name="model" 
-              disabled={isAiLoading || loading}
-              value={formData.model || ""} 
-              onChange={handleChange} 
-              placeholder="RTX 4090" 
-              className={`input w-full rounded-field ${errors.model ? "border-error focus:border-error" : ""}`} 
-            />
+            <motion.div
+              animate={isTyping || isAiLoading ? { scale: [1, 1.005, 1] } : {}}
+              transition={{ repeat: Infinity, duration: 1.2, delay: 0.2 }}
+            >
+              <input 
+                type="text" 
+                name="model" 
+                disabled={isFormDisabled}
+                value={formData.model || ""} 
+                onChange={handleChange} 
+                placeholder={isAiLoading ? "AI detecting model..." : "RTX 4090"} 
+                className={`input w-full rounded-field transition-all duration-300 ${
+                  isTyping || isAiLoading ? "border-amber-500 ring-2 ring-amber-500/20 bg-amber-500/5 text-amber-900 font-medium" : ""
+                } ${errors.model ? "border-error focus:border-error" : ""}`} 
+              />
+            </motion.div>
             {errors.model && <span className="text-xs text-error mt-1 font-medium">{errors.model}</span>}
           </div>
 
           <div className="form-control w-full">
-            <label className="label py-1">
+            <label className="label py-1 flex items-center justify-between">
               <span className="label-text font-bold text-base-content">Price (THB) <span className="text-error">*</span></span>
+              {(isAiLoading || isTyping) && <SkeletonLoadingText text={isTyping ? "AI typing price" : "Estimating price"} />}
             </label>
-            <div className="relative">
+            <motion.div
+              animate={isTyping || isAiLoading ? { scale: [1, 1.005, 1] } : {}}
+              transition={{ repeat: Infinity, duration: 1.2, delay: 0.3 }}
+              className="relative"
+            >
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-base-content/60">฿</span>
               <input 
                 type="number" 
                 name="price" 
                 min="1"
-                max="999999999" // 👈 กำหนดสูงสุดในระดับ HTML Attribute
-                disabled={isAiLoading || loading}
+                max="999999999"
+                disabled={isFormDisabled}
                 value={formData.price ?? ""} 
                 onChange={handleChange} 
-                placeholder="55000" 
-                className={`input w-full pl-8 rounded-field ${errors.price ? "border-error focus:border-error" : ""}`} 
+                placeholder={isAiLoading ? "Estimating..." : "55000"} 
+                className={`input w-full pl-8 rounded-field transition-all duration-300 ${
+                  isTyping || isAiLoading ? "border-amber-500 ring-2 ring-amber-500/20 bg-amber-500/5 text-amber-900 font-medium" : ""
+                } ${errors.price ? "border-error focus:border-error" : ""}`} 
               />
-            </div>
+            </motion.div>
             {errors.price && <span className="text-xs text-error mt-1 font-medium">{errors.price}</span>}
           </div>
         </div>
 
-        {/* MODAL เลือกจังหวัด */}
+        {/* PROVINCE LOCATION */}
         <div className="form-control w-full">
           <label className="label py-1">
             <span className="label-text font-bold text-base-content flex items-center gap-1.5">
@@ -309,7 +433,7 @@ export default function ProductBasicForm({
           </label>
           <button
             type="button"
-            disabled={isAiLoading || loading}
+            disabled={isFormDisabled}
             onClick={() => setIsProvinceModalOpen(true)}
             className={`w-full h-12 px-4 rounded-field border bg-base-100 hover:bg-base-200/60 flex items-center justify-between text-left transition-colors ${
               errors.location ? "border-error focus:border-error" : "border-base-300 focus:border-accent"
@@ -326,44 +450,72 @@ export default function ProductBasicForm({
           {errors.location && <span className="text-xs text-error mt-1 font-medium">{errors.location}</span>}
         </div>
 
-        {/* รายละเอียดเพิ่มเติม */}
+        {/* ADDITIONAL DESCRIPTION */}
         <div className="form-control w-full">
-          <label className="label py-1">
+          <label className="label py-1 flex items-center justify-between">
             <span className="label-text font-bold text-base-content">Additional Description <span className="text-error">*</span></span>
+            {(isAiLoading || isTyping) && <SkeletonLoadingText text={isTyping ? "AI typing description" : "Generating description"} />}
           </label>
-          <textarea 
-            name="description" 
-            rows={4} 
-            disabled={isAiLoading || loading}
-            value={formData.description || ""} 
-            onChange={handleChange} 
-            placeholder="Specify purchase date, previous usage history, reason for selling..." 
-            className={`textarea w-full rounded-field ${errors.description ? "border-error focus:border-error" : ""}`} 
-          />
+          <motion.div
+            animate={isTyping || isAiLoading ? { scale: [1, 1.002, 1] } : {}}
+            transition={{ repeat: Infinity, duration: 1.2, delay: 0.4 }}
+          >
+            <textarea 
+              name="description" 
+              rows={4} 
+              disabled={isFormDisabled}
+              value={formData.description || ""} 
+              onChange={handleChange} 
+              placeholder={isAiLoading ? "AI is generating description..." : "Specify purchase date, previous usage history, reason for selling..."} 
+              className={`textarea w-full rounded-field transition-all duration-300 ${
+                isTyping || isAiLoading ? "border-amber-500 ring-2 ring-amber-500/20 bg-amber-500/5 text-amber-900 font-medium" : ""
+              } ${errors.description ? "border-error focus:border-error" : ""}`} 
+            />
+          </motion.div>
           {errors.description && <span className="text-xs text-error mt-1 font-medium">{errors.description}</span>}
         </div>
 
-        {/* ปุ่มถัดไป */}
+        {/* SUBMIT BUTTON */}
         <div className="flex justify-end pt-3 border-t border-base-200">
           <button 
             type="button" 
             onClick={handleFormSubmit} 
-            disabled={loading || isAiLoading} 
-            className="btn btn-accent px-8 rounded-field font-bold shadow-md w-full sm:w-auto"
+            disabled={isFormDisabled} 
+            className="btn btn-accent px-8 rounded-field font-bold shadow-md w-full sm:w-auto overflow-hidden relative"
           >
-            {loading || isAiLoading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>{isAiLoading ? "Analyzing..." : "Saving..."}</span>
-              </div>
-            ) : (
-              <span>Next ➔</span>
-            )}
+            <AnimatePresence mode="wait">
+              {loading || isAiLoading || isTyping ? (
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="flex items-center gap-2"
+                >
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>{isAiLoading ? "AI Scanning" : isTyping ? "AI Typing" : "Saving"}</span>
+                  <span className="flex items-center gap-0.5 ml-0.5">
+                    <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0 }}>.</motion.span>
+                    <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }}>.</motion.span>
+                    <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }}>.</motion.span>
+                  </span>
+                </motion.div>
+              ) : (
+                <motion.span
+                  key="idle"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                >
+                  Next ➔
+                </motion.span>
+              )}
+            </AnimatePresence>
           </button>
         </div>
       </div>
 
-      {/* Modal หมวดหมู่ */}
+      {/* MODAL หมวดหมู่ */}
       <CategorySelectModal
         isOpen={isCategoryModalOpen}
         onClose={() => setIsCategoryModalOpen(false)}
@@ -371,7 +523,7 @@ export default function ProductBasicForm({
         onSelectCategory={handleSelectCategory}
       />
 
-      {/* Modal เลือกจังหวัด */}
+      {/* MODAL เลือกจังหวัด */}
       <ProvinceSelectModal
         isOpen={isProvinceModalOpen}
         onClose={() => setIsProvinceModalOpen(false)}
