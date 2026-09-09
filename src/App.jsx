@@ -1,5 +1,5 @@
+import { Toaster } from "@/components/ui/sonner";
 import { RouterProvider } from "react-router";
-import { Toaster } from "sonner";
 import { CartFlyAnimationProvider } from "./components/animation/CartFlyAnimationProvider";
 import AuthInitializer from "./components/auth/AuthInitializer";
 import BrandIntro from "./components/branding/BrandIntro";

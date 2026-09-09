@@ -68,6 +68,7 @@ export default function BrandIntro({
     let watchdog;
 
     const image = new Image();
+    const wordmark = new Image();
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -92,14 +93,44 @@ export default function BrandIntro({
 
     async function play() {
       try {
-        // Begin the timeline only after the real logo has loaded.
-        await new Promise((resolve, reject) => {
-          image.onload = resolve;
-          image.onerror = reject;
+        await Promise.race([
+          Promise.all([
+            new Promise((resolve, reject) => {
+              image.onload = async () => {
+                try {
+                  await image.decode();
+                  resolve();
+                } catch (error) {
+                  reject(error);
+                }
+              };
 
-          imageTimer = window.setTimeout(reject, 4000);
-          image.src = logoSrc;
-        });
+              image.onerror = reject;
+              image.src = logoSrc;
+            }),
+
+            new Promise((resolve, reject) => {
+              wordmark.onload = async () => {
+                try {
+                  await wordmark.decode();
+                  resolve();
+                } catch (error) {
+                  reject(error);
+                }
+              };
+
+              wordmark.onerror = reject;
+              wordmark.src = "/spec-hub-wordmark.png";
+            }),
+          ]),
+
+          new Promise((_, reject) => {
+            imageTimer = window.setTimeout(
+              () => reject(new Error("Brand images timed out.")),
+              4000,
+            );
+          }),
+        ]);
 
         clearTimeout(imageTimer);
 
@@ -117,25 +148,34 @@ export default function BrandIntro({
           ]);
         } else {
           controls = animate([
-            // Four overlapping diagonal slices assemble softly.
+            // Assemble with shorter gaps and softer movement.
             ...[0, 1, 2, 3].map((index) => [
               `.brand-piece-${index}`,
-              { opacity: [0, 1], x: [8, 0], y: [18, 0] },
               {
-                at: index * 0.4,
-                duration: 0.95,
+                opacity: [0, 1],
+                x: [5, 0],
+                y: [12, 0],
+              },
+              {
+                at: index * 0.22,
+                duration: 0.8,
                 ease: EASE,
               },
             ]),
 
-            // A gentle settling movement, without a bouncing logo.
             [
               ".brand-mark",
-              { scale: [0.96, 1], rotate: [-3, 0] },
-              { at: 0, duration: 2.5, ease: EASE },
+              {
+                scale: [0.97, 1],
+                rotate: [-2, 0],
+              },
+              {
+                at: 0,
+                duration: 1.8,
+                ease: EASE,
+              },
             ],
 
-            // Shadow lengthens, travels, then contracts.
             [
               ".brand-shadow",
               {
@@ -144,24 +184,26 @@ export default function BrandIntro({
                 y: [0, 30, 15, 0],
               },
               {
-                at: 0.25,
-                duration: 3.1,
+                at: 0.1,
+                duration: 2.35,
                 times: [0, 0.45, 0.75, 1],
                 ease: "easeInOut",
               },
             ],
 
-            // Restore the original orange and black artwork.
             [
               ".brand-color",
               {
                 opacity: [0, 1],
                 clipPath: ["inset(0% 100% 0% 0%)", "inset(0% 0% 0% 0%)"],
               },
-              { at: 2.55, duration: 1.25, ease: EASE },
+              {
+                at: 1.65,
+                duration: 0.95,
+                ease: EASE,
+              },
             ],
 
-            // A narrow highlight passes over the colored logo.
             [
               ".brand-shine",
               {
@@ -174,30 +216,50 @@ export default function BrandIntro({
                 ],
               },
               {
-                at: 3.05,
-                duration: 1.05,
+                at: 2.05,
+                duration: 0.85,
                 times: [0, 0.25, 0.75, 1],
                 ease: "linear",
               },
             ],
 
-            // Title enters after the logo becomes recognizable.
             [
               ".brand-title",
-              { opacity: [0, 1], y: [9, 0] },
-              { at: 3.55, duration: 0.65, ease: EASE },
+              {
+                opacity: [0, 1],
+                y: [6, 0],
+              },
+              {
+                at: 2.35,
+                duration: 0.55,
+                ease: EASE,
+              },
             ],
 
-            // Hold the finished brand until 5.25 seconds.
+            // Finished brand holds from 2.9 to 3.4 seconds.
             [
               ".brand-stage",
-              { scale: [1, 1.035], y: [0, -5] },
-              { at: 5.25, duration: 0.65, ease: EASE },
+              {
+                scale: [1, 1.025],
+                y: [0, -3],
+              },
+              {
+                at: 3.4,
+                duration: 0.6,
+                ease: EASE,
+              },
             ],
+
             [
               ".brand-overlay",
-              { opacity: [1, 0] },
-              { at: 5.25, duration: 0.75, ease: "easeInOut" },
+              {
+                opacity: [1, 0],
+              },
+              {
+                at: 3.4,
+                duration: 0.6,
+                ease: "easeInOut",
+              },
             ],
           ]);
         }
