@@ -15,7 +15,7 @@ function QueueError({ onRetry }) {
       <button
         type="button"
         onClick={() => onRetry()}
-        className="mt-4 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600"
+        className="mt-4 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 focus:outline-none focus:ring-2 focus:ring-red-100"
       >
         <RefreshCw size={14} />
         Try Again
@@ -66,7 +66,7 @@ function ConversationError({ error, onRetry }) {
       <button
         type="button"
         onClick={() => onRetry()}
-        className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-neutral-900 px-4 py-2.5 text-sm font-semibold text-white"
+        className="mt-5 inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl bg-neutral-900 px-4 py-2.5 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-orange-200"
       >
         <RefreshCw size={16} />
         Try Again

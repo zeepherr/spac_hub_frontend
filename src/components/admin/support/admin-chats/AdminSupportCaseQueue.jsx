@@ -22,8 +22,8 @@ function AdminSupportCaseQueue({
   handleSelectSupportCase,
 }) {
   return (
-    <aside className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-      <div className="border-b border-neutral-200 p-4">
+    <aside className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+      <div className="border-b border-neutral-200 p-3 sm:p-4">
         <label className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 px-3 transition focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100">
           <Search size={18} className="shrink-0 text-neutral-400" />
 
@@ -32,14 +32,14 @@ function AdminSupportCaseQueue({
             value={searchText}
             onChange={(event) => setSearchText(event.target.value)}
             placeholder="Search order, user or issue..."
-            className="h-11 min-w-0 flex-1 bg-transparent text-sm text-neutral-800 outline-none placeholder:text-neutral-400"
+            className="h-11 min-w-0 flex-1 bg-transparent text-base text-neutral-800 outline-none placeholder:text-neutral-400 sm:text-sm"
           />
         </label>
 
         <select
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value)}
-          className="mt-3 h-11 w-full cursor-pointer rounded-xl border border-neutral-200 bg-white px-3 text-sm font-semibold text-neutral-700 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+          className="mt-3 h-11 w-full cursor-pointer rounded-xl border border-neutral-200 bg-white px-3 text-base font-semibold text-neutral-700 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 sm:text-sm"
         >
           {STATUS_FILTERS.map((status) => (
             <option key={status.value} value={status.value}>

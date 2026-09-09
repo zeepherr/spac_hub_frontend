@@ -131,8 +131,8 @@ function AdminChats() {
   }
 
   return (
-    <section className="h-full min-h-0 overflow-hidden bg-[#F5F5F4] px-4 py-4 lg:px-6">
-      <div className="mx-auto flex h-full min-h-0 w-full max-w-375 flex-col">
+    <section className="min-h-full bg-[#F5F5F4] px-3 py-3 sm:px-4 sm:py-4 lg:px-6 xl:h-full xl:min-h-0 xl:overflow-hidden">
+      <div className="mx-auto flex min-h-full w-full max-w-375 flex-col xl:h-full xl:min-h-0">
         <div className="shrink-0">
           <AdminChatsHeader
             totalCases={supportCases.length}
@@ -141,7 +141,7 @@ function AdminChats() {
           />
         </div>
 
-        <div className="mt-4 grid min-h-0 flex-1 grid-rows-[minmax(160px,0.45fr)_minmax(0,1fr)] gap-4 xl:grid-cols-[360px_minmax(0,1fr)] xl:grid-rows-1">
+        <div className="mt-3 grid flex-1 grid-rows-[minmax(240px,38dvh)_auto] gap-3 sm:mt-4 sm:grid-rows-[minmax(280px,38dvh)_auto] sm:gap-4 xl:min-h-0 xl:grid-cols-[minmax(300px,360px)_minmax(0,1fr)] xl:grid-rows-1">
           {/* Left: Support queue */}
           <AdminSupportCaseQueue
             searchText={searchText}

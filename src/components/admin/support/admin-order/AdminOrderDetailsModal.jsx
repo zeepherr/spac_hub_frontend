@@ -59,7 +59,7 @@ function AdminOrderDetailsModal({ isOpen, order, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-neutral-950/55 p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-neutral-950/55 p-2 backdrop-blur-[2px] sm:p-4"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
@@ -70,9 +70,9 @@ function AdminOrderDetailsModal({ isOpen, order, onClose }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="admin-order-detail-title"
-        className="flex max-h-[88dvh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-2xl"
+        className="flex max-h-[calc(100dvh-1rem)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl sm:max-h-[88dvh] sm:rounded-3xl"
       >
-        <header className="flex shrink-0 items-start justify-between gap-4 border-b border-neutral-200 px-5 py-4 sm:px-6">
+        <header className="flex shrink-0 items-start justify-between gap-3 border-b border-neutral-200 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4">
           <div className="min-w-0">
             <p className="text-xs font-bold uppercase tracking-wider text-orange-500">
               Order details
@@ -84,22 +84,22 @@ function AdminOrderDetailsModal({ isOpen, order, onClose }) {
               {order.orderNumber || `Order #${order.id}`}
             </h2>
           </div>
-          <div className="flex shrink-0 items-center gap-3">
+          <div className="flex shrink-0 flex-col-reverse items-end gap-2 sm:flex-row sm:items-center sm:gap-3">
             <OrderStatusBadge status={order.status} />
             <button
               type="button"
               onClick={onClose}
               aria-label="Close order details"
-              className="inline-flex size-9 cursor-pointer items-center justify-center rounded-xl text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus:ring-2 focus:ring-orange-200"
+              className="inline-flex size-11 cursor-pointer items-center justify-center rounded-xl text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800 focus:outline-none focus:ring-2 focus:ring-orange-200 sm:size-9"
             >
               <X size={20} />
             </button>
           </div>
         </header>
 
-        <div className="chat-scrollbar min-h-0 flex-1 overflow-y-auto p-5 sm:p-6">
-          <article className="flex flex-col gap-5 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 sm:flex-row sm:items-center">
-            <div className="flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+        <div className="chat-scrollbar min-h-0 flex-1 overflow-y-auto p-3 sm:p-6">
+          <article className="flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-3 sm:flex-row sm:items-center sm:gap-5 sm:p-4">
+            <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-white sm:size-28">
               {coverImage ? (
                 <img src={coverImage} alt={productName} className="size-full object-cover" />
               ) : (
@@ -168,11 +168,11 @@ function AdminOrderDetailsModal({ isOpen, order, onClose }) {
           </div>
         </div>
 
-        <footer className="flex shrink-0 justify-end border-t border-neutral-200 bg-neutral-50 px-5 py-4 sm:px-6">
+        <footer className="flex shrink-0 justify-end border-t border-neutral-200 bg-neutral-50 px-3 py-3 sm:px-6 sm:py-4">
           <button
             type="button"
             onClick={onClose}
-            className="h-10 cursor-pointer rounded-xl bg-neutral-900 px-5 text-sm font-bold text-white transition hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200"
+            className="h-11 w-full cursor-pointer rounded-xl bg-neutral-900 px-5 text-sm font-bold text-white transition hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 sm:h-10 sm:w-auto"
           >
             Close
           </button>

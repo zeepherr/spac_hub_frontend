@@ -23,7 +23,13 @@ function AdminSupportConversation({
   setIsOrderDetailOpen,
 }) {
   return (
-    <main className="min-h-0 min-w-0 overflow-hidden">
+    <main
+      className={`min-w-0 overflow-hidden xl:min-h-0 ${
+        selectedSupportCaseId
+          ? "h-[900px] min-h-[900px] sm:h-[760px] sm:min-h-[760px] xl:h-auto xl:min-h-0"
+          : "h-[360px] min-h-[360px] xl:h-auto xl:min-h-0"
+      }`}
+    >
       {!selectedSupportCaseId ? (
         <NoSelectedCase />
       ) : isDetailPending && !supportCaseDetail ? (

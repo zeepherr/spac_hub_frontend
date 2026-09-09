@@ -52,7 +52,7 @@ function SupportCaseListItem({
       onClick={onSelect}
       aria-pressed={isSelected}
       className={[
-        "group relative w-full rounded-xl border p-2.5 text-left transition-all duration-200",
+        "group relative w-full rounded-xl border p-2 text-left transition-all duration-200 sm:p-2.5",
         isSelected
           ? "border-orange-300 bg-orange-50/80 shadow-sm"
           : hasUnread
@@ -60,9 +60,9 @@ function SupportCaseListItem({
             : "border-neutral-200 bg-white hover:border-neutral-300 hover:bg-neutral-50/70",
       ].join(" ")}
     >
-      <div className="flex gap-3">
+      <div className="flex gap-2.5 sm:gap-3">
         {/* Product image */}
-        <div className="relative size-16 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100">
+        <div className="relative size-14 shrink-0 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100 sm:size-16">
           {productImage ? (
             <img
               src={productImage}

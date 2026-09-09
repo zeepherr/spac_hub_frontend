@@ -60,7 +60,7 @@ function SupportChatPanel({
 
   return (
     <section
-      className={`flex min-h-0 flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm ${
+      className={`flex min-h-0 flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm sm:rounded-2xl ${
         fillAvailableHeight ? "h-full" : "h-[min(680px,70dvh)] min-h-[420px]"
       }`}
     >

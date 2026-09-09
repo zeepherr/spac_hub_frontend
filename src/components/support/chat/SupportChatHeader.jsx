@@ -14,7 +14,7 @@ function SupportChatHeader({
 }) {
   return (
     <>
-      <header className="shrink-0 border-b border-neutral-200 px-4 py-3 sm:px-5">
+      <header className="shrink-0 border-b border-neutral-200 px-3 py-3 sm:px-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
@@ -57,7 +57,7 @@ function SupportChatHeader({
       </header>
 
       {socketError && (
-        <div className="flex shrink-0 items-start gap-3 border-b border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 sm:px-5">
+        <div className="flex shrink-0 items-start gap-3 border-b border-red-100 bg-red-50 px-3 py-3 text-sm text-red-700 sm:px-5">
           <WifiOff size={18} className="mt-0.5 shrink-0" />
           <div>
             <p className="font-semibold">Chat connection problem</p>

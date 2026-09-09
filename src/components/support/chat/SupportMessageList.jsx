@@ -29,7 +29,7 @@ function SupportMessageList({
       <div
         ref={messageContainerRef}
         onScroll={handleMessageScroll}
-        className="chat-scrollbar h-full overflow-y-auto overscroll-contain bg-white px-4 py-4 sm:px-5"
+        className="chat-scrollbar h-full overflow-y-auto overscroll-contain bg-white px-3 py-4 sm:px-5"
         aria-live="polite"
       >
         {hasNextPage && (
@@ -38,7 +38,7 @@ function SupportMessageList({
               type="button"
               onClick={() => fetchNextPage()}
               disabled={isFetchingNextPage}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs font-semibold text-neutral-600 transition hover:border-orange-200 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs font-semibold text-neutral-600 transition hover:border-orange-200 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-200 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isFetchingNextPage ? (
                 <LoaderCircle size={15} className="animate-spin" />
@@ -63,7 +63,7 @@ function SupportMessageList({
             <button
               type="button"
               onClick={() => refetchMessages()}
-              className="mt-4 cursor-pointer rounded-lg border border-orange-500 px-4 py-2 text-sm font-semibold text-orange-500 transition hover:bg-orange-50"
+              className="mt-4 min-h-11 cursor-pointer rounded-lg border border-orange-500 px-4 py-2 text-sm font-semibold text-orange-500 transition hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-200"
             >
               Try Again
             </button>
@@ -93,7 +93,7 @@ function SupportMessageList({
         <button
           type="button"
           onClick={() => scrollToBottom("smooth")}
-          className="animate-in fade-in slide-in-from-bottom-2 absolute bottom-4 left-1/2 -translate-x-1/2 cursor-pointer rounded-full bg-neutral-900 px-4 py-2 text-xs font-semibold text-white shadow-lg duration-200 hover:bg-neutral-800"
+          className="animate-in fade-in slide-in-from-bottom-2 absolute bottom-4 left-1/2 min-h-11 -translate-x-1/2 cursor-pointer rounded-full bg-neutral-900 px-4 py-2 text-xs font-semibold text-white shadow-lg duration-200 hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-orange-200"
         >
           New message
         </button>
@@ -123,7 +123,7 @@ function MessageBubble({ message, supportCase, currentUserId }) {
       }`}
     >
       <div
-        className={`max-w-[85%] sm:max-w-[72%] ${
+        className={`max-w-[92%] sm:max-w-[72%] ${
           isMine ? "items-end" : "items-start"
         }`}
       >

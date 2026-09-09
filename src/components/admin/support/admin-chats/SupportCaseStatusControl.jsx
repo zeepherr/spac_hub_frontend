@@ -46,7 +46,7 @@ function SupportCaseStatusControl({ supportCase }) {
       onSubmit={handleSubmit}
       className="shrink-0 rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm"
     >
-      <div className="grid gap-3 lg:grid-cols-[220px_minmax(0,1fr)_120px]">
+      <div className="grid gap-3 xl:grid-cols-[minmax(150px,0.7fr)_minmax(220px,1.6fr)_minmax(100px,0.55fr)]">
         <div>
           <label
             htmlFor="support-case-status"
@@ -60,7 +60,7 @@ function SupportCaseStatusControl({ supportCase }) {
             value={status}
             onChange={(event) => setStatus(event.target.value)}
             disabled={updateStatusMutation.isPending}
-            className="mt-2 h-11 w-full cursor-pointer rounded-xl border border-neutral-200 bg-white px-3 text-sm font-semibold text-neutral-700 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+            className="mt-2 h-11 w-full cursor-pointer rounded-xl border border-neutral-200 bg-white px-3 text-base font-semibold text-neutral-700 outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 sm:text-sm"
           >
             {STATUS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -86,7 +86,7 @@ function SupportCaseStatusControl({ supportCase }) {
             maxLength={2000}
             disabled={updateStatusMutation.isPending}
             placeholder="Optional note about the resolution..."
-            className="mt-2 h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-sm text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+            className="mt-2 h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-base text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 sm:text-sm"
           />
         </div>
 
