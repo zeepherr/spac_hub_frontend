@@ -3,6 +3,7 @@ import { Headset, Percent, ShieldCheck, Truck, Wrench } from "lucide-react";
 import { useMemo } from "react";
 import { Link } from "react-router";
 import ProductCard from "./ProductCard";
+import { useWebAssets } from "@/hook/webAsset/useWebAssets";
 
 const TRUST_ITEMS = [
   {
@@ -30,35 +31,57 @@ function pickRandomProducts(list, count) {
   return shuffled.slice(0, count);
 }
 
-function HeroBanner() {
-  // TODO: fetch แบนเนอร์จาก backend แล้ว .map() แทน placeholder นี้
-  const slides = [];
+function HeroBanner({ data }) {
+  // ดึงรูปแบนเนอร์จริงจาก backend - เดิม data อาจยัง undefined ตอนโหลดไม่เสร็จ ใช้ ?. กันแอปพัง
+  // (ของเดิมเรียก data.coverImageUrl ตรงๆ ไม่ใส่ optional chaining จะ throw ตอน data ยังไม่มา)
+  const bannerImageUrl = data?.coverImageUrl;
 
   return (
-    <div className="flex h-64 items-center justify-center rounded-2xl border border-dashed border-neutral-200 bg-neutral-50">
-      {slides.length === 0 ? (
-        <p className="text-sm text-neutral-400">no banner data available</p>
+    <div
+      className={`flex h-64 items-center justify-center overflow-hidden rounded-2xl bg-neutral-50 ${
+        bannerImageUrl
+          ? "border border-neutral-200"
+          : "border border-dashed border-neutral-200"
+      }`}
+    >
+      {bannerImageUrl ? (
+        <img
+          src={bannerImageUrl}
+          alt="Promotional banner"
+          className="h-full w-full object-cover"
+        />
       ) : (
-        slides.map((slide) => (
-          <div key={slide.id}>{/* render banner slide */}</div>
-        ))
+        <p className="text-sm text-neutral-400">no banner data available</p>
       )}
     </div>
   );
 }
 
-function PromoCards() {
+function PromoCards({ data }) {
   // TODO: fetch โปรโมชัน/ทางลัดจาก backend แล้ว .map() แทน placeholder นี้
   const cards = [];
+
+  // ดึงรูปโปรโมชันจริงจาก backend เหมือนกับ HeroBanner - ใช้ ?. กัน data ยัง undefined ตอนโหลดไม่เสร็จ
+  const promotionImageUrl = data?.promotionImageUrl;
 
   return (
     <div className="flex flex-col gap-4">
       {cards.length === 0 ? (
-        <div className="flex h-64 items-center justify-center rounded-2xl border border-dashed border-neutral-200 bg-neutral-50">
-          <p className="text-sm text-neutral-400">
-            no promotion data available
-          </p>
-        </div>
+        promotionImageUrl ? (
+          <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
+            <img
+              src={promotionImageUrl}
+              alt="Promotion"
+              className="h-64 w-full object-cover"
+            />
+          </div>
+        ) : (
+          <div className="flex h-64 items-center justify-center rounded-2xl border border-dashed border-neutral-200 bg-neutral-50">
+            <p className="text-sm text-neutral-400">
+              no promotion data available
+            </p>
+          </div>
+        )
       ) : (
         cards.map((card) => (
           <div
@@ -217,6 +240,7 @@ function ArticleSection() {
 
 export default function HomeStore() {
   const { data: listings = [], isLoading, isError } = useListings();
+  const { data: images } = useWebAssets();
 
   // ล่าสุด - backend เรียง createdAt desc มาให้อยู่แล้ว เอา 5 ตัวแรกตรงๆ
   const newest = listings.slice(0, 5);
@@ -229,7 +253,7 @@ export default function HomeStore() {
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
       <div className="flex flex-col gap-8">
-        <HeroBanner />
+        <HeroBanner data={images} />
         <TrustBar />
         <ProductSection
           title="Recommended Products"
@@ -246,7 +270,7 @@ export default function HomeStore() {
       </div>
 
       <div className="flex flex-col gap-8">
-        <PromoCards />
+        <PromoCards data={images} />
         <ArticleSection />
       </div>
     </div>

@@ -16,31 +16,29 @@ function App() {
   useEffect(() => {
     if (!showIntro) return;
 
-    const timer = setTimeout(() => {
-      sessionStorage.setItem("spechub:intro-seen", "true");
+    const timer = setTimeout(
+      () => {
+        sessionStorage.setItem("spechub:intro-seen", "true");
 
-      setShowIntro(false);
-    }, shouldReduceMotion ? 600 : 1850);
+        setShowIntro(false);
+      },
+      shouldReduceMotion ? 600 : 1850,
+    );
 
     return () => clearTimeout(timer);
   }, [showIntro, shouldReduceMotion]);
   return (
     <main>
       <Toaster />
-<<<<<<< HEAD
       <CartFlyAnimationProvider>
         <AuthInitializer>
           <RouterProvider router={router} />
         </AuthInitializer>
       </CartFlyAnimationProvider>
-=======
-      <AuthInitializer>
-        <RouterProvider router={router} />
-      </AuthInitializer>
+
       <AnimatePresence>
         {showIntro && <BrandIntro key="brand-intro" />}
       </AnimatePresence>
->>>>>>> dev
     </main>
   );
 }
