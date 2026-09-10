@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
 import { Package, RefreshCw, Search } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import { useAdminOrders } from "@/hook/order/useAdminOrder";
 
@@ -62,7 +62,7 @@ function AwaitingReceipt() {
 
             <div>
               <h1 className="text-2xl font-semibold text-neutral-900">
-                Awaiting Receipt
+                Awaiting Receive
               </h1>
 
               <p className="mt-1 text-sm text-neutral-500">

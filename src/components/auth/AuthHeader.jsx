@@ -1,20 +1,25 @@
 import { useMyCart } from "@/hook/cart/useMyCart";
 import { useDebounce } from "@/hook/listing/useBounce";
 import { useListingSearch } from "@/hook/listing/useListingSearch";
+import { useWebAssets } from "@/hook/webAsset/useWebAssets";
 import useAuthStore from "@/stores/auth.store";
 import { Cpu, Search, ShoppingCart, User, X } from "lucide-react";
 import { animate } from "motion";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import { useCartFlyAnimation } from "../animation/CartFlyAnimationProvider";
+import GlobalLoading from "../loading/GlobalLoading";
 
 function Logo() {
+  const { data: webassents, isLoading } = useWebAssets();
+  const logoUrl = webassents?.homeImageUrl;
+  if (logoUrl && isLoading) return <GlobalLoading />;
   return (
     <Link to="/" className="flex shrink-0 flex-col items-start">
       <img
-        src="/spechub-logo.png"
+        src={logoUrl ? logoUrl : "/spechub-logo.png"}
         alt="SpecHub"
-        className="h-13 w-auto object-contain"
+        className="h-13 w-auto object-contain "
       />
     </Link>
   );

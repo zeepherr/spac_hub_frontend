@@ -44,10 +44,10 @@ import MyListingsPage from "@/pages/seller/MyListingsPage";
 import SalesReportPage from "@/pages/seller/SalesReportPage";
 import SellingOrdersPage from "@/pages/seller/SellingOrdersPage";
 
-import BuildPcPage from "@/pages/build/BuildPcPage";
-import SupportInbox from "@/pages/public/user/SupportInbox";
 import LatestProduct from "@/components/auth/LastestProduct";
 import WebAssets from "@/pages/admin/WebAssets";
+import BuildPcPage from "@/pages/build/BuildPcPage";
+import SupportInbox from "@/pages/public/user/SupportInbox";
 
 const router = createBrowserRouter([
   {
@@ -187,7 +187,7 @@ const router = createBrowserRouter([
                 Component: Dashboard,
               },
               {
-                path: "orders/awaiting-receipt",
+                path: "orders/awaiting-receive",
                 Component: AwaitingReceipt,
               },
               {

@@ -1,10 +1,10 @@
 import {
   ClipboardCheck,
+  History,
   LoaderCircle,
   PackageCheck,
   RefreshCw,
   ScanLine,
-  History,
 } from "lucide-react";
 import { Link } from "react-router";
 
@@ -12,9 +12,9 @@ import { useAdminOrders } from "@/hook/order/useAdminOrder";
 
 const summaryItems = [
   {
-    title: "Awaiting Receipt",
+    title: "Awaiting Receive",
     statuses: ["SELLER_SHIPPING"],
-    path: "/admin/orders/awaiting-receipt",
+    path: "/admin/orders/awaiting-receive",
     icon: ScanLine,
   },
   {
@@ -31,19 +31,17 @@ const summaryItems = [
   },
   {
     title: "Shipping Summary",
-    statuses: ["COMPLETED","REJECTED","SHIPPING_TO_BUYER"],
+    statuses: ["COMPLETED", "REJECTED", "SHIPPING_TO_BUYER"],
     path: "/admin/orders/summary",
     icon: History,
   },
 ];
 
-const dashboardStatuses = summaryItems.flatMap(
-  (item) => item.statuses,
-);
+const dashboardStatuses = summaryItems.flatMap((item) => item.statuses);
 
 const statusConfig = {
   SELLER_SHIPPING: {
-    label: "Awaiting Receipt",
+    label: "Awaiting Receive",
     className: "bg-orange-50 text-orange-600",
   },
 
@@ -80,19 +78,13 @@ const priceFormatter = new Intl.NumberFormat("th-TH", {
 });
 
 function formatPrice(value) {
-  if (
-    value === null ||
-    value === undefined ||
-    value === ""
-  ) {
+  if (value === null || value === undefined || value === "") {
     return "—";
   }
 
   const amount = Number(value);
 
-  return Number.isFinite(amount)
-    ? priceFormatter.format(amount)
-    : "—";
+  return Number.isFinite(amount) ? priceFormatter.format(amount) : "—";
 }
 
 function getCreatedTime(order) {
@@ -110,10 +102,7 @@ function Dashboard() {
   const hasData = ordersQuery.data !== undefined;
 
   const latestOrders = [...orders]
-    .sort(
-      (a, b) =>
-        getCreatedTime(b) - getCreatedTime(a),
-    )
+    .sort((a, b) => getCreatedTime(b) - getCreatedTime(a))
     .slice(0, 10);
 
   return (
@@ -121,13 +110,10 @@ function Dashboard() {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Dashboard
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
 
           <p className="mt-1 text-sm text-gray-500">
-            Overview of orders that require admin
-            action.
+            Overview of orders that require admin action.
           </p>
         </div>
 
@@ -139,16 +125,10 @@ function Dashboard() {
         >
           <RefreshCw
             size={16}
-            className={
-              ordersQuery.isFetching
-                ? "animate-spin"
-                : ""
-            }
+            className={ordersQuery.isFetching ? "animate-spin" : ""}
           />
 
-          {ordersQuery.isFetching
-            ? "Loading..."
-            : "Refresh"}
+          {ordersQuery.isFetching ? "Loading..." : "Refresh"}
         </button>
       </div>
 
@@ -165,8 +145,7 @@ function Dashboard() {
           </p>
 
           <p className="mt-1">
-            {ordersQuery.error?.response?.data
-              ?.message ||
+            {ordersQuery.error?.response?.data?.message ||
               "Please try refreshing again."}
           </p>
         </div>
@@ -188,14 +167,9 @@ function Dashboard() {
               className="rounded-xl border border-gray-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-md"
             >
               <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-500">
-                  {item.title}
-                </p>
+                <p className="text-sm text-gray-500">{item.title}</p>
 
-                <Icon
-                  size={19}
-                  className="text-orange-500"
-                />
+                <Icon size={19} className="text-orange-500" />
               </div>
 
               <div className="mt-3 text-2xl font-bold text-gray-900">
@@ -220,21 +194,16 @@ function Dashboard() {
       <section className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-200 px-6 py-5">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">
-              Recent Orders
-            </h2>
+            <h2 className="text-lg font-bold text-gray-900">Recent Orders</h2>
 
             <p className="mt-1 text-sm text-gray-500">
-              Orders awaiting action, sorted by most
-              recently created.
+              Orders awaiting action, sorted by most recently created.
             </p>
           </div>
 
           {hasData && (
             <p className="text-sm text-gray-500">
-              Total{" "}
-              {orders.length.toLocaleString("en-US")}{" "}
-              orders
+              Total {orders.length.toLocaleString("en-US")} orders
             </p>
           )}
         </div>
@@ -244,14 +213,9 @@ function Dashboard() {
             role="status"
             className="flex min-h-52 items-center justify-center gap-3"
           >
-            <LoaderCircle
-              size={26}
-              className="animate-spin text-orange-500"
-            />
+            <LoaderCircle size={26} className="animate-spin text-orange-500" />
 
-            <p className="text-sm text-gray-500">
-              Loading orders...
-            </p>
+            <p className="text-sm text-gray-500">Loading orders...</p>
           </div>
         ) : !hasData ? (
           <div className="px-6 py-16 text-center text-sm text-gray-500">
@@ -259,18 +223,14 @@ function Dashboard() {
           </div>
         ) : orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-6 py-16">
-            <PackageCheck
-              size={36}
-              className="text-gray-300"
-            />
+            <PackageCheck size={36} className="text-gray-300" />
 
             <p className="mt-3 font-medium text-gray-700">
               No orders require action
             </p>
 
             <p className="mt-1 text-sm text-gray-500">
-              Orders will appear here when sellers ship
-              their items.
+              Orders will appear here when sellers ship their items.
             </p>
           </div>
         ) : (
@@ -279,42 +239,26 @@ function Dashboard() {
               <table className="w-full min-w-[900px] text-left text-sm">
                 <thead className="bg-gray-50 text-gray-500">
                   <tr>
-                    <th className="px-6 py-4 font-medium">
-                      Order
-                    </th>
+                    <th className="px-6 py-4 font-medium">Order</th>
 
-                    <th className="px-6 py-4 font-medium">
-                      Product
-                    </th>
+                    <th className="px-6 py-4 font-medium">Product</th>
 
-                    <th className="px-6 py-4 font-medium">
-                      Seller
-                    </th>
+                    <th className="px-6 py-4 font-medium">Seller</th>
 
-                    <th className="px-6 py-4 font-medium">
-                      Price
-                    </th>
+                    <th className="px-6 py-4 font-medium">Price</th>
 
-                    <th className="px-6 py-4 font-medium">
-                      Status
-                    </th>
+                    <th className="px-6 py-4 font-medium">Status</th>
 
-                    <th className="px-6 py-4 font-medium">
-                      Action
-                    </th>
+                    <th className="px-6 py-4 font-medium">Action</th>
                   </tr>
                 </thead>
 
                 <tbody className="divide-y divide-gray-200">
                   {latestOrders.map((order) => {
-                    const status =
-                      statusConfig[order.status] ?? {
-                        label:
-                          order.status ||
-                          "Unknown Status",
-                        className:
-                          "bg-gray-100 text-gray-600",
-                      };
+                    const status = statusConfig[order.status] ?? {
+                      label: order.status || "Unknown Status",
+                      className: "bg-gray-100 text-gray-600",
+                    };
 
                     const sellerName = [
                       order.seller?.firstName,
@@ -323,39 +267,28 @@ function Dashboard() {
                       .filter(Boolean)
                       .join(" ");
 
-                    const queue =
-                      summaryItems.find((item) =>
-                        item.statuses.includes(
-                          order.status,
-                        ),
-                      );
+                    const queue = summaryItems.find((item) =>
+                      item.statuses.includes(order.status),
+                    );
 
                     return (
-                      <tr
-                        key={order.id}
-                        className="hover:bg-gray-50"
-                      >
+                      <tr key={order.id} className="hover:bg-gray-50">
                         <td className="px-6 py-5 font-semibold text-gray-900">
-                          {order.orderNumber ||
-                            `#${order.id}`}
+                          {order.orderNumber || `#${order.id}`}
                         </td>
 
                         <td className="px-6 py-5 text-gray-700">
                           <p className="max-w-[260px] break-words">
-                            {order.listing?.title ||
-                              "Product name unavailable"}
+                            {order.listing?.title || "Product name unavailable"}
                           </p>
                         </td>
 
                         <td className="px-6 py-5 text-gray-600">
-                          {sellerName ||
-                            "Name unavailable"}
+                          {sellerName || "Name unavailable"}
                         </td>
 
                         <td className="whitespace-nowrap px-6 py-5 font-medium text-gray-900">
-                          {formatPrice(
-                            order.agreedPrice,
-                          )}
+                          {formatPrice(order.agreedPrice)}
                         </td>
 
                         <td className="px-6 py-5">
@@ -375,9 +308,7 @@ function Dashboard() {
                               Manage
                             </Link>
                           ) : (
-                            <span className="text-gray-400">
-                              —
-                            </span>
+                            <span className="text-gray-400">—</span>
                           )}
                         </td>
                       </tr>
@@ -389,8 +320,7 @@ function Dashboard() {
 
             <div className="border-t border-gray-200 px-6 py-4 text-sm text-gray-500">
               Showing {latestOrders.length} of{" "}
-              {orders.length.toLocaleString("en-US")}{" "}
-              orders
+              {orders.length.toLocaleString("en-US")} orders
             </div>
           </>
         )}
