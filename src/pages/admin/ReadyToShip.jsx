@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 import {
   LoaderCircle,
   PackageCheck,
   RefreshCw,
   Search,
 } from "lucide-react";
-import { useNavigate } from "react-router";
 
 import { useAdminOrders } from "@/hook/order/useAdminOrder";
 
@@ -21,25 +21,36 @@ function ReadyToShip() {
     statuses: ["VERIFIED", "REJECTED"],
   });
 
-  const orders = ordersQuery.data ?? [];
+  const orders = Array.isArray(
+    ordersQuery.data,
+  )
+    ? ordersQuery.data
+    : (ordersQuery.data?.data ?? []);
 
   const filteredOrders = useMemo(() => {
-    const keyword = search.trim().toLowerCase();
+    const keyword = search
+      .trim()
+      .toLowerCase();
 
     return orders.filter((order) => {
       const listing = order.listing;
 
-      // REJECTED orders remain REJECTED
-      // even after Admin creates a return shipment to Seller.
-      // Therefore, ADMIN_TO_SELLER shipment must also be checked.
-      const hasReturnShipment = order.shipments?.some(
-        (shipment) =>
-          shipment.shipmentType ===
-          "ADMIN_TO_SELLER",
-      );
+      /*
+       * REJECTED order จะยังคงเป็น REJECTED
+       * แม้ Admin จะสร้าง shipment
+       * สำหรับส่งสินค้าคืน Seller แล้ว
+       */
+      const hasReturnShipment =
+        order.shipments?.some(
+          (shipment) =>
+            shipment.shipmentType ===
+            "ADMIN_TO_SELLER",
+        );
 
-      // Product has already been returned,
-      // so remove it from the Ready to Ship page.
+      /*
+       * ถ้าส่งคืน Seller ไปแล้ว
+       * ไม่ต้องแสดงใน Ready to Ship
+       */
       if (
         order.status === "REJECTED" &&
         hasReturnShipment
@@ -47,21 +58,27 @@ function ReadyToShip() {
         return false;
       }
 
+      /*
+       * SEARCH
+       */
+      const values = [
+        order.orderNumber,
+        listing?.title,
+        listing?.brand,
+        listing?.model,
+      ];
+
       const matchesSearch =
         !keyword ||
-        order.orderNumber
-          ?.toLowerCase()
-          .includes(keyword) ||
-        listing?.title
-          ?.toLowerCase()
-          .includes(keyword) ||
-        listing?.brand
-          ?.toLowerCase()
-          .includes(keyword) ||
-        listing?.model
-          ?.toLowerCase()
-          .includes(keyword);
+        values.some((value) =>
+          String(value ?? "")
+            .toLowerCase()
+            .includes(keyword),
+        );
 
+      /*
+       * FILTER
+       */
       const matchesFilter =
         filter === "ALL" ||
         order.status === filter;
@@ -73,38 +90,52 @@ function ReadyToShip() {
     });
   }, [orders, search, filter]);
 
+  /*
+   * ================================
+   * LOADING
+   * ================================
+   */
   if (ordersQuery.isPending) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center">
-        <LoaderCircle
-          size={30}
-          className="animate-spin text-orange-500"
-        />
+      <div className="min-h-screen bg-[#F5F5F4] px-6 py-6">
+        <div className="mx-auto flex min-h-[500px] w-full max-w-[1500px] items-center justify-center">
+          <LoaderCircle
+            size={30}
+            className="animate-spin text-orange-500"
+          />
 
-        <span className="ml-3 text-sm text-neutral-500">
-          Loading data...
-        </span>
+          <span className="ml-3 text-sm text-neutral-500">
+            Loading data...
+          </span>
+        </div>
       </div>
     );
   }
 
+  /*
+   * ================================
+   * ERROR
+   * ================================
+   */
   if (ordersQuery.isError) {
     return (
-      <div className="flex min-h-[500px] items-center justify-center">
-        <div className="text-center">
-          <p className="text-sm text-red-500">
-            Unable to load data
-          </p>
+      <div className="min-h-screen bg-[#F5F5F4] px-6 py-6">
+        <div className="mx-auto flex min-h-[500px] w-full max-w-[1500px] items-center justify-center">
+          <div className="text-center">
+            <p className="text-sm text-red-500">
+              Unable to load data
+            </p>
 
-          <button
-            type="button"
-            onClick={() =>
-              ordersQuery.refetch()
-            }
-            className="mt-4 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-orange-600"
-          >
-            Try Again
-          </button>
+            <button
+              type="button"
+              onClick={() =>
+                ordersQuery.refetch()
+              }
+              className="mt-4 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-orange-600"
+            >
+              Try Again
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -129,7 +160,8 @@ function ReadyToShip() {
               </h1>
 
               <p className="mt-1 text-xs text-neutral-500">
-                Manage products that have completed inspection.
+                Manage products that have completed
+                inspection.
               </p>
             </div>
           </div>
@@ -160,6 +192,7 @@ function ReadyToShip() {
         {/* SEARCH + FILTER */}
         <div className="mb-5 rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm">
           <div className="flex flex-col gap-3 lg:flex-row">
+            {/* SEARCH */}
             <div className="relative flex-1">
               <Search
                 size={17}
@@ -179,6 +212,7 @@ function ReadyToShip() {
               />
             </div>
 
+            {/* FILTER */}
             <div className="flex gap-2">
               <FilterButton
                 active={
@@ -216,6 +250,7 @@ function ReadyToShip() {
           </div>
         </div>
 
+        {/* TABLE */}
         <ReadyToShipTable
           orders={filteredOrders}
           onOpen={(order) =>

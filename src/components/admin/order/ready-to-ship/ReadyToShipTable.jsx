@@ -4,69 +4,84 @@ function ReadyToShipTable({
   orders,
   onOpen,
 }) {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-neutral-200 bg-neutral-50/60 text-left">
-              <th className="px-6 py-4 text-xs font-semibold text-neutral-500">
-                Order
-              </th>
+  /*
+   * ================================
+   * EMPTY STATE
+   * ================================
+   */
+  if (orders.length === 0) {
+    return (
+      <div className="flex min-h-[500px] w-full flex-col items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        <div className="flex size-14 items-center justify-center rounded-2xl bg-orange-50">
+          <PackageCheck
+            size={25}
+            className="text-orange-500"
+          />
+        </div>
 
-              <th className="px-6 py-4 text-xs font-semibold text-neutral-500">
-                Product
-              </th>
+        <p className="mt-4 text-sm font-medium text-neutral-700">
+          No products found
+        </p>
 
-              <th className="px-6 py-4 text-xs font-semibold text-neutral-500">
-                Price
-              </th>
-
-              <th className="px-6 py-4 text-xs font-semibold text-neutral-500">
-                Status
-              </th>
-
-              <th className="px-6 py-4 text-right text-xs font-semibold text-neutral-500">
-                Action
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {orders.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="px-6 py-16 text-center"
-                >
-                  <PackageCheck
-                    size={36}
-                    className="mx-auto text-neutral-300"
-                  />
-
-                  <p className="mt-3 text-sm font-medium text-neutral-500">
-                    No products found
-                  </p>
-
-                  <p className="mt-1 text-xs text-neutral-400">
-                    Try changing your search or filter.
-                  </p>
-                </td>
-              </tr>
-            ) : (
-              orders.map((order) => (
-                <OrderRow
-                  key={order.id}
-                  order={order}
-                  onOpen={() =>
-                    onOpen(order)
-                  }
-                />
-              ))
-            )}
-          </tbody>
-        </table>
+        <p className="mt-1 text-xs text-neutral-400">
+          Try changing your search or filter.
+        </p>
       </div>
+    );
+  }
+
+  /*
+   * ================================
+   * TABLE
+   * ================================
+   */
+  return (
+    <div className="w-full overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+      <table className="w-full table-fixed text-left">
+        <colgroup>
+          <col className="w-[21%]" />
+          <col className="w-[31%]" />
+          <col className="w-[14%]" />
+          <col className="w-[16%]" />
+          <col className="w-[18%]" />
+        </colgroup>
+
+        <thead>
+          <tr className="border-b border-neutral-200 bg-neutral-50">
+            <th className="px-5 py-4 text-xs font-semibold text-neutral-500">
+              Order
+            </th>
+
+            <th className="px-5 py-4 text-xs font-semibold text-neutral-500">
+              Product
+            </th>
+
+            <th className="px-5 py-4 text-xs font-semibold text-neutral-500">
+              Price
+            </th>
+
+            <th className="px-5 py-4 text-center text-xs font-semibold text-neutral-500">
+              Status
+            </th>
+
+            <th className="px-5 py-4 text-center text-xs font-semibold text-neutral-500">
+              Action
+            </th>
+          </tr>
+        </thead>
+
+        <tbody className="divide-y divide-neutral-100">
+          {orders.map((order) => (
+            <OrderRow
+              key={order.id}
+              order={order}
+              onOpen={() =>
+                onOpen(order)
+              }
+            />
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -91,24 +106,22 @@ function OrderRow({
     order.status === "VERIFIED";
 
   return (
-    <tr className="border-b border-neutral-100 last:border-b-0 transition hover:bg-neutral-50/60">
-      <td className="px-6 py-4">
-        <div className="min-w-[220px]">
-          <p className="text-sm font-semibold text-neutral-900">
-            {order.orderNumber}
-          </p>
+    <tr className="h-[90px] transition-colors hover:bg-neutral-50">
+      {/* ORDER */}
+      <td className="min-w-0 px-5 py-4">
+        <p className="truncate text-sm font-semibold text-neutral-900">
+          {order.orderNumber || "-"}
+        </p>
 
-          <p className="mt-1 text-xs text-neutral-400">
-            {formatDate(
-              order.createdAt,
-            )}
-          </p>
-        </div>
+        <p className="mt-1 truncate text-xs text-neutral-400">
+          {formatDate(order.createdAt)}
+        </p>
       </td>
 
-      <td className="px-6 py-4">
-        <div className="flex min-w-[280px] items-center gap-3">
-          <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
+      {/* PRODUCT */}
+      <td className="min-w-0 px-5 py-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="size-12 shrink-0 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
             {coverImage ? (
               <img
                 src={coverImage}
@@ -116,10 +129,10 @@ function OrderRow({
                   listing?.title ||
                   "Product"
                 }
-                className="h-full w-full object-cover"
+                className="size-full object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center">
+              <div className="flex size-full items-center justify-center">
                 <PackageCheck
                   size={20}
                   className="text-neutral-300"
@@ -128,12 +141,12 @@ function OrderRow({
             )}
           </div>
 
-          <div className="min-w-0">
-            <p className="max-w-[250px] truncate text-sm font-medium text-neutral-900">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-neutral-900">
               {listing?.title || "-"}
             </p>
 
-            <p className="mt-1 max-w-[250px] truncate text-xs text-neutral-400">
+            <p className="mt-1 truncate text-xs text-neutral-500">
               {listing?.brand || "-"}
 
               {listing?.category?.name
@@ -144,7 +157,8 @@ function OrderRow({
         </div>
       </td>
 
-      <td className="px-6 py-4">
+      {/* PRICE */}
+      <td className="px-5 py-4">
         <p className="whitespace-nowrap text-sm font-semibold text-neutral-900">
           {formatPrice(
             order.agreedPrice,
@@ -152,36 +166,34 @@ function OrderRow({
         </p>
       </td>
 
-      <td className="px-6 py-4">
+      {/* STATUS */}
+      <td className="px-5 py-4 text-center">
         {isVerified ? (
-          <span className="inline-flex whitespace-nowrap rounded-full bg-green-100 px-3 py-1.5 text-xs font-semibold text-green-700">
+          <span className="inline-flex whitespace-nowrap rounded-full bg-green-100 px-3 py-1 text-[11px] font-medium text-green-700">
             Inspection Passed
           </span>
         ) : (
-          <span className="inline-flex whitespace-nowrap rounded-full bg-red-100 px-3 py-1.5 text-xs font-semibold text-red-600">
+          <span className="inline-flex whitespace-nowrap rounded-full bg-red-100 px-3 py-1 text-[11px] font-medium text-red-600">
             Inspection Failed
           </span>
         )}
       </td>
 
-      <td className="px-6 py-4 text-right">
-        {isVerified ? (
-          <button
-            type="button"
-            onClick={onOpen}
-            className="min-w-[130px] rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
-          >
-            Ship Product
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={onOpen}
-            className="min-w-[130px] rounded-xl bg-red-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600"
-          >
-            Return Product
-          </button>
-        )}
+      {/* ACTION */}
+      <td className="px-5 py-4 text-center">
+        <button
+          type="button"
+          onClick={onOpen}
+          className={`inline-flex whitespace-nowrap rounded-xl px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition ${
+            isVerified
+              ? "bg-orange-500 hover:bg-orange-600 active:bg-orange-700"
+              : "bg-red-500 hover:bg-red-600 active:bg-red-700"
+          }`}
+        >
+          {isVerified
+            ? "Ship Product"
+            : "Return Product"}
+        </button>
       </td>
     </tr>
   );
@@ -196,13 +208,24 @@ function formatPrice(price) {
 function formatDate(date) {
   if (!date) return "-";
 
+  const parsedDate =
+    new Date(date);
+
+  if (
+    Number.isNaN(
+      parsedDate.getTime(),
+    )
+  ) {
+    return "-";
+  }
+
   return new Intl.DateTimeFormat(
     "en-GB",
     {
       dateStyle: "medium",
       timeStyle: "short",
     },
-  ).format(new Date(date));
+  ).format(parsedDate);
 }
 
 export default ReadyToShipTable;
