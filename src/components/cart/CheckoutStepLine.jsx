@@ -31,8 +31,8 @@ function CheckoutStepIndicator({ currentStep }) {
                 {step.id}
               </span>
               <span
-                className={`hardware-label normal-case ${
-                  isCurrent ? "text-neutral-900" : "text-secondary"
+                className={`text-xs font-bold normal-case ${
+                  isCurrent ? "text-neutral-900" : "text-neutral-500"
                 }`}
               >
                 {step.label}

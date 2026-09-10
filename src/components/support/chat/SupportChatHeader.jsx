@@ -14,7 +14,7 @@ function SupportChatHeader({
 }) {
   return (
     <>
-      <header className="shrink-0 border-b border-neutral-200 px-3 py-3 sm:px-5">
+      <header className="shrink-0 border-b border-neutral-200/70 px-3 py-3 sm:px-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-500">
@@ -45,13 +45,18 @@ function SupportChatHeader({
         </div>
 
         {showOrderContext && (
-          <div className="mt-3 grid gap-2 rounded-xl border border-neutral-200 bg-neutral-50 p-3 sm:grid-cols-3">
+          <div className="mt-3 grid gap-2 rounded-xl border border-neutral-200/70 bg-white/40 backdrop-blur-sm p-3 sm:grid-cols-3">
             <ContextItem label="Support Case" value={`#${supportCase.id}`} />
             <ContextItem
               label="Order"
-              value={supportCase.order?.orderNumber || `#${supportCase.orderId}`}
+              value={
+                supportCase.order?.orderNumber || `#${supportCase.orderId}`
+              }
             />
-            <ContextItem label="Issue" value={formatEnumLabel(supportCase.issueType)} />
+            <ContextItem
+              label="Issue"
+              value={formatEnumLabel(supportCase.issueType)}
+            />
           </div>
         )}
       </header>

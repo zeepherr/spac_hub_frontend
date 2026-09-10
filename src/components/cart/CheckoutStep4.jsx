@@ -5,6 +5,12 @@ import { usePaymentStatus } from "@/hook/payment/usePaymentStatus";
 import CheckoutStepIndicator from "@/components/cart/CheckoutStepLine";
 import { clearPendingCheckoutSession } from "@/utils/auth/pendingCheckoutSession";
 
+// เดียวกับ GLASS_PANEL/CTA_GLASS ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const CTA_GLASS =
+  "bg-orange-500 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
+
 function formatPaymentStatus(status) {
   if (!status) return null;
   const map = {
@@ -50,16 +56,18 @@ function CheckoutStep4({ sessionId }) {
       <CheckoutStepIndicator currentStep={3} />
 
       <div className="mx-auto flex min-h-[70vh] w-full max-w-xl flex-col justify-center">
-        <div className="hardware-surface flex flex-col items-center gap-4 p-10 text-center">
+        <div
+          className={`flex flex-col items-center gap-4 rounded-3xl p-10 text-center ${GLASS_PANEL}`}
+        >
           <div className="relative flex h-20 w-20 items-center justify-center">
-            <span className="absolute inset-0 rounded-full bg-[#f97316]/15 blur-xl" />
-            <span className="matte relative flex h-20 w-20 items-center justify-center rounded-full">
-              <CheckCircle2 className="h-10 w-10 text-[#f97316]" />
+            <span className="absolute inset-0 rounded-full bg-orange-500/15 blur-xl" />
+            <span className="relative flex h-20 w-20 items-center justify-center rounded-full border border-neutral-200/70 bg-white/60 backdrop-blur-md">
+              <CheckCircle2 className="h-10 w-10 text-orange-500" />
             </span>
           </div>
 
           <div className="flex flex-col items-center gap-1.5">
-            <span className="hardware-label text-[#f97316]">
+            <span className="text-xs font-bold uppercase tracking-wide text-orange-500">
               Transaction Successful
             </span>
             <h2 className="text-xl font-bold text-neutral-900">
@@ -73,7 +81,7 @@ function CheckoutStep4({ sessionId }) {
 
           {(orders.length > 0 || paymentStatus || amount || sessionId) && (
             <>
-              <div className="hardware-divider w-full" />
+              <div className="w-full border-t border-neutral-200/70" />
               <div className="flex w-full flex-col gap-2 text-sm">
                 {orders.map((order, idx) => (
                   <div
@@ -91,7 +99,7 @@ function CheckoutStep4({ sessionId }) {
                           replace: true,
                         });
                       }}
-                      className="truncate font-mono text-xs font-semibold text-[#f97316] hover:underline"
+                      className="truncate font-mono text-xs font-semibold text-orange-500 hover:underline"
                     >
                       {order.orderNumber}
                     </button>
@@ -129,7 +137,7 @@ function CheckoutStep4({ sessionId }) {
               clearPendingCheckoutSession();
               navigate("/", { replace: true });
             }}
-            className="btn btn-accent mt-2 w-full gap-2 text-white"
+            className={`mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition ${CTA_GLASS}`}
           >
             Back to Home
             <ArrowRight size={18} />

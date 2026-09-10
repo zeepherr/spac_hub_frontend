@@ -10,17 +10,19 @@ import { animate } from "motion";
 import { useWebAssets } from "@/hook/webAsset/useWebAssets";
 
 const GLASS_IDLE =
-  "bg-white/60 backdrop-blur-md text-neutral-700 border border-neutral-200/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_8px_rgba(0,0,0,0.06)]";
+  "bg-white/30 backdrop-blur-md text-neutral-700 border border-neutral-200/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_8px_rgba(0,0,0,0.06)] hover:text-[#f97316] hardware-surface";
+const GLASS_SEARCH =
+  "bg-white/30 backdrop-blur-md text-neutral-700 border border-neutral-200/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_8px_rgba(0,0,0,0.06)] hardware-surface";
 const GLASS_ACTIVE =
   "bg-[#f97316]/90 backdrop-blur-md text-white border border-orange-300/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_4px_14px_rgba(249,115,22,0.35)]";
 const GLASS_PANEL =
   "bg-white/95 backdrop-blur-xl border border-neutral-200 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_20px_40px_rgba(0,0,0,0.10)]";
 const GLASS_BAR =
-  "bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.05)]";
+  "bg-white/25 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.05)]";
 
 const GLASS_TRACK =
-  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
-const ITEM_IDLE = "text-neutral-600 hover:text-[#f97316]";
+  "bg-white/20 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)] hardware-surface  hover:text-[#f97316]";
+const ITEM_IDLE = "text-neutral-600  hover:text-[#f97316]";
 const ITEM_ACTIVE =
   "bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(249,115,22,0.35)]";
 
@@ -117,7 +119,7 @@ function SearchForm() {
     <div ref={searchContainerRef} className="relative w-full max-w-2xl">
       <form
         onSubmit={handleSubmit}
-        className={`flex w-full items-center overflow-hidden rounded-2xl transition-colors ${GLASS_IDLE}`}
+        className={`flex w-full items-center overflow-hidden rounded-2xl transition-colors ${GLASS_SEARCH}`}
       >
         <div className="relative min-w-0 flex-1">
           <input

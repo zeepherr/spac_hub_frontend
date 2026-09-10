@@ -12,6 +12,10 @@ import { OtpInput } from "./Otp.Input";
 import { OtpCountdown } from "./OtpCountdown";
 import { ResendCodeButton } from "./ResendCodeButton";
 
+// เดียวกับ CTA_GLASS ที่ใช้ทั้งเว็บ
+const CTA_GLASS =
+  "bg-orange-500 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
+
 export function VerifyEmailForm({
   email,
   expiresAt,
@@ -140,18 +144,18 @@ export function VerifyEmailForm({
 
         <div className="min-h-6 mb-2 text-left w-full pl-1">
           {errors.code && (
-            <p className="text-xs text-error font-medium">
+            <p className="text-xs text-red-500 font-medium">
               ⚠️ {errors.code.message}
             </p>
           )}
 
           {!errors.code && serverError && (
-            <p className="text-xs text-error font-medium">⚠️ {serverError}</p>
+            <p className="text-xs text-red-500 font-medium">⚠️ {serverError}</p>
           )}
         </div>
 
         {attemptsRemaining !== null && (
-          <p className="w-full text-left mb-3 pl-1 text-xs text-secondary">
+          <p className="w-full text-left mb-3 pl-1 text-xs text-neutral-500">
             {attemptsRemaining} attempts remaining
           </p>
         )}
@@ -162,7 +166,7 @@ export function VerifyEmailForm({
           <button
             type="submit"
             disabled={isSubmitting || verificationBlocked}
-            className="btn btn-accent w-full text-accent-content font-bold h-12 text-base"
+            className={`w-full font-bold h-12 text-base rounded-xl transition disabled:cursor-not-allowed disabled:opacity-50 ${CTA_GLASS}`}
           >
             {isSubmitting
               ? "Verifying..."

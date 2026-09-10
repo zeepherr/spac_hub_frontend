@@ -1,33 +1,26 @@
 import { Check } from "lucide-react";
 
+// เดียวกับ GLASS_PANEL ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 const STEPS = [
-  {
-    label: "PAID",
-  },
-  {
-    label: "TO ADMIN",
-  },
-  {
-    label: "INSPECTION",
-  },
-  {
-    label: "TO BUYER",
-  },
+  { label: "PAID" },
+  { label: "TO ADMIN" },
+  { label: "INSPECTION" },
+  { label: "TO BUYER" },
 ];
 
 const STATUS_STEP = {
   PENDING: 0,
   AWAITING_PAYMENT: 0,
   PAID: 0,
-
   SELLER_SHIPPING: 1,
-
   INSPECTION_PENDING: 2,
   INSPECTING: 2,
   NEEDS_REVIEW: 2,
   VERIFIED: 2,
   REJECTED: 2,
-
   SHIPPING_TO_BUYER: 3,
   COMPLETED: 3,
 };
@@ -38,13 +31,12 @@ function OrderProgress({ status }) {
   const isCancelled = status === "CANCELLED";
 
   return (
-    <section className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm sm:p-6">
+    <section className={`rounded-2xl p-5 sm:p-6 ${GLASS_PANEL}`}>
       <div className="mb-5 flex items-center justify-between gap-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-orange-500">
             Order progress
           </p>
-
           <h2 className="mt-1 text-lg font-bold text-neutral-900">
             Fulfillment status
           </h2>
@@ -58,7 +50,6 @@ function OrderProgress({ status }) {
       <div className="flex items-start">
         {STEPS.map((step, index) => {
           const isCompleted = !isCancelled && index < currentStep;
-
           const isCurrent = !isCancelled && index === currentStep;
 
           return (
@@ -73,7 +64,7 @@ function OrderProgress({ status }) {
                       ? "border-emerald-500 bg-emerald-500 text-white"
                       : isCurrent
                         ? "border-orange-500 bg-orange-500 text-white shadow-[0_0_0_4px_rgba(249,115,22,0.12)]"
-                        : "border-neutral-300 bg-white text-neutral-400"
+                        : "border-neutral-300 bg-white/70 text-neutral-400"
                   }`}
                 >
                   {isCompleted ? (
@@ -112,10 +103,7 @@ function OrderProgress({ status }) {
 }
 
 function formatStatus(status) {
-  if (!status) {
-    return "-";
-  }
-
+  if (!status) return "-";
   return status
     .toLowerCase()
     .split("_")

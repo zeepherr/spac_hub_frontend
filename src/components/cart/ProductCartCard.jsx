@@ -105,13 +105,13 @@ function ProductCartCard({ item, selected, onToggleSelect }) {
           onChange={onToggleSelect}
           disabled={isUnavailable}
           aria-label={`Select ${listing.title}`}
-          className="checkbox checkbox-sm my-auto text-[#f97316] inset-shadow-sm/25 disabled:cursor-not-allowed disabled:opacity-40"
+          className="checkbox checkbox-sm my-auto accent-orange-500 disabled:cursor-not-allowed disabled:opacity-40"
         />
       </div>
 
       {/* Fade only the product image */}
       <div
-        className={`flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-box bg-neutral-50 ${
+        className={`flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-neutral-50 ${
           isUnavailable ? "opacity-50 grayscale" : ""
         }`}
       >
@@ -160,7 +160,9 @@ function ProductCartCard({ item, selected, onToggleSelect }) {
             isUnavailable ? "opacity-60" : ""
           }`}
         >
-          <span className={`hardware-label normal-case ${conditionInfo.color}`}>
+          <span
+            className={`text-xs font-bold normal-case ${conditionInfo.color}`}
+          >
             {conditionInfo.label}
           </span>
 
@@ -168,13 +170,13 @@ function ProductCartCard({ item, selected, onToggleSelect }) {
             <>
               <ConditionScoreBar score={estimatedScore} />
 
-              <span className="hardware-label normal-case text-secondary">
+              <span className="text-xs font-bold normal-case text-neutral-500">
                 {estimatedScore}/100
               </span>
             </>
           )}
 
-          <span className="hardware-label normal-case text-secondary">
+          <span className="text-xs font-bold normal-case text-neutral-500">
             • Quantity: 1
           </span>
         </div>
