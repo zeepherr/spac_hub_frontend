@@ -1,20 +1,27 @@
 import React, { useState, useMemo } from "react";
-import { 
-  DollarSign, 
-  Clock, 
-  TrendingUp, 
-  TrendingDown, 
-  ShoppingBag, 
-  ArrowLeft, 
+import {
+  DollarSign,
+  Clock,
+  TrendingUp,
+  TrendingDown,
+  ShoppingBag,
+  ArrowLeft,
   Calendar,
   Filter,
-  Package
+  Package,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useSellingOrders } from "@/hook/order/useSellingOrder";
 import { StatCards } from "@/components/userSellerDashboard/StatCards";
 import { RevenueChart } from "@/components/userSellerDashboard/RevenueChart";
 import { TransactionTable } from "@/components/userSellerDashboard/TransactionTable";
+
+// bg หลักมาตรฐานของทั้งเว็บ (เดียวกับที่ตั้งไว้ใน PublicLayout.jsx) - เดิมหน้านี้ไม่มี bg เลย
+const PAGE_BG =
+  "bg-[linear-gradient(180deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
+// ปุ่มกลมแบบแก้วโปร่ง (เดียวกับ GLASS_IDLE ที่ใช้ทั้งเว็บ)
+const GLASS_ICON_BUTTON =
+  "border border-neutral-200/70 bg-white/60 backdrop-blur-md text-neutral-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_2px_8px_rgba(0,0,0,0.06)] hover:bg-white/80";
 
 export default function SalesReportPage() {
   const navigate = useNavigate();
@@ -88,12 +95,17 @@ export default function SalesReportPage() {
 
     let momChange = 0;
     if (previousMonthSales > 0) {
-      momChange = Math.round(((currentMonthSales - previousMonthSales) / previousMonthSales) * 100);
+      momChange = Math.round(
+        ((currentMonthSales - previousMonthSales) / previousMonthSales) * 100,
+      );
     } else if (currentMonthSales > 0) {
       momChange = 100;
     }
 
-    const avgOrderValue = completedOrdersCount > 0 ? Math.round(salesTotal / completedOrdersCount) : 0;
+    const avgOrderValue =
+      completedOrdersCount > 0
+        ? Math.round(salesTotal / completedOrdersCount)
+        : 0;
 
     return {
       totalSales: salesTotal,
@@ -108,9 +120,18 @@ export default function SalesReportPage() {
   // 2. Filter Table Items
   const filteredOrders = useMemo(() => {
     if (statusFilter === "ALL") return sellingOrders;
-    if (statusFilter === "COMPLETED") return sellingOrders.filter((o) => o.status === "COMPLETED");
+    if (statusFilter === "COMPLETED")
+      return sellingOrders.filter((o) => o.status === "COMPLETED");
     if (statusFilter === "PENDING") {
-      const pendingStatuses = ["PAID", "SELLER_SHIPPING", "INSPECTION_PENDING", "INSPECTING", "NEEDS_REVIEW", "VERIFIED", "SHIPPING_TO_BUYER"];
+      const pendingStatuses = [
+        "PAID",
+        "SELLER_SHIPPING",
+        "INSPECTION_PENDING",
+        "INSPECTING",
+        "NEEDS_REVIEW",
+        "VERIFIED",
+        "SHIPPING_TO_BUYER",
+      ];
       return sellingOrders.filter((o) => pendingStatuses.includes(o.status));
     }
     return sellingOrders;
@@ -119,7 +140,9 @@ export default function SalesReportPage() {
   if (isLoading) {
     return (
       /* 🟢 ปรับเปลี่ยน Skeleton Container เป็น w-full */
-      <div className="w-full p-4 sm:p-6 md:p-8 space-y-6">
+      <div
+        className={`min-h-full w-full p-4 sm:p-6 md:p-8 space-y-6 ${PAGE_BG}`}
+      >
         <div className="skeleton h-8 w-48 rounded-lg" />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
@@ -133,16 +156,22 @@ export default function SalesReportPage() {
 
   return (
     /* 🟢 เปลี่ยนจาก max-w-6xl mx-auto เป็น w-full เพื่อขยายเต็มหน้าจอ */
-    <div className="w-full p-4 sm:p-6 md:p-8 space-y-6">
+    <div className={`min-h-full w-full p-4 sm:p-6 md:p-8 space-y-6 ${PAGE_BG}`}>
       {/* Header Bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button type="button" onClick={() => navigate(-1)} className="btn btn-circle btn-ghost btn-sm cursor-pointer">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className={`inline-flex size-9 cursor-pointer items-center justify-center rounded-full transition ${GLASS_ICON_BUTTON}`}
+          >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-black text-base-content tracking-tight">Sales Analytics & Report</h1>
-            <p className="text-xs text-base-content/60 font-medium">
+            <h1 className="text-2xl font-black text-neutral-900 tracking-tight">
+              Sales Analytics & Report
+            </h1>
+            <p className="text-xs text-neutral-500 font-medium">
               Monitor your revenue trends and detailed selling operations
             </p>
           </div>

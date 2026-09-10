@@ -42,27 +42,50 @@ export default function MyListingItemCard({
 
   // 🟢 ฟังก์ชันสำหรับสไตล์ Status Badge
   const renderStatusBadge = (status) => {
-    const baseClass = "text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider shadow-2xs";
+    const baseClass =
+      "text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider shadow-2xs";
     switch (status) {
       case "ACTIVE":
-        return <span className={`${baseClass} bg-emerald-100 text-emerald-700`}>Active</span>;
+        return (
+          <span className={`${baseClass} bg-emerald-100 text-emerald-700`}>
+            Active
+          </span>
+        );
       case "RESERVED":
-        return <span className={`${baseClass} bg-amber-100 text-amber-700`}>Reserved</span>;
+        return (
+          <span className={`${baseClass} bg-amber-100 text-amber-700`}>
+            Reserved
+          </span>
+        );
       case "SOLD":
-        return <span className={`${baseClass} bg-neutral-200 text-neutral-600`}>Sold</span>;
+        return (
+          <span className={`${baseClass} bg-neutral-200 text-neutral-600`}>
+            Sold
+          </span>
+        );
       case "DRAFT":
-        return <span className={`${baseClass} bg-sky-100 text-sky-700`}>Draft</span>;
+        return (
+          <span className={`${baseClass} bg-sky-100 text-sky-700`}>Draft</span>
+        );
       case "ARCHIVED":
-        return <span className={`${baseClass} bg-rose-100 text-rose-700`}>Archived</span>;
+        return (
+          <span className={`${baseClass} bg-rose-100 text-rose-700`}>
+            Archived
+          </span>
+        );
       default:
-        return <span className={`${baseClass} bg-neutral-100 text-neutral-500`}>{status || "GENERAL"}</span>;
+        return (
+          <span className={`${baseClass} bg-neutral-100 text-neutral-500`}>
+            {status || "GENERAL"}
+          </span>
+        );
     }
   };
 
   return (
     <div
       onClick={() => onOpenDetail(item.id)}
-      className="group relative flex flex-col justify-between bg-white border border-neutral-200/90 rounded-2xl p-3.5 cursor-pointer hover:shadow-lg transition-all duration-200 w-full min-h-[310px]"
+      className="group relative flex flex-col justify-between bg-white/60 backdrop-blur-sm border border-neutral-200/70 rounded-2xl p-3.5 cursor-pointer hover:shadow-lg transition-all duration-200 w-full min-h-[310px]"
     >
       {/* ส่วนบน: Brand + Status + Image + Title + Price */}
       <div className="space-y-2">
@@ -107,7 +130,9 @@ export default function MyListingItemCard({
             <div className="h-1.5 w-10 sm:w-12 bg-neutral-200/70 rounded-full overflow-hidden shrink-0">
               <div
                 className={`h-full rounded-full ${getScoreColor(item.estimatedScore || 70)}`}
-                style={{ width: `${Math.min(item.estimatedScore || 70, 100)}%` }}
+                style={{
+                  width: `${Math.min(item.estimatedScore || 70, 100)}%`,
+                }}
               />
             </div>
             <span className="text-[9.5px] font-bold text-neutral-400 leading-none">
@@ -124,7 +149,7 @@ export default function MyListingItemCard({
           <button
             type="button"
             onClick={(e) => onOpenEdit(e, item)}
-            className="h-7 w-7 rounded-lg bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-colors shadow-xs"
+            className="h-7 w-7 rounded-lg bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center transition-colors shadow-xs cursor-pointer"
             title="Edit Listing"
           >
             <Edit3 className="w-3.5 h-3.5" />
@@ -133,7 +158,7 @@ export default function MyListingItemCard({
           <button
             type="button"
             onClick={(e) => onOpenDelete(e, item)}
-            className="h-7 w-7 rounded-lg bg-neutral-100 hover:bg-red-50 text-neutral-500 hover:text-red-500 flex items-center justify-center transition-colors"
+            className="h-7 w-7 rounded-lg bg-neutral-100 hover:bg-red-50 text-neutral-500 hover:text-red-500 flex items-center justify-center transition-colors cursor-pointer"
             title="Delete Listing"
           >
             <Trash2 className="w-3.5 h-3.5" />

@@ -1,3 +1,4 @@
+// CartPage.jsx
 import useAuthStore from "@/stores/auth.store";
 
 import { ArrowLeft, ArrowRight, Info, Lock, Plus } from "lucide-react";
@@ -18,6 +19,11 @@ const REQUIRED_ASSEMBLY_CATEGORIES = [
   "Power Supply",
   "Case",
 ];
+
+const GLASS_PANEL =
+  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const CTA_GLASS =
+  "bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
 
 function getMissingAssemblyCategories(items) {
   const presentNames = new Set(
@@ -48,7 +54,7 @@ function OrderSummary({
   const grandTotal = hasSelection ? (quote?.grandTotal ?? 0) : 0;
 
   return (
-    <div className="hardware-surface p-5">
+    <div className={`rounded-2xl p-5 ${GLASS_PANEL}`}>
       <h2 className="mb-4 text-base font-bold text-neutral-900">
         Order Summary
       </h2>
@@ -88,7 +94,7 @@ function OrderSummary({
             ))}
 
           <label
-            className={`hardware-surface flex items-start gap-3 p-3! ${
+            className={`flex items-start gap-3 rounded-xl p-3 ${GLASS_PANEL} ${
               isAssemblyLocked
                 ? "cursor-not-allowed opacity-60"
                 : "cursor-pointer"
@@ -110,7 +116,7 @@ function OrderSummary({
                   +{formatPrice(ASSEMBLY_SERVICE_FEE)}
                 </span>
               </span>
-              <span className="hardware-label block normal-case text-secondary">
+              <span className="block text-[11px] text-neutral-400">
                 Professional assembly + tidy cable management
               </span>
               {isAssemblyLocked && (
@@ -124,7 +130,7 @@ function OrderSummary({
         </div>
       )}
 
-      <div className="hardware-divider my-4" />
+      <div className="my-4 border-t border-neutral-200/70" />
 
       <div className="mb-4 flex items-end justify-between">
         <span className="text-base font-bold text-neutral-900">Total</span>
@@ -132,9 +138,7 @@ function OrderSummary({
           <span className="block text-2xl font-bold text-neutral-900">
             {isPending ? "..." : formatPrice(grandTotal)}
           </span>
-          <span className="hardware-label normal-case text-secondary">
-            VAT included
-          </span>
+          <span className="text-[11px] text-neutral-400">VAT included</span>
         </span>
       </div>
 
@@ -142,7 +146,7 @@ function OrderSummary({
         type="button"
         onClick={onCheckout}
         disabled={checkoutDisabled}
-        className="btn btn-accent w-full gap-2 text-white disabled:opacity-50"
+        className={`flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition disabled:opacity-50 ${CTA_GLASS}`}
       >
         Proceed to Checkout{itemCount > 0 && ` (${itemCount})`}
         <ArrowRight size={18} />
@@ -276,7 +280,7 @@ export default function CartPage() {
         </div>
         <Link
           to="/products"
-          className="hardware-label flex items-center gap-1 normal-case text-secondary hover:text-[#f97316]"
+          className="flex items-center gap-1 text-xs text-neutral-400 hover:text-[#f97316]"
         >
           <ArrowLeft size={14} />
           Continue Shopping
@@ -286,18 +290,26 @@ export default function CartPage() {
       <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
         <div className="flex flex-col gap-4">
           {isLoadingCart ? (
-            <div className="hardware-surface h-40 animate-pulse bg-neutral-100" />
+            <div
+              className={`h-40 animate-pulse rounded-2xl bg-neutral-100 ${GLASS_PANEL}`}
+            />
           ) : isErrorCart ? (
-            <div className="hardware-surface flex h-40 items-center justify-center">
+            <div
+              className={`flex h-40 items-center justify-center rounded-2xl ${GLASS_PANEL}`}
+            >
               <p className="text-sm text-[#dc2626]">Failed to load cart</p>
             </div>
           ) : items.length === 0 ? (
-            <div className="hardware-surface flex h-40 items-center justify-center">
+            <div
+              className={`flex h-40 items-center justify-center rounded-2xl ${GLASS_PANEL}`}
+            >
               <p className="text-sm text-neutral-400">Your cart is empty</p>
             </div>
           ) : (
-            <div className="hardware-surface flex flex-col gap-4 p-4">
-              <label className="flex items-center gap-2 border-b border-neutral-100 pb-3 text-sm font-medium text-neutral-700">
+            <div
+              className={`flex flex-col gap-4 rounded-2xl p-4 ${GLASS_PANEL}`}
+            >
+              <label className="flex items-center gap-2 border-b border-neutral-200/70 pb-3 text-sm font-medium text-neutral-700">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -321,7 +333,7 @@ export default function CartPage() {
 
           <Link
             to="/products"
-            className="flex items-center justify-center gap-2 rounded-box border border-dashed border-neutral-200 py-5 text-sm font-medium text-neutral-500 hover:border-[#f97316] hover:text-[#f97316]"
+            className="flex items-center justify-center gap-2 rounded-2xl border border-dashed border-neutral-300/70 bg-white/20 py-5 text-sm font-medium text-neutral-500 backdrop-blur-sm transition hover:border-[#f97316] hover:bg-white/40 hover:text-[#f97316]"
           >
             <Plus size={18} />
             Add products from marketplace

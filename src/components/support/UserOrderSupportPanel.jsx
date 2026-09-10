@@ -19,6 +19,10 @@ import {
   getSupportOrderName,
 } from "./supportOrder.utils";
 
+// เดียวกับ GLASS_PANEL ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 function UserOrderSupportPanel({
   order,
   mode,
@@ -102,10 +106,16 @@ function SelectedOrderSummary({ order, mode }) {
   const statusMeta = getOrderStatusMeta(order.status);
 
   return (
-    <article className="flex shrink-0 items-center gap-3 rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm">
-      <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200 bg-neutral-100">
+    <article
+      className={`flex shrink-0 items-center gap-3 rounded-2xl p-3 ${GLASS_PANEL}`}
+    >
+      <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-neutral-200/70 bg-neutral-100">
         {imageUrl ? (
-          <img src={imageUrl} alt={productName} className="size-full object-cover" />
+          <img
+            src={imageUrl}
+            alt={productName}
+            className="size-full object-cover"
+          />
         ) : (
           <ImageIcon size={24} className="text-neutral-300" />
         )}
@@ -143,7 +153,7 @@ function SelectedOrderSummary({ order, mode }) {
 
 function NoSelectedSupportOrder({ mode }) {
   return (
-    <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-300 bg-white p-8 text-center">
+    <div className="flex h-full min-h-0 flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-300 bg-white/50 backdrop-blur-xl p-8 text-center">
       <span className="flex size-16 items-center justify-center rounded-full bg-orange-50 text-orange-500">
         <MessageSquareText size={29} />
       </span>
@@ -151,8 +161,8 @@ function NoSelectedSupportOrder({ mode }) {
         Select an order
       </h2>
       <p className="mt-2 max-w-sm text-sm leading-6 text-neutral-500">
-        Choose a {mode === "buying" ? "purchase" : "sale"} from the list to
-        open its support chat or start a new conversation.
+        Choose a {mode === "buying" ? "purchase" : "sale"} from the list to open
+        its support chat or start a new conversation.
       </p>
     </div>
   );
@@ -160,7 +170,9 @@ function NoSelectedSupportOrder({ mode }) {
 
 function PanelLoading({ label }) {
   return (
-    <div className="flex h-full min-h-64 items-center justify-center gap-3 rounded-2xl border border-neutral-200 bg-white shadow-sm">
+    <div
+      className={`flex h-full min-h-64 items-center justify-center gap-3 rounded-2xl ${GLASS_PANEL}`}
+    >
       <LoaderCircle size={24} className="animate-spin text-orange-500" />
       <span className="text-sm text-neutral-500">{label}</span>
     </div>
@@ -169,7 +181,7 @@ function PanelLoading({ label }) {
 
 function PanelError({ message, onRetry }) {
   return (
-    <div className="flex h-full min-h-64 flex-col items-center justify-center rounded-2xl border border-red-100 bg-white p-6 text-center shadow-sm">
+    <div className="flex h-full min-h-64 flex-col items-center justify-center rounded-2xl border border-red-100 bg-white/60 backdrop-blur-sm p-6 text-center shadow-sm">
       <AlertCircle size={30} className="text-red-500" />
       <p className="mt-3 text-sm font-bold text-neutral-900">
         Support is unavailable

@@ -1,5 +1,9 @@
 import { Truck } from "lucide-react";
 
+// เดียวกับ GLASS_PANEL ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 // ก็อปสไตล์มาจาก FormInput ใน EditProfile.jsx ให้ข้อมูลจัดส่งหน้าตาเหมือนกัน
 function FormInput({
   id,
@@ -22,7 +26,7 @@ function FormInput({
         id={id}
         type={type}
         placeholder={placeholder}
-        className={`w-full rounded-xl border px-4 py-3 text-sm outline-none transition ${
+        className={`w-full rounded-xl border bg-white/70 backdrop-blur-sm px-4 py-3 text-sm outline-none transition ${
           error
             ? "border-red-500"
             : "border-neutral-300 focus:border-orange-500"
@@ -47,11 +51,11 @@ function FormInput({
 // CheckoutStep1Page.jsx) ส่ง errors={errors} จาก useForm's formState ไปด้วยจริงๆ รึเปล่า
 function CheckoutStep1({ register, errors = {} }) {
   return (
-    <div className="hardware-surface p-6">
+    <div className={`rounded-3xl p-6 ${GLASS_PANEL}`}>
       <div className="mb-5 flex items-center gap-2">
         <h2 className="flex items-center gap-2 text-base font-bold text-neutral-900">
-          <Truck size={18} className="text-[#f97316]" />
-          Shipping Information
+          <Truck size={18} className="text-orange-500" />
+          ข้อมูลการจัดส่ง
         </h2>
       </div>
 
@@ -59,16 +63,16 @@ function CheckoutStep1({ register, errors = {} }) {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <FormInput
             id="firstName"
-            label="First Name"
-            placeholder="Enter your first name"
+            label="ชื่อ"
+            placeholder="กรอกชื่อ"
             error={errors.firstName?.message}
             inputProps={register("firstName")}
           />
 
           <FormInput
             id="lastName"
-            label="Last Name"
-            placeholder="Enter your last name"
+            label="นามสกุล"
+            placeholder="กรอกนามสกุล"
             error={errors.lastName?.message}
             inputProps={register("lastName")}
           />
@@ -76,7 +80,7 @@ function CheckoutStep1({ register, errors = {} }) {
 
         <FormInput
           id="phone"
-          label="Phone Number"
+          label="เบอร์โทรศัพท์"
           type="tel"
           placeholder="0812345678"
           error={errors.phone?.message}
@@ -88,14 +92,14 @@ function CheckoutStep1({ register, errors = {} }) {
             htmlFor="address"
             className="mb-2 block text-sm font-semibold text-neutral-800"
           >
-            Address
+            ที่อยู่
           </label>
 
           <textarea
             id="address"
             rows={5}
-            placeholder="Enter your shipping address"
-            className={`w-full resize-none rounded-xl border px-4 py-3 text-sm text-neutral-900 outline-none transition focus:ring-2 ${
+            placeholder="กรอกที่อยู่สำหรับจัดส่ง"
+            className={`w-full resize-none rounded-xl border bg-white/70 backdrop-blur-sm px-4 py-3 text-sm text-neutral-900 outline-none transition focus:ring-2 ${
               errors.address
                 ? "border-red-500 focus:ring-red-100"
                 : "border-neutral-300 focus:border-orange-500 focus:ring-orange-100"

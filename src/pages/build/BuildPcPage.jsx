@@ -9,8 +9,12 @@ import BuildSidebar from "@/components/build/BuildSidebar";
 import PartPickerCard from "@/components/build/PartPickerCard";
 import { useListingsByCategory } from "@/hook/listing/useListingByCategory";
 
+// เดียวกับ GLASS_PANEL ที่ใช้ใน BuildSidebar.jsx/CategorySidebar.jsx/MainNav.jsx - จางเท่ากันทั้งเว็บ
+const GLASS_PANEL =
+  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 const SELECT_CLASS =
-  "rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm text-neutral-700 outline-none transition focus:border-neutral-400";
+  "rounded-lg border border-neutral-200/70 bg-white/60 px-3 py-1.5 text-sm text-neutral-700 outline-none transition focus:border-neutral-400";
 
 function getCoverImageUrl(product) {
   const images = product.images ?? [];
@@ -134,17 +138,17 @@ export default function BuildPcPage() {
         />
 
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-3 rounded-2xl border border-neutral-200 bg-white p-4">
+          <div className={`flex flex-col gap-3 rounded-2xl p-4 ${GLASS_PANEL}`}>
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                className="flex items-center gap-2 rounded-lg border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-700 transition hover:border-[#f97316] hover:text-[#f97316]"
+                className="flex items-center gap-2 rounded-lg border border-neutral-200/70 bg-white/40 px-4 py-2 text-sm font-semibold text-neutral-700 transition hover:border-[#f97316] hover:text-[#f97316]"
               >
                 <Trophy size={16} className="text-[#f97316]" />
                 Build Rankings
               </button>
 
-              <div className="flex min-w-[220px] flex-1 items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2">
+              <div className="flex min-w-[220px] flex-1 items-center gap-2 rounded-lg border border-neutral-200/70 bg-white/40 px-3 py-2">
                 <Search size={16} className="text-neutral-400" />
                 <input
                   type="text"
@@ -154,7 +158,7 @@ export default function BuildPcPage() {
               </div>
               <button
                 type="button"
-                className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:border-[#f97316] hover:text-[#f97316]"
+                className="rounded-lg border border-neutral-200/70 bg-white/40 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:border-[#f97316] hover:text-[#f97316]"
               >
                 Search
               </button>
@@ -210,11 +214,15 @@ export default function BuildPcPage() {
               ))}
             </div>
           ) : isErrorProducts ? (
-            <div className="flex h-40 items-center justify-center rounded-2xl border border-neutral-100 bg-neutral-50">
+            <div
+              className={`flex h-40 items-center justify-center rounded-2xl ${GLASS_PANEL}`}
+            >
               <p className="text-sm text-[#dc2626]">Failed to load products</p>
             </div>
           ) : products.length === 0 ? (
-            <div className="flex h-40 items-center justify-center rounded-2xl border border-neutral-100 bg-neutral-50">
+            <div
+              className={`flex h-40 items-center justify-center rounded-2xl ${GLASS_PANEL}`}
+            >
               <p className="text-sm text-neutral-400">
                 No products in this category yet
               </p>

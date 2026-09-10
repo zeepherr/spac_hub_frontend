@@ -29,7 +29,7 @@ function SupportMessageList({
       <div
         ref={messageContainerRef}
         onScroll={handleMessageScroll}
-        className="chat-scrollbar h-full overflow-y-auto overscroll-contain bg-white px-3 py-4 sm:px-5"
+        className="chat-scrollbar h-full overflow-y-auto overscroll-contain bg-white/70 backdrop-blur-sm px-3 py-4 sm:px-5"
         aria-live="polite"
       >
         {hasNextPage && (
@@ -38,7 +38,7 @@ function SupportMessageList({
               type="button"
               onClick={() => fetchNextPage()}
               disabled={isFetchingNextPage}
-              className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs font-semibold text-neutral-600 transition hover:border-orange-200 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-200 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg border border-neutral-200/70 bg-white/60 backdrop-blur-sm px-3 py-2 text-xs font-semibold text-neutral-600 transition hover:border-orange-200 hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-200 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isFetchingNextPage ? (
                 <LoaderCircle size={15} className="animate-spin" />
@@ -73,7 +73,9 @@ function SupportMessageList({
             <span className="flex size-14 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
               <MessageSquareText size={26} />
             </span>
-            <p className="mt-4 font-semibold text-neutral-700">No messages yet</p>
+            <p className="mt-4 font-semibold text-neutral-700">
+              No messages yet
+            </p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -93,7 +95,7 @@ function SupportMessageList({
         <button
           type="button"
           onClick={() => scrollToBottom("smooth")}
-          className="animate-in fade-in slide-in-from-bottom-2 absolute bottom-4 left-1/2 min-h-11 -translate-x-1/2 cursor-pointer rounded-full bg-neutral-900 px-4 py-2 text-xs font-semibold text-white shadow-lg duration-200 hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-orange-200"
+          className="animate-in fade-in slide-in-from-bottom-2 absolute bottom-4 left-1/2 min-h-11 -translate-x-1/2 cursor-pointer rounded-full bg-neutral-900/90 backdrop-blur-sm px-4 py-2 text-xs font-semibold text-white shadow-lg duration-200 hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-orange-200"
         >
           New message
         </button>
@@ -123,14 +125,10 @@ function MessageBubble({ message, supportCase, currentUserId }) {
       }`}
     >
       <div
-        className={`max-w-[92%] sm:max-w-[72%] ${
-          isMine ? "items-end" : "items-start"
-        }`}
+        className={`max-w-[92%] sm:max-w-[72%] ${isMine ? "items-end" : "items-start"}`}
       >
         <div
-          className={`mb-1 flex items-center gap-2 text-xs ${
-            isMine ? "justify-end" : "justify-start"
-          }`}
+          className={`mb-1 flex items-center gap-2 text-xs ${isMine ? "justify-end" : "justify-start"}`}
         >
           <span className="font-semibold text-neutral-600">{senderLabel}</span>
           <time className="text-neutral-400">
@@ -141,7 +139,7 @@ function MessageBubble({ message, supportCase, currentUserId }) {
           className={`whitespace-pre-wrap wrap-break-word rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm ${
             isMine
               ? "rounded-br-md bg-orange-500 text-white"
-              : "rounded-bl-md border border-neutral-200 bg-neutral-100 text-neutral-800"
+              : "rounded-bl-md border border-neutral-200/70 bg-neutral-100/80 backdrop-blur-sm text-neutral-800"
           }`}
         >
           {message.content}

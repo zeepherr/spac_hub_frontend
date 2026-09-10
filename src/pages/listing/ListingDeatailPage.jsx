@@ -17,14 +17,22 @@ import {
 import { useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
-// ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
+
+const GLASS_PANEL =
+  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const CTA_GLASS =
+  "bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
+const GLASS_DARK =
+  "bg-neutral-900/85 backdrop-blur-xl border border-neutral-800/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_20px_40px_rgba(0,0,0,0.25)]";
 
 function DetailSkeleton() {
   return (
     <div className="mx-auto max-w-6xl animate-pulse px-4 py-6">
       <div className="mb-4 h-4 w-64 rounded bg-neutral-200" />
       <div className="grid gap-8 lg:grid-cols-[1fr_420px]">
-        <div className="hardware-surface aspect-square bg-neutral-100" />
+        <div
+          className={`aspect-square rounded-2xl bg-neutral-100 ${GLASS_PANEL}`}
+        />
         <div className="flex flex-col gap-4">
           <div className="h-8 w-3/4 rounded bg-neutral-200" />
           <div className="h-32 rounded bg-neutral-100" />
@@ -94,7 +102,6 @@ export default function ListingDetailPage() {
   const user = useAuthStore((store) => store.user);
   const navigate = useNavigate();
   const addCartItem = useAddCartItem();
-  // อ้างอิงกล่องรูปสินค้าหลัก (ตัวใหญ่ด้านซ้าย) ไว้เป็นจุดเริ่มบินของแอนิเมชัน "บินเข้าตะกร้า"
   const productImageRef = useRef(null);
   const { flyToCart } = useCartFlyAnimation();
 
@@ -160,7 +167,7 @@ export default function ListingDetailPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
-      <nav className="hardware-label mb-4 flex flex-wrap items-center gap-2 normal-case text-secondary">
+      <nav className="mb-4 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
         <Link to="/" className="hover:text-[#f97316]">
           Home
         </Link>
@@ -189,9 +196,9 @@ export default function ListingDetailPage() {
         <div>
           <div
             ref={productImageRef}
-            className="hardware-surface relative mb-3 flex aspect-square items-center justify-center overflow-hidden bg-neutral-50"
+            className={`relative mb-3 flex aspect-square items-center justify-center overflow-hidden rounded-2xl ${GLASS_PANEL}`}
           >
-            <span className="hardware-shadow absolute left-3 top-3 flex items-center gap-1 rounded-field bg-white/90 px-3 py-1 text-xs font-semibold text-neutral-700">
+            <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full border border-neutral-200/70 bg-white/90 px-3 py-1 text-xs font-semibold text-neutral-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_4px_12px_rgba(0,0,0,0.08)]">
               <ShieldCheck size={14} className="text-[#f97316]" />
               Verified by SpecHub
             </span>
@@ -213,7 +220,7 @@ export default function ListingDetailPage() {
                   key={img.id ?? i}
                   type="button"
                   onClick={() => setActiveImageIndex(i)}
-                  className={`hardware-surface flex aspect-square items-center justify-center overflow-hidden p-1 ${
+                  className={`flex aspect-square items-center justify-center overflow-hidden rounded-xl p-1 ${GLASS_PANEL} ${
                     i === activeImageIndex ? "ring-2 ring-[#f97316]" : ""
                   }`}
                 >
@@ -231,11 +238,11 @@ export default function ListingDetailPage() {
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">
             {listing.grade && (
-              <span className="hardware-label rounded-field bg-neutral-100 px-3 py-1 normal-case text-secondary">
+              <span className="rounded-full bg-neutral-100 px-3 py-1 text-[11px] font-medium text-neutral-500">
                 Grade {listing.grade}
               </span>
             )}
-            <span className="hardware-label rounded-field bg-neutral-100 px-3 py-1 normal-case text-secondary">
+            <span className="rounded-full bg-neutral-100 px-3 py-1 text-[11px] font-medium text-neutral-500">
               Used Item
             </span>
           </div>
@@ -248,7 +255,7 @@ export default function ListingDetailPage() {
             <p className="text-sm text-neutral-500">{listing.specSummary}</p>
           )}
 
-          <div className="hardware-surface p-5">
+          <div className={`rounded-2xl p-5 ${GLASS_PANEL}`}>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-neutral-900">
                 ฿{price.toLocaleString()}
@@ -264,7 +271,7 @@ export default function ListingDetailPage() {
               type="button"
               onClick={handleAddToCart}
               disabled={isOwner || (user ? addCartItem.isPending : false)}
-              className="btn btn-accent mt-4 w-full gap-2 disabled:opacity-50"
+              className={`mt-4 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition disabled:opacity-50 ${CTA_GLASS}`}
             >
               <ShoppingCart size={18} />
               Add to Cart
@@ -285,7 +292,7 @@ export default function ListingDetailPage() {
           </div>
 
           {estimatedScore != null && (
-            <div className="hardware-surface p-5">
+            <div className={`rounded-2xl p-5 ${GLASS_PANEL}`}>
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-sm font-bold text-neutral-900">
                   Condition Score
@@ -307,7 +314,7 @@ export default function ListingDetailPage() {
           )}
 
           {listing.inspection && (
-            <div className="hardware-surface p-5">
+            <div className={`rounded-2xl p-5 ${GLASS_PANEL}`}>
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="text-sm font-bold text-neutral-900">
                   Inspection Summary
@@ -316,21 +323,17 @@ export default function ListingDetailPage() {
                   View Full Report
                 </span>
               </div>
-              <div className="grid grid-cols-3 divide-x divide-base-300 text-center">
+              <div className="grid grid-cols-3 divide-x divide-neutral-200/70 text-center">
                 <div className="px-2">
                   <Eye size={18} className="mx-auto mb-1 text-neutral-500" />
-                  <p className="hardware-label normal-case text-secondary">
-                    Appearance
-                  </p>
+                  <p className="text-[11px] text-neutral-400">Appearance</p>
                   <p className="text-sm font-semibold text-neutral-900">
                     Passed
                   </p>
                 </div>
                 <div className="px-2">
                   <Gauge size={18} className="mx-auto mb-1 text-neutral-500" />
-                  <p className="hardware-label normal-case text-secondary">
-                    Performance
-                  </p>
+                  <p className="text-[11px] text-neutral-400">Performance</p>
                   <p className="text-sm font-semibold text-neutral-900">
                     {listing.inspection.performanceScore ?? "-"}%
                   </p>
@@ -340,16 +343,14 @@ export default function ListingDetailPage() {
                     size={18}
                     className="mx-auto mb-1 text-neutral-500"
                   />
-                  <p className="hardware-label normal-case text-secondary">
-                    Temperature
-                  </p>
+                  <p className="text-[11px] text-neutral-400">Temperature</p>
                   <p className="text-sm font-semibold text-neutral-900">
                     Normal
                   </p>
                 </div>
               </div>
               {listing.inspection.note && (
-                <p className="hardware-divider mt-4 pt-4 text-xs italic text-neutral-500">
+                <p className="mt-4 border-t border-neutral-200/70 pt-4 text-xs italic text-neutral-500">
                   “{listing.inspection.note}”
                 </p>
               )}
@@ -357,7 +358,9 @@ export default function ListingDetailPage() {
           )}
 
           {listing.seller && (
-            <div className="hardware-surface flex items-center gap-3 p-4">
+            <div
+              className={`flex items-center gap-3 rounded-2xl p-4 ${GLASS_PANEL}`}
+            >
               <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-neutral-100">
                 {listing.seller.profileImageUrl && (
                   <img
@@ -371,7 +374,7 @@ export default function ListingDetailPage() {
                 <p className="text-sm font-semibold text-neutral-900">
                   {listing.seller.name}
                 </p>
-                <p className="hardware-label normal-case text-secondary">
+                <p className="text-[11px] text-neutral-400">
                   {listing.seller.rating && `★ ${listing.seller.rating}`}
                   {listing.seller.salesCount != null &&
                     ` (${listing.seller.salesCount} sold)`}
@@ -394,7 +397,9 @@ export default function ListingDetailPage() {
           <h2 className="mb-4 text-lg font-bold text-neutral-900">
             Specifications
           </h2>
-          <div className="hardware-surface divide-y divide-base-300">
+          <div
+            className={`divide-y divide-neutral-200/70 overflow-hidden rounded-2xl ${GLASS_PANEL}`}
+          >
             {(listing.specs ?? []).length > 0 ? (
               listing.specs.map((spec) => (
                 <div
@@ -442,7 +447,9 @@ export default function ListingDetailPage() {
           <h2 className="mb-4 text-lg font-bold text-neutral-900">
             Purchase Process
           </h2>
-          <div className="matte flex flex-col gap-5 p-5 text-white">
+          <div
+            className={`flex flex-col gap-5 rounded-2xl p-5 text-white ${GLASS_DARK}`}
+          >
             <div className="flex gap-3">
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f97316] text-xs font-bold">
                 1

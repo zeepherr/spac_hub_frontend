@@ -1,6 +1,14 @@
-import {Camera,LoaderCircle,Save,UserRound,} from "lucide-react";
+// EditProfile.jsx
+import { Camera, LoaderCircle, Save, UserRound } from "lucide-react";
 import { useProfileForm } from "@/components/user/useProfileForm";
 import BackButton from "./BackButton";
+
+const PAGE_BG =
+  "bg-[linear-gradient(180deg,rgba(100,201,207,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(100,201,207,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const CTA_GLASS =
+  "bg-orange-500 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
 
 function EditProfile() {
   const {
@@ -18,14 +26,9 @@ function EditProfile() {
   if (isLoading) {
     return (
       <div className="flex min-h-80 items-center justify-center">
-        <LoaderCircle
-          size={30}
-          className="animate-spin text-orange-500"
-        />
+        <LoaderCircle size={30} className="animate-spin text-orange-500" />
 
-        <span className="ml-3 text-neutral-500">
-          Loading profile...
-        </span>
+        <span className="ml-3 text-neutral-500">Loading profile...</span>
       </div>
     );
   }
@@ -39,7 +42,7 @@ function EditProfile() {
   }
 
   return (
-    <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
+    <section className={`min-h-full px-5 py-8 lg:px-10 ${PAGE_BG}`}>
       <div className="mx-auto max-w-5xl">
         <BackButton />
         <header className="mb-7">
@@ -58,12 +61,11 @@ function EditProfile() {
 
         <form
           onSubmit={handleSubmit(submitProfile)}
-          className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm lg:p-8"
+          className={`rounded-2xl p-6 lg:p-8 ${GLASS_PANEL}`}
           noValidate
         >
-          {/* Profile Picture */}
-          <div className="mb-8 flex items-center gap-5 border-b border-neutral-200 pb-8">
-            <div className="flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200 bg-neutral-100">
+          <div className="mb-8 flex items-center gap-5 border-b border-neutral-200/70 pb-8">
+            <div className="flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200/70 bg-neutral-100">
               {imagePreview ? (
                 <img
                   src={imagePreview}
@@ -71,10 +73,7 @@ function EditProfile() {
                   className="size-full object-cover"
                 />
               ) : (
-                <UserRound
-                  size={48}
-                  className="text-neutral-400"
-                />
+                <UserRound size={48} className="text-neutral-400" />
               )}
             </div>
 
@@ -189,14 +188,11 @@ function EditProfile() {
             <button
               type="submit"
               disabled={isSaving}
-              className="inline-flex min-w-40 cursor-pointer items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 py-3 font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+              className={`inline-flex min-w-40 cursor-pointer items-center justify-center gap-2 rounded-lg px-6 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${CTA_GLASS}`}
             >
               {isSaving ? (
                 <>
-                  <LoaderCircle
-                    size={18}
-                    className="animate-spin"
-                  />
+                  <LoaderCircle size={18} className="animate-spin" />
                   Saving...
                 </>
               ) : (
@@ -244,11 +240,7 @@ function FormInput({
         {...inputProps}
       />
 
-      {error && (
-        <p className="mt-1 text-sm text-red-500">
-          {error}
-        </p>
-      )}
+      {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
     </div>
   );
 }

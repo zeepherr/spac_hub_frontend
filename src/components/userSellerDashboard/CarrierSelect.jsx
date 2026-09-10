@@ -11,9 +11,13 @@ const THAI_CARRIERS = [
   "SCG Express",
 ];
 
+// input/select แบบแก้วโปร่งบางๆ (เดียวกับ search box ที่ใช้ทั้งเว็บ)
+const GLASS_INPUT =
+  "w-full rounded-xl border border-neutral-300 bg-white/70 backdrop-blur-sm px-4 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100";
+
 export default function CarrierSelect({ value, onChange, disabled }) {
   const [isCustom, setIsCustom] = useState(
-    value && !THAI_CARRIERS.includes(value) ? true : false
+    value && !THAI_CARRIERS.includes(value) ? true : false,
   );
 
   const handleSelectChange = (e) => {
@@ -29,13 +33,13 @@ export default function CarrierSelect({ value, onChange, disabled }) {
 
   return (
     <div className="space-y-2">
-      <label className="label text-sm font-bold text-base-content p-0">
-        Courier / Shipping Company <span className="text-error">*</span>
+      <label className="text-sm font-bold text-neutral-900 p-0">
+        Courier / Shipping Company <span className="text-red-500">*</span>
       </label>
 
       {/* Carrier Select Dropdown */}
       <select
-        className="select select-bordered w-full rounded-xl bg-base-100 focus:border-primary"
+        className={GLASS_INPUT}
         value={isCustom ? "OTHER" : value}
         onChange={handleSelectChange}
         disabled={disabled}
@@ -59,7 +63,7 @@ export default function CarrierSelect({ value, onChange, disabled }) {
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className="input input-bordered w-full rounded-xl bg-base-100 focus:border-primary text-sm mt-2"
+          className={`${GLASS_INPUT} mt-2`}
         />
       )}
     </div>

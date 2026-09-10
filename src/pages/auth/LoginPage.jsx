@@ -1,3 +1,4 @@
+// LoginPage.jsx
 import { googleLogin, login } from "@/api/auth/auth.api";
 import { establishSession } from "@/api/auth/auth.session";
 import GlobalLoading from "@/components/loading/GlobalLoading";
@@ -11,6 +12,9 @@ import { useForm } from "react-hook-form";
 import { Link, Navigate, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { loginSchema } from "../../validations/auth.schema";
+
+const GLASS_PANEL =
+  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -118,8 +122,10 @@ function LoginPage() {
     "w-full rounded-lg border bg-white py-2.5 pl-11 pr-4 text-sm text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:ring-2";
 
   return (
-    <main className="max-h-full flex items-center justify-center w-full">
-      <div className="hardware-surface w-full max-w-md bg-white p-8 md:p-10">
+    <main className="max-h-full flex items-center justify-center w-full ">
+      <div
+        className={`w-full max-w-md p-8 md:p-10 rounded-2xl hardware-surface ${GLASS_PANEL}`}
+      >
         <div className="text-center mb-6">
           <Link
             to="/"
@@ -227,9 +233,9 @@ function LoginPage() {
           </button>
 
           <div className="flex items-center gap-4 py-1">
-            <div className="hardware-divider flex-1" />
+            <div className="h-px flex-1 bg-neutral-200/70" />
             <span className="text-sm text-neutral-400">OR</span>
-            <div className="hardware-divider flex-1" />
+            <div className="h-px flex-1 bg-neutral-200/70" />
           </div>
 
           <div className="flex justify-center w-full">

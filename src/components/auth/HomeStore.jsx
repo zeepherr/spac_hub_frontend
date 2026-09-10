@@ -97,8 +97,13 @@ function PromoCards({ data }) {
 }
 
 function TrustBar() {
+  const GLASS_PANEL =
+    "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
   return (
-    <div className="grid grid-cols-2 gap-y-5 rounded-2xl border border-neutral-200 bg-white px-6 py-6 sm:grid-cols-5 sm:gap-x-4">
+    <div
+      className={`grid grid-cols-2 gap-y-5 rounded-2xl px-6 py-6 sm:grid-cols-5 sm:gap-x-4 ${GLASS_PANEL}`}
+    >
       {TRUST_ITEMS.map(({ icon: Icon, title, subtitle }) => (
         <div key={title} className="flex items-center gap-3">
           <Icon

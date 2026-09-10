@@ -184,14 +184,14 @@
    PAGE
    ========================================================= */
 
+/* ตัด background สีพื้น (--hardware-bg เดิมคือเทาอ่อน #f5f5f5) ออกจาก html/body เพราะเป็นสีทึบ
+   ตันๆ บัง Outlet/หน้าเว็บไว้ทั้งแผ่น - ทำให้ header แบบ liquid glass (fixed + backdrop-blur) ไม่มี
+   อะไรให้เบลอเวลาอยู่ตรงขอบเนื้อหา ปล่อยให้พื้นหลังจริงมาจากเนื้อหาของแต่ละหน้า/Outlet เอง */
 html {
-  background: var(--hardware-bg);
 }
 
 body {
   min-height: 100vh;
-
-  background: var(--hardware-bg);
 
   color: var(--hardware-black);
 
@@ -210,13 +210,10 @@ body {
    ========================================================= */
 
 .hardware-surface {
-  background: var(--hardware-surface);
 
   border: 1px solid var(--hardware-border);
 
-  border-radius: var(--radius-box);
 
-  box-shadow: var(--hardware-shadow);
 
   transition:
     transform 350ms var(--hardware-ease),
@@ -225,7 +222,6 @@ body {
 }
 
 .hardware-surface:hover {
-  border-color: var(--hardware-border-dark);
 
   box-shadow: var(--hardware-shadow-hover);
 
@@ -634,7 +630,8 @@ body {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    /* ตัด bg-background (ทึบขาว) ออกด้วย เหตุผลเดียวกับ html/body ด้านบน - เหลือไว้แค่สีตัวหนังสือ */
+    @apply text-foreground;
   }
   html {
     @apply font-sans;
@@ -663,25 +660,28 @@ body {
   background: #f97316;
 }
 
-/* SpecHub notifications */
+/* SpecHub notifications *//* Toaster.css *//* Toaster.css */
 [data-sonner-toaster].spechub-toaster {
   font-family: "Inter Variable", sans-serif;
 }
 
 [data-sonner-toaster].spechub-toaster [data-sonner-toast].spechub-toast {
-  --toast-accent: var(--hardware-orange);
+  --toast-accent: #f97316;
 
   gap: 12px;
   padding: 16px;
-  border: 1px solid var(--hardware-border);
+  border: 1px solid rgba(229, 229, 229, 0.7);
   border-inline-start: 3px solid var(--toast-accent);
-  border-radius: 12px;
-  background: var(--hardware-surface);
-  color: var(--hardware-black);
-  box-shadow: var(--hardware-shadow);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #171717;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.7),
+    0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-/* Semantic colors */
 [data-sonner-toaster].spechub-toaster .spechub-toast[data-type="success"] {
   --toast-accent: #3f7d5a;
 }
@@ -691,7 +691,7 @@ body {
 }
 
 [data-sonner-toaster].spechub-toaster .spechub-toast[data-type="info"] {
-  --toast-accent: var(--hardware-gray);
+  --toast-accent: #a3a3a3;
 }
 
 [data-sonner-toaster].spechub-toaster .spechub-toast [data-icon] {
@@ -712,23 +712,22 @@ body {
 }
 
 [data-sonner-toaster].spechub-toaster .spechub-toast [data-description] {
-  color: var(--hardware-gray);
+  color: #737373;
   font-size: 12px;
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
 
-/* Compact charcoal action */
 [data-sonner-toaster].spechub-toaster .spechub-toast [data-button] {
   height: 30px;
   padding-inline: 12px;
   border-radius: 8px;
-  background: var(--hardware-black);
+  background: #171717;
   color: white;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 160ms var(--hardware-ease);
+  transition: background-color 160ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-sonner-toaster].spechub-toaster .spechub-toast [data-button]:hover {
@@ -736,28 +735,28 @@ body {
 }
 
 [data-sonner-toaster].spechub-toaster .spechub-toast [data-cancel] {
-  background: var(--hardware-surface-2);
-  color: var(--hardware-gray);
+  background: rgba(255, 255, 255, 0.4);
+  color: #737373;
 }
 
 [data-sonner-toaster].spechub-toaster .spechub-toast [data-cancel]:hover {
-  background: var(--hardware-border);
+  background: rgba(229, 229, 229, 0.6);
 }
 
-/* Dismiss button */
 [data-sonner-toaster].spechub-toaster .spechub-toast [data-close-button] {
-  background: var(--hardware-surface);
-  border-color: var(--hardware-border);
-  color: var(--hardware-gray);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-color: rgba(229, 229, 229, 0.7);
+  color: #737373;
 }
 
 [data-sonner-toaster].spechub-toaster .spechub-toast [data-close-button]:hover {
-  background: var(--hardware-surface-2);
-  color: var(--hardware-black);
+  background: rgba(255, 255, 255, 0.95);
+  color: #171717;
 }
 
-/* Keyboard focus only */
 [data-sonner-toaster].spechub-toaster .spechub-toast button:focus-visible {
-  outline: 2px solid var(--hardware-orange);
+  outline: 2px solid #f97316;
   outline-offset: 3px;
 }
