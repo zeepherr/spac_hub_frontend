@@ -22,8 +22,10 @@ import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import VerifyPage from "../pages/auth/VerifyPage";
 import HomePage from "../pages/public/HomePage";
+import GuestRoute from "./Guest.route";
 import ProtectedRoute from "./Protected.route";
 import RoleRoute, { ROLES } from "./Role.route";
+import StorefrontRoute from "./Storefront.route";
 
 import AdminChats from "@/pages/admin/AdminChats";
 import AwaitingReceipt from "@/pages/admin/AwaitingReceipt";
@@ -51,117 +53,130 @@ import SupportInbox from "@/pages/public/user/SupportInbox";
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    Component: PublicLayout,
+    element: <StorefrontRoute />,
     children: [
       {
-        index: true,
-        Component: HomePage,
-      },
-
-      {
-        path: "products",
-        Component: ListingPage,
+        path: "/",
+        Component: PublicLayout,
         children: [
           {
-            index: true, // 👈 เพิ่มใหม่ - ตรงกับ path "/products" เป๊ะๆ
-            Component: AllProduct,
+            index: true,
+            Component: HomePage,
           },
+
           {
-            path: "lastestProducts",
-            Component: LatestProduct,
-          },
-          {
-            path: "categories",
-            Component: CatagoryPage,
+            path: "products",
+            Component: ListingPage,
             children: [
               {
-                path: ":categoryId",
-                Component: CategoryListingPage,
+                index: true, // 👈 เพิ่มใหม่ - ตรงกับ path "/products" เป๊ะๆ
+                Component: AllProduct,
+              },
+              {
+                path: "lastestProducts",
+                Component: LatestProduct,
+              },
+              {
+                path: "categories",
+                Component: CatagoryPage,
+                children: [
+                  {
+                    path: ":categoryId",
+                    Component: CategoryListingPage,
+                  },
+                ],
+              },
+              {
+                path: ":id",
+                Component: ListingDetailPage,
               },
             ],
           },
           {
-            path: ":id",
-            Component: ListingDetailPage,
+            // ปุ่ม "Start Building" ใน CategorySidebar.jsx navigate มาที่นี่
+            path: "build",
+            Component: BuildPcPage,
           },
-        ],
-      },
-      {
-        path: "cart",
-        Component: CartPage,
-      },
-      {
-        // ปุ่ม "Start Building" ใน CategorySidebar.jsx navigate มาที่นี่
-        path: "build",
-        Component: BuildPcPage,
-      },
-      { path: "/payment/success", Component: PaymentSuccessPage },
-      { path: "/checkoutstep1", Component: CheckoutStep1Page },
-      { path: "/checkoutstep2", Component: CheckoutStep2Page },
-      { path: "/checkoutstep3", Component: CheckoutStep3Page },
-      {
-        path: "cart",
-        Component: CartPage,
-      },
-      {
-        Component: ProtectedRoute,
-        children: [
           {
-            element: <RoleRoute allowRoles={[ROLES.USER]} />,
+            Component: ProtectedRoute,
             children: [
               {
-                path: "user",
-                Component: ProfileLayout,
+                element: <RoleRoute allowRoles={[ROLES.USER]} />,
                 children: [
                   {
-                    index: true,
-                    Component: Buy,
+                    path: "cart",
+                    Component: CartPage,
                   },
                   {
-                    path: "orders",
-                    Component: BuyingOrders,
+                    path: "payment/success",
+                    Component: PaymentSuccessPage,
                   },
                   {
-                    path: "orders/:orderId",
-                    Component: OrderDetail,
+                    path: "checkoutstep1",
+                    Component: CheckoutStep1Page,
                   },
                   {
-                    path: "chats",
-                    Component: SupportInbox,
+                    path: "checkoutstep2",
+                    Component: CheckoutStep2Page,
                   },
                   {
-                    path: "sell",
-                    Component: Sell,
+                    path: "checkoutstep3",
+                    Component: CheckoutStep3Page,
                   },
                   {
-                    path: "sell/create",
-                    Component: CreateProductPage,
-                  },
-                  {
-                    path: "profile",
-                    Component: Profile,
-                  },
-                  {
-                    path: "profile/edit",
-                    Component: EditProfile,
-                  },
-                  {
-                    path: "sell/selling-orders",
-                    element: <SellingOrdersPage />,
-                  },
-                  {
-                    path: "sell/my-listings",
-                    element: <MyListingsPage />,
-                  },
-                  {
-                    path: "sell/sales-report",
-                    element: <SalesReportPage />,
-                  },
+                    path: "user",
+                    Component: ProfileLayout,
+                    children: [
+                      {
+                        index: true,
+                        Component: Buy,
+                      },
+                      {
+                        path: "orders",
+                        Component: BuyingOrders,
+                      },
+                      {
+                        path: "orders/:orderId",
+                        Component: OrderDetail,
+                      },
+                      {
+                        path: "chats",
+                        Component: SupportInbox,
+                      },
+                      {
+                        path: "sell",
+                        Component: Sell,
+                      },
+                      {
+                        path: "sell/create",
+                        Component: CreateProductPage,
+                      },
+                      {
+                        path: "profile",
+                        Component: Profile,
+                      },
+                      {
+                        path: "profile/edit",
+                        Component: EditProfile,
+                      },
+                      {
+                        path: "sell/selling-orders",
+                        element: <SellingOrdersPage />,
+                      },
+                      {
+                        path: "sell/my-listings",
+                        element: <MyListingsPage />,
+                      },
+                      {
+                        path: "sell/sales-report",
+                        element: <SalesReportPage />,
+                      },
 
-                  {
-                    path: "*",
-                    Component: NotFound,
+                      {
+                        path: "*",
+                        Component: NotFound,
+                      },
+                    ],
                   },
                 ],
               },
@@ -238,23 +253,28 @@ const router = createBrowserRouter([
   },
   //auth
   {
-    element: <AuthLayout />,
+    element: <GuestRoute />,
     children: [
       {
-        path: "/login",
-        Component: LoginPage,
-      },
-      {
-        path: "/register",
-        Component: RegisterPage,
-      },
-      {
-        path: "/verify-email",
-        Component: VerifyPage,
-      },
-      {
-        path: "*",
-        Component: NotFound,
+        element: <AuthLayout />,
+        children: [
+          {
+            path: "/login",
+            Component: LoginPage,
+          },
+          {
+            path: "/register",
+            Component: RegisterPage,
+          },
+          {
+            path: "/verify-email",
+            Component: VerifyPage,
+          },
+          {
+            path: "*",
+            Component: NotFound,
+          },
+        ],
       },
     ],
   },

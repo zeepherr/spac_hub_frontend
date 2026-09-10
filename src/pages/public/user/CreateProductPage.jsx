@@ -348,7 +348,7 @@ export default function CreateProductPage() {
                       disabled={isGlobalLoading}
                       className="btn btn-primary text-white w-full rounded-field font-bold"
                     >
-                      บันทึกรูปภาพและไปขั้นตอนถัดไป
+                      Save and Continue
                     </button>
                   )}
                 </div>
