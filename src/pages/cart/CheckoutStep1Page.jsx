@@ -19,8 +19,6 @@ import CheckoutStep1 from "@/components/cart/CheckoutStep1";
 import CheckoutStep3 from "@/components/cart/CheckoutStep3";
 import CheckoutStepIndicator from "@/components/cart/CheckoutStepLine";
 
-const ASSEMBLY_SERVICE_FEE = 400;
-
 function formatPrice(amount) {
   return `฿${amount.toLocaleString()}`;
 }
@@ -46,7 +44,6 @@ function OrderSummary({
   isQuoteLoading,
   isQuoteError,
   quoteError,
-  includeAssembly,
   onContinue,
   submitting,
 }) {
@@ -95,14 +92,6 @@ function OrderSummary({
               </div>
             ))
           )}
-          {includeAssembly && (
-            <div className="flex items-center justify-between">
-              <span>Assembly Service</span>
-              <span className="font-medium text-white">
-                {formatPrice(ASSEMBLY_SERVICE_FEE)}
-              </span>
-            </div>
-          )}
           <div className="flex items-center justify-between text-green-400">
             <span className="flex items-center gap-1">
               <ShieldCheck size={14} />
@@ -125,7 +114,7 @@ function OrderSummary({
       <button
         type="button"
         onClick={onContinue}
-        disabled={submitting}
+        disabled={submitting || !hasItems || isPending || isQuoteError}
         className="btn btn-accent w-full gap-2 text-white disabled:opacity-50"
       >
         Proceed to Checkout
@@ -149,6 +138,7 @@ export default function CheckoutStep1Page() {
   const createPaymentMutation = useCreatePaymentCheckout();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState("");
+  const [checkoutId, setCheckoutId] = useState(null);
 
   const items = location.state?.items ?? [];
   const includeAssembly = location.state?.includeAssembly ?? false;
@@ -206,25 +196,26 @@ export default function CheckoutStep1Page() {
         setPaymentError("");
         setIsProcessingPayment(true);
         try {
-          const listingIds = items.map((item) => item.listingId);
-          const checkout = await createCheckoutMutation.mutateAsync({
-            listingIds,
-            shippingAddress,
-            setupServiceRequested: includeAssembly,
-          });
-          const checkoutId = checkout?.data?.id;
+          let paymentCheckoutId = checkoutId;
 
-          if (!checkoutId) {
-            console.error(
-              "[checkout] checkoutId is falsy — response shape ไม่ตรงกับที่คาดไว้:",
-              checkout,
-            );
-            throw new Error(
-              "checkoutId not found in the /api/checkouts response (check console.log for where the id actually is)",
-            );
+          if (!paymentCheckoutId) {
+            const listingIds = items.map((item) => item.listingId);
+            const checkout = await createCheckoutMutation.mutateAsync({
+              listingIds,
+              shippingAddress,
+              setupServiceRequested: includeAssembly,
+            });
+
+            paymentCheckoutId = checkout?.data?.id;
+
+            if (!paymentCheckoutId) {
+              throw new Error("Checkout response did not include an ID.");
+            }
+
+            setCheckoutId(paymentCheckoutId);
           }
 
-          await createPaymentMutation.mutateAsync(checkoutId);
+          await createPaymentMutation.mutateAsync(paymentCheckoutId);
         } catch (error) {
           console.error("[checkout] failed:", error);
           setPaymentError(
@@ -309,7 +300,6 @@ export default function CheckoutStep1Page() {
             isQuoteLoading={quoteQuery.isLoading}
             isQuoteError={quoteQuery.isError}
             quoteError={quoteQuery.error}
-            includeAssembly={includeAssembly}
             onContinue={submitShippingAndPay}
             submitting={updateUserProfile.isPending || isProcessingPayment}
           />
