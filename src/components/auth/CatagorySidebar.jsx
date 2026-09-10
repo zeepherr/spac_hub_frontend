@@ -23,13 +23,6 @@ import {
 } from "lucide-react";
 import { NavLink } from "react-router";
 
-/**
- * หา icon ที่เหมาะกับชื่อหมวดหมู่ (จับคู่แบบคร่าวๆ จากชื่อที่ backend ส่งมา)
- * ถ้าไม่ match อะไรเลยจะ fallback เป็น Boxes
- *
- * หมายเหตุ: เช็ค "keyboard" ก่อนเช็ค mainboard เสมอ เพราะคำว่า "keyboard" มีคำว่า
- * "board" อยู่ในตัวเอง ไม่งั้นหมวด Keyboard จะโดนจับเป็นไอคอน Mainboard ไปก่อน
- */
 export function getCategoryIcon(name = "") {
   const key = name.toLowerCase();
   if (key.includes("cpu")) return Cpu;
@@ -60,6 +53,14 @@ export function getCategoryIcon(name = "") {
   return Boxes;
 }
 
+const GLASS_PANEL =
+  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const ITEM_ACTIVE =
+  "bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(249,115,22,0.35)]";
+const ITEM_IDLE = "text-neutral-600 hover:bg-white/40 hover:text-[#f97316]";
+const CTA_GLASS =
+  "bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
+
 export default function CategorySidebar() {
   const {
     data: categories = [],
@@ -68,15 +69,17 @@ export default function CategorySidebar() {
   } = useCategories({ includeInactive: false });
 
   return (
-    <aside className="flex h-fit flex-col rounded-2xl border border-neutral-200 bg-white hardware-surface">
-      <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3.5">
+    <aside
+      className={`flex h-fit flex-col rounded-2xl hardware-surface ${GLASS_PANEL}`}
+    >
+      <div className="flex items-center justify-between border-b border-neutral-200/60 px-4 py-3.5">
         <h2 className="text-sm font-semibold text-neutral-900">
           Product Categories
         </h2>
         <Menu size={16} className="text-neutral-400" />
       </div>
 
-      <ul className="flex flex-col">
+      <ul className="flex flex-col gap-1 p-2">
         {isLoading &&
           Array.from({ length: 10 }).map((_, i) => (
             <li key={i} className="flex items-center gap-3 px-4 py-3">
@@ -100,10 +103,8 @@ export default function CategorySidebar() {
                 <NavLink
                   to={`/products/categories/${category.id}`}
                   className={({ isActive }) =>
-                    `flex items-center justify-between border-l-2 px-4 py-2.5 text-sm transition ${
-                      isActive
-                        ? "border-l-[#f97316] bg-neutral-50 font-semibold text-neutral-900"
-                        : "border-l-transparent font-medium text-neutral-700 hover:bg-neutral-50"
+                    `flex items-center justify-between rounded-xl px-4 py-2.5 text-sm font-medium transition-colors duration-150 ${
+                      isActive ? ITEM_ACTIVE : ITEM_IDLE
                     }`
                   }
                 >
@@ -113,16 +114,14 @@ export default function CategorySidebar() {
                         <Icon
                           size={17}
                           className={
-                            isActive ? "text-[#f97316]" : "text-neutral-400"
+                            isActive ? "text-white" : "text-neutral-400"
                           }
                         />
                         {category.name}
                       </span>
                       <ChevronRight
                         size={15}
-                        className={
-                          isActive ? "text-[#f97316]" : "text-neutral-300"
-                        }
+                        className={isActive ? "text-white" : "text-neutral-300"}
                       />
                     </>
                   )}
@@ -133,7 +132,7 @@ export default function CategorySidebar() {
       </ul>
 
       {/* จัดสเปคคอม */}
-      <div className="border-t border-neutral-100 p-4">
+      <div className="border-t border-neutral-200/60 p-4">
         <p className="mb-2 text-sm font-semibold text-neutral-900">
           Build Your PC
         </p>
@@ -142,7 +141,7 @@ export default function CategorySidebar() {
         </p>
         <NavLink
           to="/build"
-          className="flex w-full items-center justify-center rounded-lg bg-[#f97316] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600"
+          className={`flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition ${CTA_GLASS}`}
         >
           Start Building
         </NavLink>

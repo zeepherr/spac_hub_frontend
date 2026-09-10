@@ -9,12 +9,40 @@ import { useCartFlyAnimation } from "../animation/CartFlyAnimationProvider";
 import { animate } from "motion";
 import { useWebAssets } from "@/hook/webAsset/useWebAssets";
 
+// เงาชุดเดียวกับ MainNav.jsx - เวอร์ชันปรับให้อ่านออกชัดบนพื้นหลังขาว (ของเดิม bg-white/25 จะจางมาก
+// ถ้าไม่มีคอนเทนต์สีสันข้างหลังให้ blur) ขึ้น opacity ของ bg-white ให้พอเห็นเป็นแผ่นแก้วได้เองแม้พื้น
+// เป็นขาวล้วน เพิ่ม border สีเทา/ส้มจางๆ ให้มีขอบชัดขึ้น แต่ยังคง backdrop-blur ไว้เผื่อมีคอนเทนต์
+// เลื่อนผ่านข้างหลังตอน scroll (ดู PublicLayout.jsx ที่ทำ header เป็น fixed ไว้แล้ว)
+const GLASS_IDLE =
+  "bg-white/60 backdrop-blur-md text-neutral-700 border border-neutral-200/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_8px_rgba(0,0,0,0.06)]";
+const GLASS_ACTIVE =
+  "bg-[#f97316]/90 backdrop-blur-md text-white border border-orange-300/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_4px_14px_rgba(249,115,22,0.35)]";
+// panel (dropdown ผลค้นหา) ต้องทึบกว่าปุ่มพอสมควร เพราะต้องมีตัวหนังสือ/รูปสินค้าอ่านง่ายอยู่ข้างใน
+const GLASS_PANEL =
+  "bg-white/95 backdrop-blur-xl border border-neutral-200 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_20px_40px_rgba(0,0,0,0.10)]";
+// พื้นหลังของตัว header เองก็เป็นแผ่นแก้ว liquid glass ด้วย (เดิมโปร่งใสล้วน) - บางกว่าตัว element ย่อย
+// ข้างใน (search/cart/avatar) มีเส้นขีดล่างจางๆ (border-b) คั่นจากเนื้อหาข้างล่างให้ดูเป็นแถบลอย
+const GLASS_BAR =
+  "bg-white/50 backdrop-blur-xl border-b border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.05)]";
+
 function Logo() {
-  const logo = useWebAssets().data?.homeImageUrl;
-  console.log(logo);
+  // ดึงรูปโลโก้จริงจาก backend - fallback กลับไปใช้ไอคอน + ตัวหนังสือเดิมถ้ายังโหลดไม่เสร็จ/ไม่มีค่า
+  const logoUrl = useWebAssets().data?.homeImageUrl;
+
   return (
     <Link to="/" className="flex shrink-0 flex-col items-start">
-      <img src={logo} alt="SpecHub" className="h-13 w-auto object-contain" />
+      {logoUrl ? (
+        <img
+          src={logoUrl}
+          alt="SpecHub"
+          className="h-10 w-auto object-contain"
+        />
+      ) : (
+        <span className="flex items-center gap-2 text-xl font-bold tracking-tight text-neutral-900">
+          <Cpu className="h-5 w-5 text-[#f97316]" strokeWidth={2} />
+          SPEC<span className="text-[#f97316]">HUB</span>
+        </span>
+      )}
     </Link>
   );
 }
@@ -89,9 +117,10 @@ function SearchForm() {
 
   return (
     <div ref={searchContainerRef} className="relative w-full max-w-2xl">
+      {/* ช่องค้นหาเป็นแผ่นแก้ว liquid glass ลอยอยู่บนพื้นหลังโปร่งใสของ header */}
       <form
         onSubmit={handleSubmit}
-        className="flex w-full items-center overflow-hidden rounded-lg border border-neutral-200 bg-white transition focus-within:border-neutral-400"
+        className={`flex w-full items-center overflow-hidden rounded-2xl transition-colors ${GLASS_IDLE}`}
       >
         <div className="relative min-w-0 flex-1">
           <input
@@ -110,7 +139,7 @@ function SearchForm() {
             }}
             placeholder="Search products, brands, models..."
             autoComplete="off"
-            className="w-full bg-transparent px-4 py-2.5 pr-9 text-sm text-neutral-800 outline-none placeholder:text-neutral-400"
+            className="w-full bg-transparent px-4 py-2.5 pr-9 text-sm text-neutral-800 outline-none placeholder:text-neutral-500"
           />
 
           {searchTerm && (
@@ -118,7 +147,7 @@ function SearchForm() {
               type="button"
               onClick={handleClearSearch}
               aria-label="Clear search"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800"
             >
               <X size={16} />
             </button>
@@ -128,14 +157,16 @@ function SearchForm() {
         <button
           type="submit"
           aria-label="Search"
-          className="flex w-11 shrink-0 items-center justify-center text-neutral-400 transition hover:text-[#f97316]"
+          className="flex w-11 shrink-0 items-center justify-center text-neutral-500 transition hover:text-[#f97316]"
         >
           <Search size={18} />
         </button>
       </form>
 
       {canShowDropdown && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-lg border border-neutral-200 bg-white p-2 shadow-md">
+        <div
+          className={`absolute left-0 right-0 top-full z-50 mt-3 max-h-96 overflow-y-auto rounded-2xl p-2 ${GLASS_PANEL}`}
+        >
           {isFetching ? (
             <p className="px-3 py-4 text-sm text-neutral-500">Searching...</p>
           ) : isError ? (
@@ -156,9 +187,9 @@ function SearchForm() {
                   key={listing.id}
                   type="button"
                   onClick={() => handleSelectListing(listing.id)}
-                  className="flex w-full items-center gap-3 rounded-md p-2.5 text-left transition hover:bg-neutral-50"
+                  className="flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition hover:bg-white/60"
                 >
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md bg-neutral-100">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white/50">
                     {imageUrl ? (
                       <img
                         src={imageUrl}
@@ -196,16 +227,16 @@ function SearchForm() {
 }
 
 const navLinkClass = ({ isActive }) =>
-  `hover:text-[#f97316] ${isActive ? "text-[#f97316]" : "text-neutral-500"}`;
+  `hover:text-[#f97316] ${isActive ? "text-[#f97316]" : "text-neutral-600"}`;
 
 function AuthLinks() {
   return (
-    <div className="flex items-center gap-1.5 text-sm font-medium text-neutral-500">
+    <div className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
       <User size={17} strokeWidth={1.75} />
       <NavLink to="/login" className={navLinkClass}>
-        Login{" "}
+        Login
       </NavLink>
-      <span className="text-neutral-300">/</span>
+      <span className="text-neutral-400">/</span>
       <NavLink to="/register" className={navLinkClass}>
         Register
       </NavLink>
@@ -220,13 +251,19 @@ function ProfileLink({ user }) {
       className="flex items-center gap-2 text-sm font-medium text-neutral-700 hover:text-[#f97316]"
     >
       {user.profileImageUrl ? (
-        <img
-          src={user.profileImageUrl}
-          alt={user.firstName ?? "My Profile "}
-          className="h-7 w-7 rounded-full object-cover ring-1 ring-transparent hover:ring-[#f97316]"
-        />
+        <span
+          className={`flex h-8 w-8 items-center justify-center rounded-full ${GLASS_IDLE}`}
+        >
+          <img
+            src={user.profileImageUrl}
+            alt={user.firstName ?? "My Profile "}
+            className="h-7 w-7 rounded-full object-cover"
+          />
+        </span>
       ) : (
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100">
+        <span
+          className={`flex h-8 w-8 items-center justify-center rounded-full ${GLASS_IDLE}`}
+        >
           <User size={14} className="text-[#f97316]" />
         </span>
       )}
@@ -260,12 +297,13 @@ function MainNav() {
   }, [cartCount]);
 
   return (
-    <nav className="flex shrink-0 items-center gap-5 whitespace-nowrap text-sm font-medium">
+    <nav className="flex shrink-0 items-center gap-4 whitespace-nowrap text-sm font-medium">
+      {/* ปุ่มตะกร้าเป็นแผ่นแก้วเดียวกับปุ่มเมนูใน MainNav.jsx - ใส (idle) / ส้มโปร่งพร้อมเรืองแสงตอน active */}
       <NavLink
         to={user ? "/cart" : "/login"}
         className={() =>
-          `flex items-center gap-1.5 hover:text-[#f97316] ${
-            isCartActive ? "text-[#f97316]" : "text-neutral-500"
+          `flex items-center gap-2 rounded-2xl px-3 py-2 transition-colors ${
+            isCartActive ? GLASS_ACTIVE : `${GLASS_IDLE} hover:text-[#f97316]`
           }`
         }
       >
@@ -299,8 +337,8 @@ function Header() {
 
   return (
     <header>
-      <div className="sticky top-0 z-40 w-screen border-b border-neutral-100 bg-white shadow-sm/20">
-        <div className="mx-auto grid max-w-8xl grid-cols-[auto_1fr_auto] items-center gap-2 px-4 py-4">
+      <div className={`sticky top-0 z-40 w-screen ${GLASS_BAR}`}>
+        <div className="mx-auto grid max-w-8xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-4">
           <Logo />
 
           <div className="flex justify-center">

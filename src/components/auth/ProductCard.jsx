@@ -5,18 +5,15 @@ import { Cpu, ShoppingCart, Star } from "lucide-react";
 import { useRef } from "react";
 import { Link, useNavigate } from "react-router";
 
-// แก้สแลชซ้อน (เช่น "r2.dev//listings/...") ที่เกิดจากฝั่ง backend ต่อ URL พลาด
+const GLASS_PANEL =
+  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
 
-// หารูปปกจาก listing.images (isCover ก่อน ถ้าไม่มีเอารูปแรก)
-// backend คืน imageUrl เต็มมาให้อยู่แล้ว (แปลง imageKey เป็น URL ฝั่ง server แล้ว)
 function getCoverImageUrl(listing) {
   const images = listing.images ?? [];
   const cover = images.find((img) => img.isCover) ?? images[0];
   return cover?.imageUrl;
 }
 
-// label ภาษาไทยของ estimatedCondition - เหมือนที่ทำไว้ใน ListingDetailPage.jsx / ProductCartCard.jsx
-// ยืนยันจริงแค่ "FAIR" ตัวเดียวจาก response ที่เคย log ดู ค่าอื่นเป็นการเดาตามรูปแบบทั่วไป
 const CONDITION_LABELS = {
   LIKE_NEW: { label: "Like New", color: "text-green-600" },
   GOOD: { label: "Good Condition", color: "text-green-600" },
@@ -33,7 +30,6 @@ function getConditionInfo(condition) {
   );
 }
 
-// หลอดคะแนนแบบย่อ (เหมือนใน ProductCartCard.jsx) สีไล่ตามช่วงคะแนน เขียว/ส้ม/แดง
 function ConditionScoreBar({ score }) {
   const clamped = Math.min(100, Math.max(0, score));
   const barColor =
@@ -59,7 +55,6 @@ function ProductCard({ product }) {
   const user = useAuthStore((store) => store.user);
   const navigate = useNavigate();
   const addCartItem = useAddCartItem();
-  // อ้างอิงกล่องรูปสินค้าในการ์ดนี้ไว้เป็นจุดเริ่มบินของแอนิเมชัน "บินเข้าตะกร้า"
   const productImageRef = useRef(null);
   const { flyToCart } = useCartFlyAnimation();
 
@@ -68,27 +63,22 @@ function ProductCard({ product }) {
     product.estimatedScore != null ? Number(product.estimatedScore) : null;
 
   const handleAddToCart = (e) => {
-    // กันไม่ให้ <Link> ที่ครอบการ์ดอยู่ทำการ navigate ไปหน้า detail ตอนกดปุ่มนี้
     e.preventDefault();
     e.stopPropagation();
 
     if (!user) {
-      // ยังไม่ login เด้งไปหน้า login แทนการ add เลย
       navigate("/login");
       return;
     }
 
     flyToCart(productImageRef.current, imageUrl);
-
-    // TODO: ปรับ payload ให้ตรงกับที่ addCartItem ต้องการจริงๆ
-    // ตอนนี้เดาว่าส่งแค่ listingId เฉยๆ ถ้า backend ต้องการ shape อื่น (เช่น { listingId, qty }) ปรับตรงนี้
     addCartItem.mutate(product.id);
   };
 
   return (
     <Link
       to={`/products/${product.id}`}
-      className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-4 transition hover:border-neutral-300 hardware-surface"
+      className={`flex flex-col rounded-2xl p-4 transition hover:bg-white/70 ${GLASS_PANEL}`}
     >
       <span className="mb-2 w-fit text-[11px] font-medium uppercase tracking-wide text-neutral-400">
         {product.brand}
@@ -111,12 +101,15 @@ function ProductCard({ product }) {
         )}
       </div>
 
-      <p className="mb-1 line-clamp-2 text-sm font-medium text-neutral-900">
+      <p className="line-clamp-2 text-sm font-medium text-neutral-900">
         {product.title}
       </p>
-      <p className="mb-1 text-lg font-bold text-[#f97316]">
-        {price.toLocaleString()}.-
-      </p>
+
+      {product.seller?.name && (
+        <p className="mb-1 truncate text-[11px] text-neutral-400">
+          ขายโดย {product.seller.firstName}
+        </p>
+      )}
 
       {estimatedScore != null && (
         <div className="mb-2 flex items-center gap-1.5">
@@ -128,23 +121,23 @@ function ProductCard({ product }) {
         </div>
       )}
 
+      {product.rating ? (
+        <span className="mb-1 flex items-center gap-1 text-xs text-neutral-500">
+          <Star size={14} className="fill-[#f97316] text-[#f97316]" />
+          {product.rating} ({product.reviewCount})
+        </span>
+      ) : null}
+
       <div className="mt-auto flex items-center justify-between">
-        {/* schema ตอนนี้ยังไม่มี rating ผูกกับ Listing โดยตรง (Review อยู่บน Order)
-            เว้นที่ไว้เผื่อทำสรุป rating ทีหลัง ถ้ายังไม่มีข้อมูลจะไม่โชว์แถวนี้ */}
-        {product.rating ? (
-          <span className="flex items-center gap-1 text-xs text-neutral-500">
-            <Star size={14} className="fill-[#f97316] text-[#f97316]" />
-            {product.rating} ({product.reviewCount})
-          </span>
-        ) : (
-          <span />
-        )}
+        <p className="text-lg font-bold text-[#f97316]">
+          {price.toLocaleString()}.-
+        </p>
         <button
           type="button"
           aria-label="Add to Cart"
           onClick={handleAddToCart}
           disabled={user ? addCartItem.isPending : false}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f97316] text-white transition hover:bg-orange-600 disabled:opacity-50"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] transition hover:bg-orange-600 disabled:opacity-50"
         >
           <ShoppingCart size={15} />
         </button>

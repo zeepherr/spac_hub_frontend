@@ -184,14 +184,14 @@
    PAGE
    ========================================================= */
 
+/* ตัด background สีพื้น (--hardware-bg เดิมคือเทาอ่อน #f5f5f5) ออกจาก html/body เพราะเป็นสีทึบ
+   ตันๆ บัง Outlet/หน้าเว็บไว้ทั้งแผ่น - ทำให้ header แบบ liquid glass (fixed + backdrop-blur) ไม่มี
+   อะไรให้เบลอเวลาอยู่ตรงขอบเนื้อหา ปล่อยให้พื้นหลังจริงมาจากเนื้อหาของแต่ละหน้า/Outlet เอง */
 html {
-  background: var(--hardware-bg);
 }
 
 body {
   min-height: 100vh;
-
-  background: var(--hardware-bg);
 
   color: var(--hardware-black);
 
@@ -210,13 +210,10 @@ body {
    ========================================================= */
 
 .hardware-surface {
-  background: var(--hardware-surface);
 
   border: 1px solid var(--hardware-border);
 
-  border-radius: var(--radius-box);
 
-  box-shadow: var(--hardware-shadow);
 
   transition:
     transform 350ms var(--hardware-ease),
@@ -225,7 +222,6 @@ body {
 }
 
 .hardware-surface:hover {
-  border-color: var(--hardware-border-dark);
 
   box-shadow: var(--hardware-shadow-hover);
 
@@ -634,7 +630,8 @@ body {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    /* ตัด bg-background (ทึบขาว) ออกด้วย เหตุผลเดียวกับ html/body ด้านบน - เหลือไว้แค่สีตัวหนังสือ */
+    @apply text-foreground;
   }
   html {
     @apply font-sans;
