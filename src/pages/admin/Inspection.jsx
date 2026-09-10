@@ -48,8 +48,15 @@ function Inspection() {
     ? ordersQuery.data
     : (ordersQuery.data?.data ?? []);
 
+  /*
+   * =========================================
+   * FILTER ORDERS
+   * =========================================
+   */
   const filteredOrders = useMemo(() => {
-    const keyword = search.trim().toLowerCase();
+    const keyword = search
+      .trim()
+      .toLowerCase();
 
     if (!keyword) {
       return orders;
@@ -73,6 +80,11 @@ function Inspection() {
     });
   }, [orders, search]);
 
+  /*
+   * =========================================
+   * START / CONTINUE INSPECTION
+   * =========================================
+   */
   const handleInspection = (order) => {
     if (order.status === "INSPECTING") {
       navigate(
@@ -97,30 +109,35 @@ function Inspection() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F4] p-8">
-      <div className="w-full">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
+    <div className="min-h-screen bg-[#F5F5F4] px-6 py-6">
+      <div className="mx-auto w-full max-w-[1500px]">
+        {/* =========================================
+            HEADER
+        ========================================= */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-100">
+            {/* ICON */}
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-orange-100">
               <ClipboardCheck
-                size={23}
+                size={22}
                 className="text-orange-500"
               />
             </div>
 
+            {/* TITLE */}
             <div>
-              <h1 className="text-2xl font-semibold text-neutral-900">
+              <h1 className="text-xl font-semibold text-neutral-900">
                 Inspection
               </h1>
 
-              <p className="mt-1 text-sm text-neutral-500">
+              <p className="mt-1 text-xs text-neutral-500">
                 Inspect the condition of products
                 received from sellers.
               </p>
             </div>
           </div>
 
+          {/* REFRESH */}
           <button
             type="button"
             onClick={() =>
@@ -129,7 +146,20 @@ function Inspection() {
             disabled={
               ordersQuery.isFetching
             }
-            className="flex h-11 items-center gap-2 rounded-xl border border-neutral-200 bg-white px-4 text-sm font-medium text-neutral-700 shadow-sm transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="
+              inline-flex items-center gap-2
+              rounded-xl
+              border border-neutral-200
+              bg-white
+              px-4 py-2.5
+              text-sm font-medium
+              text-neutral-700
+              shadow-sm
+              transition
+              hover:bg-neutral-50
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+            "
           >
             <RefreshCw
               size={16}
@@ -140,18 +170,26 @@ function Inspection() {
               }
             />
 
-            Refresh
+            {ordersQuery.isFetching
+              ? "Loading..."
+              : "Refresh"}
           </button>
         </div>
 
-        {/* Filter */}
-        <div className="mb-5 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+        {/* =========================================
+            FILTER
+        ========================================= */}
+        <div className="mb-6 rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-            {/* Search */}
-            <div className="relative flex-1">
+            {/* SEARCH */}
+            <div className="relative min-w-0 flex-1">
               <Search
-                size={18}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400"
+                size={17}
+                className="
+                  absolute left-4 top-1/2
+                  -translate-y-1/2
+                  text-neutral-400
+                "
               />
 
               <input
@@ -163,32 +201,63 @@ function Inspection() {
                   )
                 }
                 placeholder="Search by order, product, brand, or model"
-                className="h-11 w-full rounded-xl border border-neutral-200 bg-white pl-11 pr-4 text-sm outline-none transition placeholder:text-neutral-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                className="
+                  h-11 w-full
+                  rounded-xl
+                  border border-neutral-200
+                  bg-white
+                  pl-11 pr-4
+                  text-sm text-neutral-800
+                  outline-none
+                  transition
+                  placeholder:text-neutral-400
+                  focus:border-orange-400
+                  focus:ring-2
+                  focus:ring-orange-100
+                "
               />
             </div>
 
-            {/* Status Filter */}
-            <div className="flex gap-2">
-              {statusOptions.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() =>
-                    setStatus(option.value)
-                  }
-                  className={`h-11 rounded-xl px-5 text-sm font-medium transition ${
-                    status === option.value
-                      ? "bg-orange-500 text-white shadow-sm hover:bg-orange-600"
-                      : "border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
+            {/* STATUS FILTER */}
+            <div className="flex shrink-0 flex-wrap gap-2">
+              {statusOptions.map((option) => {
+                const isActive =
+                  status === option.value;
+
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() =>
+                      setStatus(
+                        option.value,
+                      )
+                    }
+                    className={`
+                      h-11 cursor-pointer
+                      whitespace-nowrap
+                      rounded-xl
+                      px-4
+                      text-sm font-medium
+                      transition
+                      ${
+                        isActive
+                          ? "bg-orange-500 text-white shadow-sm hover:bg-orange-600"
+                          : "border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
+                      }
+                    `}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
 
+        {/* =========================================
+            TABLE
+        ========================================= */}
         <InspectionTable
           orders={filteredOrders}
           isPending={
