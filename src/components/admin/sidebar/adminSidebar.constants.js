@@ -1,12 +1,12 @@
 import {
   ClipboardCheck,
   ClipboardList,
+  Images,
   LayoutGrid,
   ListTree,
   MessageSquareText,
   PackageCheck,
   ScanLine,
-  Images
 } from "lucide-react";
 
 const menuItems = [
@@ -22,8 +22,8 @@ const menuItems = [
     icon: ListTree,
   },
   {
-    name: "Awaiting Receipt",
-    path: "/admin/orders/awaiting-receipt",
+    name: "Awaiting Receive",
+    path: "/admin/orders/awaiting-receive",
     icon: ScanLine,
   },
   {

@@ -1,13 +1,14 @@
 import { useMyCart } from "@/hook/cart/useMyCart";
 import { useDebounce } from "@/hook/listing/useBounce";
 import { useListingSearch } from "@/hook/listing/useListingSearch";
+import { useWebAssets } from "@/hook/webAsset/useWebAssets";
 import useAuthStore from "@/stores/auth.store";
 import { Cpu, Search, ShoppingCart, User, X } from "lucide-react";
+import { animate } from "motion";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import { useCartFlyAnimation } from "../animation/CartFlyAnimationProvider";
-import { animate } from "motion";
-import { useWebAssets } from "@/hook/webAsset/useWebAssets";
+import GlobalLoading from "../loading/GlobalLoading";
 
 // เงาชุดเดียวกับ MainNav.jsx - เวอร์ชันปรับให้อ่านออกชัดบนพื้นหลังขาว (ของเดิม bg-white/25 จะจางมาก
 // ถ้าไม่มีคอนเทนต์สีสันข้างหลังให้ blur) ขึ้น opacity ของ bg-white ให้พอเห็นเป็นแผ่นแก้วได้เองแม้พื้น
@@ -26,23 +27,16 @@ const GLASS_BAR =
   "bg-white/50 backdrop-blur-xl border-b border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.05)]";
 
 function Logo() {
-  // ดึงรูปโลโก้จริงจาก backend - fallback กลับไปใช้ไอคอน + ตัวหนังสือเดิมถ้ายังโหลดไม่เสร็จ/ไม่มีค่า
-  const logoUrl = useWebAssets().data?.homeImageUrl;
-
+  const { data: webassents, isLoading } = useWebAssets();
+  const logoUrl = webassents?.homeImageUrl;
+  if (logoUrl && isLoading) return <GlobalLoading />;
   return (
     <Link to="/" className="flex shrink-0 flex-col items-start">
-      {logoUrl ? (
-        <img
-          src={logoUrl}
-          alt="SpecHub"
-          className="h-10 w-auto object-contain"
-        />
-      ) : (
-        <span className="flex items-center gap-2 text-xl font-bold tracking-tight text-neutral-900">
-          <Cpu className="h-5 w-5 text-[#f97316]" strokeWidth={2} />
-          SPEC<span className="text-[#f97316]">HUB</span>
-        </span>
-      )}
+      <img
+        src={logoUrl ? logoUrl : "/spechub-logo.png"}
+        alt="SpecHub"
+        className="h-13 w-auto object-contain "
+      />
     </Link>
   );
 }
