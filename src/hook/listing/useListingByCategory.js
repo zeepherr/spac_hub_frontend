@@ -1,12 +1,21 @@
 import { getListingsByCategory } from "@/api/listing.api";
+import useAuthStore from "@/stores/auth.store";
+import { isListingOwnedBy } from "@/utils/listing/listingOwnership";
 import { useQuery } from "@tanstack/react-query";
 import { listingKeys } from "./listingKeys";
 
 export const useListingsByCategory = (categoryId) => {
+  const userId = useAuthStore((state) => state.user?.id);
+
   return useQuery({
     queryKey: listingKeys.byCategory(categoryId),
 
     queryFn: () => getListingsByCategory(categoryId),
+
+    select: (listings) =>
+      userId
+        ? listings.filter((listing) => !isListingOwnedBy(listing, userId))
+        : listings,
 
     enabled: !!categoryId,
 
