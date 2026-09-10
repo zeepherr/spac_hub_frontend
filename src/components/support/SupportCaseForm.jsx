@@ -8,6 +8,14 @@ import {
   SELLER_SUPPORT_ISSUES,
 } from "./support.constants";
 
+// เดียวกับ GLASS_PANEL/GLASS_INPUT/CTA_GLASS ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const GLASS_INPUT =
+  "w-full rounded-xl border border-neutral-300 bg-white/70 backdrop-blur-sm text-sm text-neutral-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60";
+const CTA_GLASS =
+  "bg-orange-500 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
+
 function SupportCaseForm({
   orderId,
   role = "BUYER",
@@ -18,7 +26,6 @@ function SupportCaseForm({
     role === "SELLER" ? SELLER_SUPPORT_ISSUES : BUYER_SUPPORT_ISSUES;
 
   const [issueType, setIssueType] = useState(issueOptions[0].value);
-
   const [message, setMessage] = useState("");
 
   const createCaseMutation = useCreateSupportCase();
@@ -48,18 +55,8 @@ function SupportCaseForm({
         message: submittedMessage,
       });
 
-      /*
-       * Pass the case and creation result to
-       * BuyerOrderSupport/SellerOrderSupport.
-       */
       onCreated?.(response.data, {
         created: response.meta?.created === true,
-
-        /*
-         * If the case already existed, Backend did not
-         * save this submitted message. The parent can
-         * send it through Socket after joining the room.
-         */
         pendingMessage:
           response.meta?.created === false ? submittedMessage : null,
       });
@@ -76,9 +73,7 @@ function SupportCaseForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`rounded-2xl border border-neutral-200 bg-white shadow-sm ${
-        compact ? "p-4" : "p-5 sm:p-6"
-      }`}
+      className={`rounded-2xl ${GLASS_PANEL} ${compact ? "p-4" : "p-5 sm:p-6"}`}
     >
       <div className="flex items-start gap-3">
         <span
@@ -119,7 +114,7 @@ function SupportCaseForm({
           value={issueType}
           onChange={(event) => setIssueType(event.target.value)}
           disabled={createCaseMutation.isPending}
-          className="mt-2 h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-sm text-neutral-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60"
+          className={`mt-2 h-11 px-3 ${GLASS_INPUT}`}
         >
           {issueOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -139,9 +134,7 @@ function SupportCaseForm({
           </label>
 
           <span
-            className={`text-xs ${
-              message.length > 2000 ? "text-red-500" : "text-neutral-400"
-            }`}
+            className={`text-xs ${message.length > 2000 ? "text-red-500" : "text-neutral-400"}`}
           >
             {message.length}/2000
           </span>
@@ -155,19 +148,17 @@ function SupportCaseForm({
           rows={compact ? 3 : 5}
           maxLength={2000}
           placeholder="Please explain what happened..."
-          className="mt-2 w-full resize-none rounded-xl border border-neutral-200 bg-white p-3 text-sm leading-6 text-neutral-800 outline-none transition placeholder:text-neutral-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 disabled:cursor-not-allowed disabled:opacity-60"
+          className={`mt-2 resize-none p-3 leading-6 placeholder:text-neutral-400 ${GLASS_INPUT}`}
         />
       </div>
 
       <div
-        className={`mt-4 rounded-xl border border-orange-100 bg-orange-50 ${
+        className={`mt-4 rounded-xl border border-orange-100 bg-orange-50/80 backdrop-blur-sm ${
           compact ? "p-3" : "p-4"
         }`}
       >
         <p
-          className={`text-orange-800 ${
-            compact ? "text-xs leading-5" : "text-sm leading-6"
-          }`}
+          className={`text-orange-800 ${compact ? "text-xs leading-5" : "text-sm leading-6"}`}
         >
           You can return to this inbox anytime to read replies and continue the
           conversation with SpecHub Admin.
@@ -177,7 +168,7 @@ function SupportCaseForm({
       <button
         type="submit"
         disabled={!canSubmit}
-        className={`inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50 ${
+        className={`inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${CTA_GLASS} ${
           compact ? "mt-4 py-2.5" : "mt-5 py-3"
         }`}
       >

@@ -1,6 +1,12 @@
 import React from "react";
 import { Upload, Camera, X } from "lucide-react";
 
+// เดียวกับ GLASS_PANEL/GLASS_IDLE ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const GLASS_IDLE =
+  "border border-neutral-200/70 bg-white/60 backdrop-blur-md shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_2px_8px_rgba(0,0,0,0.06)]";
+
 export default function ImageUploadPreview({
   imageFiles = [],
   setImageFiles,
@@ -21,12 +27,17 @@ export default function ImageUploadPreview({
   };
 
   return (
-    <div className="hardware-surface p-6 bg-base-100 border border-base-300 rounded-box space-y-4 shadow-sm">
-      <div className="border-b border-base-300 pb-3 flex items-center justify-between">
-        <h3 className="font-bold text-lg text-base-content">
-          Product Images <span className="text-sm font-bold text-neutral/80">(Max 5 images)</span>
+    <div className={`p-6 rounded-3xl space-y-4 ${GLASS_PANEL}`}>
+      <div className="border-b border-neutral-200/70 pb-3 flex items-center justify-between">
+        <h3 className="font-bold text-lg text-neutral-900">
+          Product Images{" "}
+          <span className="text-sm font-bold text-neutral-500">
+            (Max 5 images)
+          </span>
         </h3>
-        <span className="text-xs text-neutral/80 font-bold">Upload at least 1 image</span>
+        <span className="text-xs text-neutral-500 font-bold">
+          Upload at least 1 image
+        </span>
       </div>
 
       {/* Grid รูปภาพ */}
@@ -41,7 +52,7 @@ export default function ImageUploadPreview({
           return (
             <div
               key={idx}
-              className="relative aspect-square rounded-field overflow-hidden border border-base-300 group bg-base-200"
+              className="relative aspect-square rounded-xl overflow-hidden border border-neutral-200/70 group bg-neutral-100"
             >
               <img
                 src={previewUrl}
@@ -52,7 +63,7 @@ export default function ImageUploadPreview({
                 <button
                   type="button"
                   onClick={() => handleRemove(idx)}
-                  className="absolute top-1 right-1 bg-neutral/80 text-white hover:bg-error rounded-full p-1 transition-colors"
+                  className="absolute top-1 right-1 bg-neutral-800/80 text-white hover:bg-red-500 rounded-full p-1 transition-colors cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -63,11 +74,11 @@ export default function ImageUploadPreview({
 
         {/* ปุ่มช่อง + เพิ่มรูป */}
         {imageFiles.length < 5 && !disabled && (
-          <label className="aspect-square border-2 border-dashed border-base-300 hover:border-[#f97316] bg-base-200/80 hover:bg-base-200 rounded-field flex flex-col items-center justify-center cursor-pointer transition-all p-2 text-center group">
-            <div className="w-10 h-10 rounded-full bg-base-300 group-hover:bg-[#f97316]/20 flex items-center justify-center mb-1 transition-colors">
-              <Camera className="w-5 h-5 text-base-content group-hover:text-[#f97316]" />
+          <label className="aspect-square border-2 border-dashed border-neutral-300 hover:border-orange-400 bg-white/40 backdrop-blur-sm hover:bg-orange-50/50 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all p-2 text-center group">
+            <div className="w-10 h-10 rounded-full bg-neutral-100 group-hover:bg-orange-500/15 flex items-center justify-center mb-1 transition-colors">
+              <Camera className="w-5 h-5 text-neutral-600 group-hover:text-orange-500" />
             </div>
-            <span className="text-xs font-bold text-base-content group-hover:text-[#f97316]">
+            <span className="text-xs font-bold text-neutral-600 group-hover:text-orange-500">
               + Add Image
             </span>
             <input
@@ -84,8 +95,10 @@ export default function ImageUploadPreview({
 
       {/* ปุ่มกดเลือกไฟล์จากเครื่อง */}
       {imageFiles.length < 5 && !disabled && (
-        <label className="btn btn-outline border-base-300 hover:bg-base-200 w-full flex items-center justify-center gap-2 text-xs font-bold text-base-content cursor-pointer mt-2">
-          <Upload className="w-4 h-4 text-[#f97316]" />
+        <label
+          className={`w-full flex items-center justify-center gap-2 text-xs font-bold text-neutral-700 cursor-pointer mt-2 rounded-xl py-2.5 transition hover:border-orange-300 hover:bg-orange-50/70 hover:text-orange-600 ${GLASS_IDLE}`}
+        >
+          <Upload className="w-4 h-4 text-orange-500" />
           <span>Upload images from your device</span>
           <input
             type="file"

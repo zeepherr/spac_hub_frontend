@@ -1,7 +1,7 @@
+// CreateProductPage.jsx
 import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
-// Components
 import AiConditionAnalysisSection from "@/components/userseller/AiConditionAnalysisSection";
 import ConditionFormSection from "@/components/userseller/ConditionFormSection";
 import ConfirmUploadModal from "@/components/userseller/ConfirmUploadModal";
@@ -22,11 +22,19 @@ import { useUpdateListing } from "@/hook/listing/useUpdateListing";
 import { useUploadListingImages } from "@/hook/listing/useUploadListingImages";
 import { useNavigate } from "react-router";
 
+// bg หลักมาตรฐานของทั้งเว็บ (เดียวกับที่ตั้งไว้ใน PublicLayout.jsx) - ใช้กับพื้นหลังหลักของหน้าเท่านั้น
+// (ไฟล์นี้ที่ส่งมาใช้สีเขียวอมฟ้าอีกรอบ แก้กลับเป็นสีน้ำเงินมาตรฐานตามกฎที่ตกลงกันไว้)
+const PAGE_BG =
+  "bg-[linear-gradient(180deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const CTA_GLASS =
+  "bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
+
 export default function CreateProductPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [listingId, setListingId] = useState(null);
   const navitage = useNavigate();
-  // Form States
   const [formData, setFormData] = useState({
     title: "",
     categoryId: "",
@@ -41,11 +49,9 @@ export default function CreateProductPage() {
   const [imageFiles, setImageFiles] = useState([]);
   const [aiResult, setAiResult] = useState(null);
 
-  // Modal States
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
   const [isConfirmUploadOpen, setIsConfirmUploadOpen] = useState(false);
 
-  // --- React Query Mutations & Queries ---
   const identifyProductMutation = useIdentifyProduct();
   const createListingMutation = useCreateListing();
   const updateListingMutation = useUpdateListing();
@@ -54,7 +60,6 @@ export default function CreateProductPage() {
   const analyzeConditionMutation = useAnalyzeListingCondition();
   const publishListingMutation = usePublishListing();
 
-  // Fetch all categories
   const { categories: categoriesData } = useListingsByCategory();
   const categories = useMemo(() => {
     return Array.isArray(categoriesData)
@@ -62,7 +67,6 @@ export default function CreateProductPage() {
       : categoriesData?.data || [];
   }, [categoriesData]);
 
-  // Find category name
   const currentCategoryName = useMemo(() => {
     if (!formData.categoryId) return "";
     const found = categories.find(
@@ -99,7 +103,6 @@ export default function CreateProductPage() {
     }, 150);
   };
 
-  // --- AI AUTOFILL HANDLER ---
   const handleAiAutofill = (file) => {
     return new Promise((resolve, reject) => {
       if (!file) return reject("No file provided");
@@ -122,7 +125,6 @@ export default function CreateProductPage() {
     });
   };
 
-  // --- SAVE DRAFT BUTTON HANDLER ---
   const handleSaveDraftAnytime = () => {
     if (!listingId) return;
 
@@ -139,7 +141,6 @@ export default function CreateProductPage() {
     updateListingMutation.mutate({ listingId, payload });
   };
 
-  // --- STEP 1 SUBMIT ---
   const handleStep1Submit = (e) => {
     if (e && e.preventDefault) e.preventDefault();
 
@@ -182,7 +183,6 @@ export default function CreateProductPage() {
     }
   };
 
-  // --- STEP 2 SUBMIT ---
   const handleStep2Submit = (e) => {
     if (e && e.preventDefault) e.preventDefault();
 
@@ -202,7 +202,6 @@ export default function CreateProductPage() {
     );
   };
 
-  // --- STEP 3 HANDLER ---
   const handleOpenUploadConfirm = () => {
     if (imageFiles.length === 0) {
       toast.error("กรุณาเลือกรูปภาพสินค้าอย่างน้อย 1 รูป");
@@ -211,7 +210,6 @@ export default function CreateProductPage() {
     setIsConfirmUploadOpen(true);
   };
 
-  // --- STEP 3 SUBMIT ---
   const handleStep3Submit = () => {
     uploadImagesMutation.mutate(
       { listingId, images: imageFiles },
@@ -225,7 +223,6 @@ export default function CreateProductPage() {
     );
   };
 
-  // --- STEP 4 ANALYZE ---
   const handleStep4Analyze = () => {
     analyzeConditionMutation.mutate(listingId, {
       onSuccess: (res) => {
@@ -237,7 +234,6 @@ export default function CreateProductPage() {
     });
   };
 
-  // --- STEP 5: CONFIRM PUBLISH FROM MODAL ---
   const handleFinalPublish = async () => {
     if (!listingId) return;
 
@@ -280,7 +276,9 @@ export default function CreateProductPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-base-100 text-base-content pb-20 relative">
+    <div
+      className={`relative w-full min-h-screen pb-20 text-neutral-900 ${PAGE_BG}`}
+    >
       <SellerStepProgress
         currentStep={currentStep}
         onSaveDraft={handleSaveDraftAnytime}
@@ -288,12 +286,9 @@ export default function CreateProductPage() {
         listingId={listingId}
       />
 
-      {/* 🟢 เปลี่ยนจาก max-w-7xl mx-auto px-4 เป็น w-full px-4 sm:px-6 md:px-8 เพื่อขยายเต็มจอ */}
       <div className="w-full px-4 sm:px-6 md:px-8">
-        {/* 🟢 ปรับเป็น grid-cols-4 ให้ฝั่ง Form กินพื้นที่ 3 ส่วน และ Sidebar กิน 1 ส่วน */}
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 items-start">
           <div className="xl:col-span-3 space-y-8">
-            {/* Step 1: Basic Info */}
             <div ref={step1Ref} className="relative">
               <ProductBasicForm
                 formData={formData}
@@ -304,7 +299,6 @@ export default function CreateProductPage() {
               />
             </div>
 
-            {/* Step 2: Answer Condition Questions */}
             <div className="relative">
               <ConditionFormSection
                 stepRef={step2Ref}
@@ -317,19 +311,18 @@ export default function CreateProductPage() {
               />
             </div>
 
-            {/* Step 3: Upload Images */}
             <section
               ref={step3Ref}
-              className={`bg-base-100 p-6 rounded-box border border-base-300 shadow-sm space-y-6 transition-all duration-300 ${
+              className={`rounded-2xl p-6 space-y-6 transition-all duration-300 ${GLASS_PANEL} ${
                 currentStep < 3 ? "opacity-40 pointer-events-none" : ""
               }`}
             >
-              <div className="flex items-center justify-between border-b border-base-300 pb-4">
+              <div className="flex items-center justify-between border-b border-neutral-200/70 pb-4">
                 <div className="flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center font-bold text-sm">
+                  <span className="w-8 h-8 rounded-full bg-[#f97316] text-white flex items-center justify-center font-bold text-sm">
                     3
                   </span>
-                  <h2 className="text-xl font-bold text-base-content">
+                  <h2 className="text-xl font-bold text-neutral-900">
                     Upload Actual Product Images
                   </h2>
                 </div>
@@ -346,16 +339,15 @@ export default function CreateProductPage() {
                     <button
                       onClick={handleOpenUploadConfirm}
                       disabled={isGlobalLoading}
-                      className="btn btn-primary text-white w-full rounded-field font-bold"
+                      className={`w-full rounded-xl py-3 text-sm font-bold transition disabled:opacity-50 ${CTA_GLASS}`}
                     >
-                      บันทึกรูปภาพและไปขั้นตอนถัดไป
+                      Save and Continue
                     </button>
                   )}
                 </div>
               )}
             </section>
 
-            {/* Step 4: AI Analyze */}
             <AiConditionAnalysisSection
               stepRef={step4Ref}
               currentStep={currentStep}
@@ -364,7 +356,6 @@ export default function CreateProductPage() {
               loading={isGlobalLoading}
             />
 
-            {/* Step 5: Publish */}
             <PublishStepSection
               stepRef={step5Ref}
               currentStep={currentStep}
@@ -379,7 +370,6 @@ export default function CreateProductPage() {
         </div>
       </div>
 
-      {/* Modal ยืนยันการอัปโหลดภาพก่อนไปขั้นตอนถัดไป */}
       <ConfirmUploadModal
         isOpen={isConfirmUploadOpen}
         onClose={() => setIsConfirmUploadOpen(false)}
@@ -387,7 +377,6 @@ export default function CreateProductPage() {
         loading={uploadImagesMutation.isPending}
       />
 
-      {/* Summary Modal */}
       <ProductSummaryModal
         isOpen={isSummaryModalOpen}
         onClose={() => setIsSummaryModalOpen(false)}

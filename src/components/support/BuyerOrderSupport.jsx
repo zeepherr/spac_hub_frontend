@@ -8,6 +8,10 @@ import OrderProgress from "./OrderProgress";
 import SupportCaseForm from "./SupportCaseForm";
 import SupportChatPanel from "./SupportChatPanel";
 
+// เดียวกับ GLASS_PANEL ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 function BuyerOrderSupport({ order }) {
   const [localSupportCase, setLocalSupportCase] = useState(null);
 
@@ -21,12 +25,6 @@ function BuyerOrderSupport({ order }) {
     refetch,
   } = useMySupportCases();
 
-  /*
-   * The same USER account can be a Buyer in one
-   * order and Seller in another order.
-   *
-   * Matching by orderId finds the correct case.
-   */
   const existingSupportCase = useMemo(() => {
     return supportCases.find(
       (supportCase) => Number(supportCase.orderId) === Number(order.id),
@@ -35,11 +33,6 @@ function BuyerOrderSupport({ order }) {
 
   const selectedSupportCase = localSupportCase || existingSupportCase;
 
-  /*
-   * Refresh the selected case detail.
-   * The list response already contains enough data
-   * to display immediately while detail refetches.
-   */
   const { data: supportCaseDetail } = useMySupportCaseById(
     selectedSupportCase?.id,
   );
@@ -88,9 +81,10 @@ function BuyerOrderSupport({ order }) {
 
 function SupportLoading() {
   return (
-    <div className="flex min-h-64 items-center justify-center gap-3 rounded-2xl border border-neutral-200 bg-white shadow-sm">
+    <div
+      className={`flex min-h-64 items-center justify-center gap-3 rounded-2xl ${GLASS_PANEL}`}
+    >
       <LoaderCircle size={25} className="animate-spin text-orange-500" />
-
       <span className="text-sm text-neutral-500">Loading Order Support...</span>
     </div>
   );
@@ -98,7 +92,7 @@ function SupportLoading() {
 
 function SupportError({ message, onRetry }) {
   return (
-    <div className="flex min-h-64 flex-col items-center justify-center rounded-2xl border border-red-100 bg-white p-6 text-center shadow-sm">
+    <div className="flex min-h-64 flex-col items-center justify-center rounded-2xl border border-red-100 bg-white/60 backdrop-blur-sm p-6 text-center shadow-sm">
       <span className="flex size-12 items-center justify-center rounded-full bg-red-50 text-red-500">
         <AlertCircle size={23} />
       </span>

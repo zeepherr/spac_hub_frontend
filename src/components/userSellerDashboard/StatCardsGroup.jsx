@@ -10,35 +10,40 @@ import { useBuyingOrders } from "@/hook/order/useBuyingOrders";
 import { useSellingOrders } from "@/hook/order/useSellingOrder";
 import { useNavigate } from "react-router";
 
+// glass shadow เดียวกับ GLASS_PANEL ที่ใช้ทั้งเว็บ ทำให้การ์ดดูเป็นกระจกมี highlight บาง ๆ
+const GLASS_SHADOW =
+  "shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)] hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_12px_28px_rgba(0,0,0,0.08)]";
+
 export default function StatCardsGroup() {
   const navigate = useNavigate();
-  const { data: buyingOrders = [], isLoading: isLoadingBuying } = useBuyingOrders();
-  const { data: sellingOrders = [], isLoading: isLoadingSelling } = useSellingOrders();
+  const { data: buyingOrders = [], isLoading: isLoadingBuying } =
+    useBuyingOrders();
+  const { data: sellingOrders = [], isLoading: isLoadingSelling } =
+    useSellingOrders();
 
-  // 1. Buying count
   const buyingCount = sellingOrders.filter((order) => {
     const status = String(order.status || "").toUpperCase();
     return ["COMPLETED", "DELIVERED", "RECEIVED", "SUCCESS"].includes(status);
   }).length;
 
-  // 2. Selling count
   const sellingCount = sellingOrders.filter((order) => {
     const status = String(order.status || "").toUpperCase();
     return status !== "CANCELLED" && status !== "REJECTED";
   }).length;
 
-  // 3. Pending Verification count
   const pendingVerificationCount = sellingOrders.filter((order) => {
     const status = String(order.status || "").toUpperCase();
-    return ["INSPECTION_PENDING", "INSPECTING", "NEEDS_REVIEW"].includes(status);
+    return ["INSPECTION_PENDING", "INSPECTING", "NEEDS_REVIEW"].includes(
+      status,
+    );
   }).length;
 
-  // 4. Rejected count
   const rejectedCount = sellingOrders.filter((order) => {
     const status = String(order.status || "").toUpperCase();
     return status === "REJECTED";
   }).length;
 
+  // ลด opacity ของสีพื้นหลัง + เพิ่ม backdrop-blur ให้ทุกการ์ดดูเป็นกระจกโปร่งแสง (liquid glass) แทนสีทึบเดิม
   const stats = [
     {
       label: "Buying",
@@ -47,7 +52,8 @@ export default function StatCardsGroup() {
       actionText: "View completed →",
       path: "/user/sell/selling-orders",
       filterTab: "COMPLETED",
-      cardStyle: "bg-amber-50/50 border-orange-200/70 hover:border-orange-300",
+      cardStyle:
+        "bg-amber-50/40 backdrop-blur-xl border-orange-200/60 hover:border-orange-300",
       iconStyle: "bg-orange-100/70 text-orange-600",
       textStyle: "text-orange-500 group-hover:text-orange-600",
     },
@@ -58,7 +64,8 @@ export default function StatCardsGroup() {
       actionText: "View orders →",
       path: "/user/sell/selling-orders",
       filterTab: "ALL",
-      cardStyle: "bg-white border-neutral-100 hover:border-neutral-200",
+      cardStyle:
+        "bg-white/50 backdrop-blur-xl border-neutral-200/70 hover:border-neutral-300",
       iconStyle: "bg-neutral-100/80 text-neutral-800",
       textStyle: "text-orange-500 group-hover:text-orange-600",
     },
@@ -69,7 +76,8 @@ export default function StatCardsGroup() {
       actionText: "View details →",
       path: "/user/sell/selling-orders",
       filterTab: "INSPECTION",
-      cardStyle: "bg-amber-50/50 border-orange-200/70 hover:border-orange-300",
+      cardStyle:
+        "bg-amber-50/40 backdrop-blur-xl border-orange-200/60 hover:border-orange-300",
       iconStyle: "bg-orange-100/70 text-orange-600",
       textStyle: "text-orange-500 group-hover:text-orange-600",
     },
@@ -80,9 +88,10 @@ export default function StatCardsGroup() {
       actionText: "View items →",
       path: "/user/sell/selling-orders",
       filterTab: "CANCELLED",
-      cardStyle: "bg-rose-50/60 border-rose-200/70 hover:border-rose-300", // 🔴 การ์ดสีแดง
-      iconStyle: "bg-rose-100 text-rose-600",                            // 🔴 ไอคอนสีแดง
-      textStyle: "text-rose-600 group-hover:text-rose-700",              // 🔴 ข้อความสีแดง
+      cardStyle:
+        "bg-rose-50/40 backdrop-blur-xl border-rose-200/60 hover:border-rose-300", // 🔴 การ์ดสีแดง (กระจก)
+      iconStyle: "bg-rose-100 text-rose-600", // 🔴 ไอคอนสีแดง
+      textStyle: "text-rose-600 group-hover:text-rose-700", // 🔴 ข้อความสีแดง
     },
   ];
 
@@ -91,7 +100,7 @@ export default function StatCardsGroup() {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 ">
       {stats.map((item, idx) => {
         const IconComponent = item.icon;
         return (
@@ -100,7 +109,7 @@ export default function StatCardsGroup() {
             onClick={() =>
               navigate(item.path, { state: { activeTab: item.filterTab } })
             }
-            className={`group relative rounded-3xl p-5 md:p-6 transition-all duration-300 cursor-pointer flex items-center gap-4 border shadow-sm hover:shadow-md ${item.cardStyle}`}
+            className={`group relative rounded-3xl p-5 md:p-6 transition-all duration-300 cursor-pointer flex items-center gap-4 border hardware-surface ${GLASS_SHADOW} ${item.cardStyle}`}
           >
             {/* Left Icon Container */}
             <div

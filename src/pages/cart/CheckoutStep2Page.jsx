@@ -1,10 +1,16 @@
+// CheckoutStep2Page.jsx
 import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { useCreateCheckout } from "@/hook/checkout/useCreateCheckout"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { useCreatePaymentCheckout } from "@/hook/payment/useCreatePaymentCheckout"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
+import { useCreateCheckout } from "@/hook/checkout/useCreateCheckout";
+import { useCreatePaymentCheckout } from "@/hook/payment/useCreatePaymentCheckout";
 import CheckoutStep3 from "@/components/cart/CheckoutStep3";
 import CheckoutStepIndicator from "@/components/cart/CheckoutStepLine";
+
+const GLASS_PANEL =
+  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const CTA_GLASS =
+  "bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
 
 function CheckoutStep2Page() {
   const location = useLocation();
@@ -59,7 +65,9 @@ function CheckoutStep2Page() {
 
       <div className="mx-auto w-full max-w-xl">
         {hasFailed ? (
-          <div className="hardware-surface flex flex-col items-center gap-3 p-10 text-center">
+          <div
+            className={`flex flex-col items-center gap-3 rounded-2xl p-10 text-center ${GLASS_PANEL}`}
+          >
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
               <AlertTriangle className="h-7 w-7 text-red-500" />
             </span>
@@ -76,7 +84,7 @@ function CheckoutStep2Page() {
                   state: { items, includeAssembly },
                 })
               }
-              className="btn btn-accent mt-2 gap-2 text-white"
+              className={`mt-2 flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${CTA_GLASS}`}
             >
               <ArrowLeft size={16} />
               Back to Edit Shipping Address

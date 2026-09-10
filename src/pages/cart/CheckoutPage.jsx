@@ -1,11 +1,12 @@
+// CheckoutPage.jsx
 import CheckoutStep1 from "@/components/cart/CheckoutStep1";
 import CheckoutStep3 from "@/components/cart/CheckoutStep3";
-import { useCheckoutQuote } from "@/hook/checkout/useCheckoutQuote"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { useCreateCheckout } from "@/hook/checkout/useCreateCheckout"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { useCreatePaymentCheckout } from "@/hook/payment/useCreatePaymentCheckout"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { useUpdateUserProfile } from "@/hook/user/useUpdateUserProfile"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import useAuthStore from "@/stores/auth.store"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
-import { zodResolver } from "@hookform/resolvers/zod"; // ปรับตามที่โปรเจกต์คุณใช้จริง
+import { useCheckoutQuote } from "@/hook/checkout/useCheckoutQuote";
+import { useCreateCheckout } from "@/hook/checkout/useCreateCheckout";
+import { useCreatePaymentCheckout } from "@/hook/payment/useCreatePaymentCheckout";
+import { useUpdateUserProfile } from "@/hook/user/useUpdateUserProfile";
+import useAuthStore from "@/stores/auth.store";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, Lock, ShieldCheck } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -13,6 +14,11 @@ import { useLocation, useNavigate } from "react-router";
 import { z } from "zod";
 
 const ASSEMBLY_SERVICE_FEE = 400;
+
+const GLASS_DARK =
+  "bg-neutral-900/85 backdrop-blur-xl border border-neutral-800/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_20px_40px_rgba(0,0,0,0.25)]";
+const CTA_GLASS =
+  "bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
 
 function formatPrice(amount) {
   return `฿${amount.toLocaleString()}`;
@@ -63,8 +69,8 @@ function StepIndicator() {
                 {step.id}
               </span>
               <span
-                className={`hardware-label normal-case ${
-                  isCurrent ? "text-neutral-900" : "text-secondary"
+                className={`text-[11px] ${
+                  isCurrent ? "text-neutral-900" : "text-neutral-400"
                 }`}
               >
                 {step.label}
@@ -101,7 +107,7 @@ function OrderSummary({
     : 0;
 
   return (
-    <div className="matte sticky top-24 p-6 text-white">
+    <div className={`sticky top-24 rounded-2xl p-6 text-white ${GLASS_DARK}`}>
       <h2 className="mb-4 text-lg font-bold">Order Summary</h2>
 
       <div className="mb-4 flex flex-col gap-3 border-b border-white/10 pb-4 text-sm">
@@ -172,7 +178,7 @@ function OrderSummary({
         type="button"
         onClick={onContinue}
         disabled={submitting || !hasItems || isPending || isQuoteError}
-        className="btn btn-accent w-full gap-2 text-white disabled:opacity-50"
+        className={`flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition disabled:opacity-50 ${CTA_GLASS}`}
       >
         Proceed to Checkout
         <ArrowRight size={18} />
@@ -280,7 +286,7 @@ export default function CheckoutPage() {
         type="button"
         onClick={() => navigate("/cart")}
         disabled={isProcessing}
-        className="mb-4 flex items-center gap-1.5 rounded-field border border-neutral-200 bg-white px-3 py-1.5 text-sm font-semibold text-neutral-700 hardware-shadow hover:border-[#f97316] hover:text-[#f97316] disabled:cursor-not-allowed disabled:opacity-50"
+        className="mb-4 flex items-center gap-1.5 rounded-lg border border-neutral-200/70 bg-white/60 px-3 py-1.5 text-sm font-semibold text-neutral-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_2px_8px_rgba(0,0,0,0.06)] backdrop-blur-md transition hover:border-[#f97316] hover:text-[#f97316] disabled:cursor-not-allowed disabled:opacity-50"
       >
         <ArrowLeft size={16} />
         Back

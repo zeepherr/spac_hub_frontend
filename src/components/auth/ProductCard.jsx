@@ -1,11 +1,19 @@
 import { useCartFlyAnimation } from "@/components/animation/CartFlyAnimationProvider";
 import { useAddCartItem } from "@/hook/cart/useCreateItem";
 import useAuthStore from "@/stores/auth.store";
+import { isListingOwnedBy } from "@/utils/listing/listingOwnership";
 import { Cpu, ShoppingCart, Star } from "lucide-react";
 import { useRef } from "react";
 import { Link, useNavigate } from "react-router";
+import { toast } from "sonner";
 
 // แก้สแลชซ้อน (เช่น "r2.dev//listings/...") ที่เกิดจากฝั่ง backend ต่อ URL พลาด
+
+// เดียวกับ GLASS_PANEL ที่ใช้ใน PartPickerCard.jsx/CategorySidebar.jsx/MainNav.jsx - จางเท่ากันทั้ง
+// เว็บ (ตัด hardware-surface ที่หลุดกลับมาออกด้วย เพราะเป็น class ทึบไม่อยู่ใน @layer จะไปทับ
+// bg-white/50 กับ shadow ของ glass จนหายหมด)
+const GLASS_PANEL =
+  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
 
 // หารูปปกจาก listing.images (isCover ก่อน ถ้าไม่มีเอารูปแรก)
 // backend คืน imageUrl เต็มมาให้อยู่แล้ว (แปลง imageKey เป็น URL ฝั่ง server แล้ว)
@@ -66,6 +74,7 @@ function ProductCard({ product }) {
   const conditionInfo = getConditionInfo(product.estimatedCondition);
   const estimatedScore =
     product.estimatedScore != null ? Number(product.estimatedScore) : null;
+  const isOwner = isListingOwnedBy(product, user?.id);
 
   const handleAddToCart = (e) => {
     // กันไม่ให้ <Link> ที่ครอบการ์ดอยู่ทำการ navigate ไปหน้า detail ตอนกดปุ่มนี้
@@ -78,22 +87,32 @@ function ProductCard({ product }) {
       return;
     }
 
-    flyToCart(productImageRef.current, imageUrl);
+    if (isOwner) return;
 
-    // TODO: ปรับ payload ให้ตรงกับที่ addCartItem ต้องการจริงๆ
-    // ตอนนี้เดาว่าส่งแค่ listingId เฉยๆ ถ้า backend ต้องการ shape อื่น (เช่น { listingId, qty }) ปรับตรงนี้
-    addCartItem.mutate(product.id);
+    addCartItem.mutate(product.id, {
+      onSuccess: () => {
+        flyToCart(productImageRef.current, imageUrl);
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.message || "Failed to add to cart", {
+          position: "top-right",
+        });
+      },
+    });
   };
 
   return (
     <Link
       to={`/products/${product.id}`}
-      className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-4 transition hover:border-neutral-300 hardware-surface"
+      className={`flex flex-col rounded-2xl p-4 transition hover:bg-white/70 hardware-surface ${GLASS_PANEL}`}
     >
       <span className="mb-2 w-fit text-[11px] font-medium uppercase tracking-wide text-neutral-400">
         {product.brand}
       </span>
 
+      {/* เปลี่ยนเป็น object-cover แทน object-contain ให้รูปเต็มกรอบ aspect-square เท่ากันทุกการ์ด
+          ไม่ว่ารูปต้นฉบับจะสัดส่วนอะไรก็ตาม (ข้อแลกเปลี่ยนคือรูปที่ไม่ใช่สี่เหลี่ยมจัตุรัสอาจโดนครอบตัด
+          ขอบบน-ล่างหรือซ้าย-ขวาบางส่วน แต่ขนาด/ฟีลของรูปจะเท่ากันทุกใบจริงๆ) */}
       <div
         ref={productImageRef}
         className="mb-3 aspect-square overflow-hidden rounded-xl bg-neutral-50"
@@ -111,12 +130,21 @@ function ProductCard({ product }) {
         )}
       </div>
 
-      <p className="mb-1 line-clamp-2 text-sm font-medium text-neutral-900">
+      {/* เปลี่ยนจาก line-clamp-2 เป็น truncate ตัดบรรทัดเดียวแทนการขึ้นบรรทัดที่ 2 */}
+      <p className="truncate text-sm font-medium text-neutral-900">
         {product.title}
       </p>
-      <p className="mb-1 text-lg font-bold text-[#f97316]">
-        {price.toLocaleString()}.-
-      </p>
+
+      {/* ชื่อคนขาย + ที่ตั้ง - ยังเดา path จาก product.seller อยู่ ปรับให้ตรงกับ field จริงที่ backend
+          ส่งมา (เช่น product.seller?.location หรือ product.location) ถ้ายังไม่ออกลอง
+          console.log(product) ดูก่อนว่า object จริงมี key ชื่ออะไรกันแน่ - เป็นไปได้ว่า endpoint
+          รายการสินค้า (list) ไม่ได้ join ข้อมูล seller มาด้วยเลย (ต่างจาก endpoint detail) เลย
+          product.seller เป็น undefined ตั้งแต่ต้น ไม่ใช่แค่ field ชื่อผิด */}
+      {product.location && (
+        <p className="mb-1 truncate text-[11px] text-neutral-400">
+          {product.location}
+        </p>
+      )}
 
       {estimatedScore != null && (
         <div className="mb-2 flex items-center gap-1.5">
@@ -128,22 +156,25 @@ function ProductCard({ product }) {
         </div>
       )}
 
+      {/* schema ตอนนี้ยังไม่มี rating ผูกกับ Listing โดยตรง (Review อยู่บน Order)
+          เว้นที่ไว้เผื่อทำสรุป rating ทีหลัง ถ้ายังไม่มีข้อมูลจะไม่โชว์แถวนี้ */}
+      {product.rating ? (
+        <span className="mb-1 flex items-center gap-1 text-xs text-neutral-500">
+          <Star size={14} className="fill-[#f97316] text-[#f97316]" />
+          {product.rating} ({product.reviewCount})
+        </span>
+      ) : null}
+
+      {/* ราคาย้ายมาอยู่บรรทัดเดียวกับปุ่มตะกร้าแล้ว (เดิมแยกคนละบรรทัด) */}
       <div className="mt-auto flex items-center justify-between">
-        {/* schema ตอนนี้ยังไม่มี rating ผูกกับ Listing โดยตรง (Review อยู่บน Order)
-            เว้นที่ไว้เผื่อทำสรุป rating ทีหลัง ถ้ายังไม่มีข้อมูลจะไม่โชว์แถวนี้ */}
-        {product.rating ? (
-          <span className="flex items-center gap-1 text-xs text-neutral-500">
-            <Star size={14} className="fill-[#f97316] text-[#f97316]" />
-            {product.rating} ({product.reviewCount})
-          </span>
-        ) : (
-          <span />
-        )}
+        <p className="text-lg font-bold text-[#f97316]">
+          {price.toLocaleString()}.-
+        </p>
         <button
           type="button"
           aria-label="Add to Cart"
           onClick={handleAddToCart}
-          disabled={user ? addCartItem.isPending : false}
+          disabled={isOwner || (user ? addCartItem.isPending : false)}
           className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f97316] text-white transition hover:bg-orange-600 disabled:opacity-50"
         >
           <ShoppingCart size={15} />

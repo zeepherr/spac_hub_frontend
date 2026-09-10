@@ -9,6 +9,10 @@ import {
   OrderListSkeleton,
 } from "./inbox/SupportOrderListStates";
 
+// เดียวกับ GLASS_PANEL ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 function UserSupportOrderList({
   orders,
   supportCaseByOrderId,
@@ -27,9 +31,7 @@ function UserSupportOrderList({
 
     return orders
       .filter((order) => {
-        if (!normalizedSearch) {
-          return true;
-        }
+        if (!normalizedSearch) return true;
         return [
           order.orderNumber,
           order.id,
@@ -71,9 +73,11 @@ function UserSupportOrderList({
   }, [orders, supportCaseByOrderId, searchText, currentUserId]);
 
   return (
-    <aside className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-      <div className="shrink-0 border-b border-neutral-200 p-3">
-        <label className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3 transition focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100">
+    <aside
+      className={`flex min-h-0 flex-col overflow-hidden rounded-2xl ${GLASS_PANEL}`}
+    >
+      <div className="shrink-0 border-b border-neutral-200/70 p-3">
+        <label className="flex items-center gap-2 rounded-xl border border-neutral-200/70 bg-white/40 backdrop-blur-sm px-3 transition focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100">
           <Search size={17} className="shrink-0 text-neutral-400" />
           <input
             type="search"

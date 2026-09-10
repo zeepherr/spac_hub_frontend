@@ -14,6 +14,14 @@ import { useSellingOrders } from "@/hook/order/useSellingOrder";
 import { useMySupportCases } from "@/hook/support/useMySupportCases";
 import useAuthStore from "@/stores/auth.store";
 
+// bg หลักมาตรฐานของทั้งเว็บ (เดียวกับที่ตั้งไว้ใน PublicLayout.jsx) - ใช้กับพื้นหลังหลักของหน้าเท่านั้น
+// ไม่ใช่ bg ของปุ่มหรือ element ย่อย เดิมหน้านี้ใช้ bg-neutral-50 (สีทึบ)
+const PAGE_BG =
+  "bg-[linear-gradient(180deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
+// เดียวกับ GLASS_PANEL ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 const SELLER_HIDDEN_STATUSES = new Set(["PENDING", "AWAITING_PAYMENT"]);
 const EMPTY_LIST = [];
 
@@ -88,11 +96,15 @@ function SupportInbox() {
   }
 
   return (
-    <section className="h-full min-h-0 overflow-hidden bg-neutral-50 px-4 py-4 lg:px-6">
+    <section
+      className={`h-full min-h-0 overflow-hidden px-4 py-4 lg:px-6 ${PAGE_BG}`}
+    >
       <div className="mx-auto flex h-full min-h-0 w-full max-w-[1420px] flex-col">
         <SupportInboxHeader />
 
-        <div className="mt-3 grid shrink-0 grid-cols-2 gap-2 rounded-2xl border border-neutral-200 bg-white p-1.5 shadow-sm">
+        <div
+          className={`mt-3 grid shrink-0 grid-cols-2 gap-2 rounded-2xl p-1.5 ${GLASS_PANEL}`}
+        >
           <SupportModeButton
             icon={ShoppingBag}
             label="Buying"

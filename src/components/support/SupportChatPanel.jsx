@@ -5,6 +5,10 @@ import SupportMessageComposer from "./chat/SupportMessageComposer";
 import SupportMessageList from "./chat/SupportMessageList";
 import { SUPPORT_STATUS_META } from "./support.constants";
 
+// เดียวกับ GLASS_PANEL ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 function SupportChatPanel({
   supportCase,
   isAdmin = false,
@@ -60,7 +64,7 @@ function SupportChatPanel({
 
   return (
     <section
-      className={`flex min-h-0 flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm sm:rounded-2xl ${
+      className={`flex min-h-0 flex-col overflow-hidden rounded-xl sm:rounded-2xl ${GLASS_PANEL} ${
         fillAvailableHeight ? "h-full" : "h-[min(680px,70dvh)] min-h-[420px]"
       }`}
     >

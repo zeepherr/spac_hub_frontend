@@ -1,26 +1,48 @@
 import { useMyCart } from "@/hook/cart/useMyCart";
 import { useDebounce } from "@/hook/listing/useBounce";
 import { useListingSearch } from "@/hook/listing/useListingSearch";
-import { useWebAssets } from "@/hook/webAsset/useWebAssets";
 import useAuthStore from "@/stores/auth.store";
 import { Cpu, Search, ShoppingCart, User, X } from "lucide-react";
-import { animate } from "motion";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import { useCartFlyAnimation } from "../animation/CartFlyAnimationProvider";
-import GlobalLoading from "../loading/GlobalLoading";
+import { animate } from "motion";
+import { useWebAssets } from "@/hook/webAsset/useWebAssets";
+
+const GLASS_IDLE =
+  "bg-white/30 backdrop-blur-md text-neutral-700 border border-neutral-200/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_8px_rgba(0,0,0,0.06)] hover:text-[#f97316] hardware-surface";
+const GLASS_SEARCH =
+  "bg-white/30 backdrop-blur-md text-neutral-700 border border-neutral-200/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_8px_rgba(0,0,0,0.06)] hardware-surface";
+const GLASS_ACTIVE =
+  "bg-[#f97316]/90 backdrop-blur-md text-white border border-orange-300/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_4px_14px_rgba(249,115,22,0.35)]";
+const GLASS_PANEL =
+  "bg-white/95 backdrop-blur-xl border border-neutral-200 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_20px_40px_rgba(0,0,0,0.10)]";
+const GLASS_BAR =
+  "bg-white/25 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.05)]";
+
+const GLASS_TRACK =
+  "bg-white/20 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)] hardware-surface  hover:text-[#f97316]";
+const ITEM_IDLE = "text-neutral-600  hover:text-[#f97316]";
+const ITEM_ACTIVE =
+  "bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(249,115,22,0.35)]";
 
 function Logo() {
-  const { data: webassents, isLoading } = useWebAssets();
-  const logoUrl = webassents?.homeImageUrl;
-  if (logoUrl && isLoading) return <GlobalLoading />;
+  const logoUrl = useWebAssets().data?.homeImageUrl;
+
   return (
     <Link to="/" className="flex shrink-0 flex-col items-start">
-      <img
-        src={logoUrl ? logoUrl : "/spechub-logo.png"}
-        alt="SpecHub"
-        className="h-13 w-auto object-contain "
-      />
+      {logoUrl ? (
+        <img
+          src={logoUrl}
+          alt="SpecHub"
+          className="h-10 w-auto object-contain"
+        />
+      ) : (
+        <span className="flex items-center gap-2 text-xl font-bold tracking-tight text-neutral-900">
+          <Cpu className="h-5 w-5 text-[#f97316]" strokeWidth={2} />
+          SPEC<span className="text-[#f97316]">HUB</span>
+        </span>
+      )}
     </Link>
   );
 }
@@ -97,7 +119,7 @@ function SearchForm() {
     <div ref={searchContainerRef} className="relative w-full max-w-2xl">
       <form
         onSubmit={handleSubmit}
-        className="flex w-full items-center overflow-hidden rounded-lg border border-neutral-200 bg-white transition focus-within:border-neutral-400"
+        className={`flex w-full items-center overflow-hidden rounded-2xl transition-colors ${GLASS_SEARCH}`}
       >
         <div className="relative min-w-0 flex-1">
           <input
@@ -116,7 +138,7 @@ function SearchForm() {
             }}
             placeholder="Search products, brands, models..."
             autoComplete="off"
-            className="w-full bg-transparent px-4 py-2.5 pr-9 text-sm text-neutral-800 outline-none placeholder:text-neutral-400"
+            className="w-full bg-transparent px-4 py-2.5 pr-9 text-sm text-neutral-800 outline-none placeholder:text-neutral-500"
           />
 
           {searchTerm && (
@@ -124,7 +146,7 @@ function SearchForm() {
               type="button"
               onClick={handleClearSearch}
               aria-label="Clear search"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800"
             >
               <X size={16} />
             </button>
@@ -134,14 +156,16 @@ function SearchForm() {
         <button
           type="submit"
           aria-label="Search"
-          className="flex w-11 shrink-0 items-center justify-center text-neutral-400 transition hover:text-[#f97316]"
+          className="flex w-11 shrink-0 items-center justify-center text-neutral-500 transition hover:text-[#f97316]"
         >
           <Search size={18} />
         </button>
       </form>
 
       {canShowDropdown && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-96 overflow-y-auto rounded-lg border border-neutral-200 bg-white p-2 shadow-md">
+        <div
+          className={`absolute left-0 right-0 top-full z-50 mt-3 max-h-96 overflow-y-auto rounded-2xl p-2 ${GLASS_PANEL}`}
+        >
           {isFetching ? (
             <p className="px-3 py-4 text-sm text-neutral-500">Searching...</p>
           ) : isError ? (
@@ -162,9 +186,9 @@ function SearchForm() {
                   key={listing.id}
                   type="button"
                   onClick={() => handleSelectListing(listing.id)}
-                  className="flex w-full items-center gap-3 rounded-md p-2.5 text-left transition hover:bg-neutral-50"
+                  className="flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition hover:bg-white/60"
                 >
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md bg-neutral-100">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white/50">
                     {imageUrl ? (
                       <img
                         src={imageUrl}
@@ -201,21 +225,22 @@ function SearchForm() {
   );
 }
 
-const navLinkClass = ({ isActive }) =>
-  `hover:text-[#f97316] ${isActive ? "text-[#f97316]" : "text-neutral-500"}`;
+const trackItemClass = ({ isActive }) =>
+  `flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition-colors duration-150 ${
+    isActive ? ITEM_ACTIVE : ITEM_IDLE
+  }`;
 
 function AuthLinks() {
   return (
-    <div className="flex items-center gap-1.5 text-sm font-medium text-neutral-500">
-      <User size={17} strokeWidth={1.75} />
-      <NavLink to="/login" className={navLinkClass}>
-        Login{" "}
+    <>
+      <NavLink to="/login" className={trackItemClass}>
+        <User size={15} strokeWidth={1.75} />
+        Login
       </NavLink>
-      <span className="text-neutral-300">/</span>
-      <NavLink to="/register" className={navLinkClass}>
+      <NavLink to="/register" className={trackItemClass}>
         Register
       </NavLink>
-    </div>
+    </>
   );
 }
 
@@ -223,18 +248,16 @@ function ProfileLink({ user }) {
   return (
     <NavLink
       to="/user" // TODO: แก้ path ให้ตรงกับ route หน้าโปรไฟล์จริงของคุณ เช่น `/users/${user.id}`
-      className="flex items-center gap-2 text-sm font-medium text-neutral-700 hover:text-[#f97316]"
+      className={trackItemClass}
     >
       {user.profileImageUrl ? (
         <img
           src={user.profileImageUrl}
-          alt={user.firstName ?? "My Profile "}
-          className="h-7 w-7 rounded-full object-cover ring-1 ring-transparent hover:ring-[#f97316]"
+          alt={user.firstName ?? "My Profile"}
+          className="h-6 w-6 rounded-full object-cover"
         />
       ) : (
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-100">
-          <User size={14} className="text-[#f97316]" />
-        </span>
+        <User size={16} />
       )}
       <span className="max-w-[100px] truncate">{user.firstName}</span>
     </NavLink>
@@ -266,12 +289,14 @@ function MainNav() {
   }, [cartCount]);
 
   return (
-    <nav className="flex shrink-0 items-center gap-5 whitespace-nowrap text-sm font-medium">
+    <nav className="flex shrink-0 items-center gap-3 whitespace-nowrap text-sm font-medium">
+      {/* ตะกร้าแยกออกมาเป็นปุ่มวงกลมของตัวเอง ไม่รวมอยู่ใน track เดียวกับโปรไฟล์แล้ว */}
       <NavLink
         to={user ? "/cart" : "/login"}
+        aria-label="Cart"
         className={() =>
-          `flex items-center gap-1.5 hover:text-[#f97316] ${
-            isCartActive ? "text-[#f97316]" : "text-neutral-500"
+          `relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors duration-150 ${
+            isCartActive ? GLASS_ACTIVE : GLASS_IDLE
           }`
         }
       >
@@ -281,19 +306,23 @@ function MainNav() {
             className="pointer-events-none absolute -inset-1.5 rounded-full border border-[#f97316] opacity-0"
           />
           <ShoppingCart size={18} strokeWidth={1.75} />
-          {cartCount > 0 && (
-            <span
-              ref={cartBadgeRef}
-              className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#f97316] text-[10px] text-white"
-            >
-              {cartCount > 99 ? "99+" : cartCount}
-            </span>
-          )}
         </span>
-        Cart
+        {cartCount > 0 && (
+          <span
+            ref={cartBadgeRef}
+            className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#f97316] text-[10px] text-white"
+          >
+            {cartCount > 99 ? "99+" : cartCount}
+          </span>
+        )}
       </NavLink>
 
-      {user ? <ProfileLink user={user} /> : <AuthLinks />}
+      {/* โปรไฟล์/login-register ยังเป็น track แก้วเหมือนเดิม แค่ไม่มีตะกร้าปนอยู่ในนี้แล้ว */}
+      <div
+        className={`inline-flex items-center gap-1 rounded-2xl p-1.5 ${GLASS_TRACK}`}
+      >
+        {user ? <ProfileLink user={user} /> : <AuthLinks />}
+      </div>
     </nav>
   );
 }
@@ -305,8 +334,8 @@ function Header() {
 
   return (
     <header>
-      <div className="sticky top-0 z-40 w-screen border-b border-neutral-100 bg-white shadow-sm/20">
-        <div className="mx-auto grid max-w-8xl grid-cols-[auto_1fr_auto] items-center gap-2 px-4 py-4">
+      <div className={`sticky top-0 z-40 w-screen ${GLASS_BAR}`}>
+        <div className="mx-auto grid max-w-8xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-4">
           <Logo />
 
           <div className="flex justify-center">

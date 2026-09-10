@@ -9,6 +9,10 @@ import ListingDetailModal from "./ListingDetailModal";
 const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || "";
 const DEFAULT_IMAGE = "https://placehold.co/150x150?text=No+Image";
 
+// เดียวกับ GLASS_PANEL ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 export default function MyListingsSection({ listings, isLoading, isError }) {
   const navigate = useNavigate();
   const { mutate: deleteListing, isPending: isDeleting } = useDeleteListing();
@@ -17,10 +21,12 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
   const [selectedListingForEdit, setSelectedListingForEdit] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const [selectedListingForDelete, setSelectedListingForDelete] = useState(null);
+  const [selectedListingForDelete, setSelectedListingForDelete] =
+    useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const [selectedListingIdForDetail, setSelectedListingIdForDetail] = useState(null);
+  const [selectedListingIdForDetail, setSelectedListingIdForDetail] =
+    useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const handleOpenDetailModal = (listingId) => {
@@ -51,14 +57,45 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
   };
 
   const renderStatusBadge = (status) => {
-    const baseClass = "badge text-xs sm:text-sm font-bold shrink-0 min-w-[90px] py-3 text-center border-none shadow-xs";
+    const baseClass =
+      "inline-flex min-w-[90px] shrink-0 items-center justify-center rounded-full py-3 text-center text-xs font-bold sm:text-sm";
     switch (status) {
-      case "ACTIVE": return <span className={`${baseClass} badge-success text-white`}>Active</span>;
-      case "RESERVED": return <span className={`${baseClass} badge-warning text-white`}>Reserved</span>;
-      case "SOLD": return <span className={`${baseClass} badge-ghost`}>Sold</span>;
-      case "DRAFT": return <span className={`${baseClass} badge-info text-white`}>Draft</span>;
-      case "ARCHIVED": return <span className={`${baseClass} badge-error text-white`}>Archived</span>;
-      default: return <span className={`${baseClass} badge-outline`}>{status || "General"}</span>;
+      case "ACTIVE":
+        return (
+          <span className={`${baseClass} bg-emerald-500 text-white`}>
+            Active
+          </span>
+        );
+      case "RESERVED":
+        return (
+          <span className={`${baseClass} bg-amber-500 text-white`}>
+            Reserved
+          </span>
+        );
+      case "SOLD":
+        return (
+          <span className={`${baseClass} bg-neutral-200 text-neutral-600`}>
+            Sold
+          </span>
+        );
+      case "DRAFT":
+        return (
+          <span className={`${baseClass} bg-sky-500 text-white`}>Draft</span>
+        );
+      case "ARCHIVED":
+        return (
+          <span className={`${baseClass} bg-rose-500 text-white`}>
+            Archived
+          </span>
+        );
+      default:
+        return (
+          <span
+            className={`${baseClass} border border-neutral-300 text-neutral-600`}
+          >
+            {status || "General"}
+          </span>
+        );
     }
   };
 
@@ -76,33 +113,36 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
 
   return (
     <>
-      <div className="card hardware-surface p-6 space-y-4 h-[600px] flex flex-col">
+      <div
+        className={`rounded-2xl p-6 space-y-4 h-[600px] flex flex-col ${GLASS_PANEL}`}
+      >
         {/* Section Header */}
-        <div className="flex items-center justify-between border-b border-base-300/60 pb-4 shrink-0">
-          <h3 className="font-bold text-xl text-base-content">My Listings</h3>
+        <div className="flex items-center justify-between border-b border-neutral-200/70 pb-4 shrink-0">
+          <h3 className="font-bold text-xl text-neutral-900">My Listings</h3>
           <button
             type="button"
             onClick={() => navigate("/user/sell/my-listings")}
-            className="text-sm text-base-content/70 hover:text-primary font-semibold flex items-center gap-1 transition-colors"
+            className="text-sm text-neutral-500 hover:text-orange-600 font-semibold flex items-center gap-1 transition-colors cursor-pointer"
           >
             View All <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
         {/* Listings List */}
-        <div className="space-y-4 flex-1 pr-2 p-1.5 scrollbar-thin scrollbar-thumb-base-300 scrollbar-track-base-100 overflow-y-auto">
+        <div className="space-y-4 flex-1 pr-2 p-1.5 scrollbar-thin scrollbar-thumb-neutral-300 scrollbar-track-transparent overflow-y-auto">
           {isError ? (
-            <div className="text-center py-8 text-sm text-error">
+            <div className="text-center py-8 text-sm text-red-500">
               Failed to load listings data.
             </div>
           ) : !listings || listings.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-base-content/50 space-y-2">
+            <div className="flex flex-col items-center justify-center h-full text-neutral-400 space-y-2">
               <PackageX className="w-12 h-12 stroke-1" />
               <p className="text-base">No listings found</p>
             </div>
           ) : (
             listings.map((item) => {
-              const coverImage = item.images?.find((img) => img.isCover) || item.images?.[0];
+              const coverImage =
+                item.images?.find((img) => img.isCover) || item.images?.[0];
               let imageUrl = DEFAULT_IMAGE;
               const rawUrl = coverImage?.imageUrl || coverImage?.url;
               const rawKey = coverImage?.imageKey || coverImage?.key;
@@ -118,40 +158,52 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
                 <div
                   key={item.id}
                   onClick={() => handleOpenDetailModal(item.id)}
-                  className="flex items-center justify-between p-5 bg-base-100 border border-base-200 rounded-2xl cursor-pointer hover:border-primary hover:shadow-[0_4px_16px_rgba(249,115,22,0.15)] transition-all duration-200 gap-5"
+                  className="flex items-center justify-between p-5 bg-white/40 backdrop-blur-sm border border-neutral-200/70 rounded-2xl cursor-pointer hover:border-orange-300 hover:shadow-[0_4px_16px_rgba(249,115,22,0.15)] transition-all duration-200 gap-5"
                 >
                   <div className="flex items-center gap-5 min-w-0 flex-1">
-                    <div className="bg-base-300 rounded-xl overflow-hidden shrink-0 flex items-center justify-center border border-base-200 w-[110px] h-[110px]">
-                      <img src={imageUrl} alt={item.title || "Product"} className="w-full h-full object-cover" />
+                    <div className="bg-neutral-100 rounded-xl overflow-hidden shrink-0 flex items-center justify-center border border-neutral-200/70 w-[110px] h-[110px]">
+                      <img
+                        src={imageUrl}
+                        alt={item.title || "Product"}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     <div className="min-w-0 space-y-2 flex-1">
-                      <p className="text-lg font-bold truncate text-base-content">
+                      <p className="text-lg font-bold truncate text-neutral-900">
                         {item.title || "Untitled Product"}
                       </p>
-                      <p className="text-xl font-black text-primary">
-                        {item.price ? `฿${Number(item.price).toLocaleString()}` : "-"}
+                      <p className="text-xl font-black text-orange-500">
+                        {item.price
+                          ? `฿${Number(item.price).toLocaleString()}`
+                          : "-"}
                       </p>
                       {formatCondition(item.estimatedCondition) && (
-                        <p className="text-sm text-base-content/70 font-medium">
+                        <p className="text-sm text-neutral-500 font-medium">
                           {formatCondition(item.estimatedCondition)}
                         </p>
                       )}
                       {item.estimatedScore != null && (
                         <div className="flex items-center gap-1.5 text-sm text-amber-500 font-bold pt-0.5">
                           <Sparkles className="w-4 h-4 fill-amber-500/20" />
-                          <span>AI Score: {Number(item.estimatedScore).toFixed(1)}/100</span>
+                          <span>
+                            AI Score: {Number(item.estimatedScore).toFixed(1)}
+                            /100
+                          </span>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+                  <div
+                    className="flex items-center gap-2 shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     {renderStatusBadge(item.status)}
 
                     <button
                       type="button"
                       onClick={(e) => handleOpenEdit(e, item)}
-                      className="btn btn-ghost btn-circle btn-sm text-info hover:bg-info/10 transition-colors"
+                      className="flex size-8 cursor-pointer items-center justify-center rounded-full text-blue-500 hover:bg-blue-50 transition-colors"
                       title="Edit Listing"
                     >
                       <Edit3 className="w-4 h-4" />
@@ -160,7 +212,7 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
                     <button
                       type="button"
                       onClick={(e) => handleOpenDeleteModal(e, item)}
-                      className="btn btn-ghost btn-circle btn-sm text-error/70 hover:text-error hover:bg-error/10 transition-colors"
+                      className="flex size-8 cursor-pointer items-center justify-center rounded-full text-red-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                       title="Delete Listing"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -210,14 +262,19 @@ export default function MyListingsSection({ listings, isLoading, isError }) {
 
 function MyListingsSectionSkeleton() {
   return (
-    <div className="card hardware-surface p-6 space-y-4 h-[600px] flex flex-col">
-      <div className="flex items-center justify-between border-b border-base-300/60 pb-4">
+    <div
+      className={`rounded-2xl p-6 space-y-4 h-[600px] flex flex-col ${GLASS_PANEL}`}
+    >
+      <div className="flex items-center justify-between border-b border-neutral-200/70 pb-4">
         <div className="skeleton h-6 w-40" />
         <div className="skeleton h-4 w-24" />
       </div>
       <div className="space-y-4 flex-1 overflow-hidden">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="flex items-center justify-between p-5 border border-base-200 rounded-2xl">
+          <div
+            key={i}
+            className="flex items-center justify-between p-5 border border-neutral-200/70 rounded-2xl"
+          >
             <div className="flex items-center gap-5 w-full">
               <div className="skeleton rounded-xl shrink-0 w-[110px] h-[110px]" />
               <div className="space-y-3 w-full">
