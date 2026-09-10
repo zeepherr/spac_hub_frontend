@@ -89,31 +89,61 @@ function Buy() {
    * แสดงสูงสุด 2 รายการบน Dashboard
    */
   const actionItems = buyingOrders
-    .filter((order) => order.status === "SHIPPING_TO_BUYER")
-    .map((order) => ({
-      id: order.id,
+    .filter((order) =>
+      [
+        "AWAITING_PAYMENT",
+        "PENDING_PAYMENT",
+        "SHIPPING_TO_BUYER",
+      ].includes(order.status),
+    )
+    .map((order) => {
+      const mappedOrder = mapOrderForDashboard(order);
 
-      orderNumber: order.orderNumber,
+      const needsPayment =
+        order.status === "AWAITING_PAYMENT" ||
+        order.status === "PENDING_PAYMENT";
 
-      productName:
-        order.listing?.title ||
-        [order.listing?.brand, order.listing?.model]
-          .filter(Boolean)
-          .join(" ") ||
-        "Ordered Item",
+      const hasBeenDelivered =
+        order.status === "SHIPPING_TO_BUYER" &&
+        Boolean(order.deliveryShipment?.deliveredAt);
 
-      message:
-        "Your item is on the way. Open the order to view shipping details.",
-    }));
+      if (needsPayment) {
+        return {
+          ...mappedOrder,
+          actionType: "PAYMENT",
+          actionLabel: "Pay Now",
+          statusLabel: "PAYMENT REQUIRED",
+          message:
+            "Complete payment to continue your order.",
+        };
+      }
 
+      if (hasBeenDelivered) {
+        return {
+          ...mappedOrder,
+          actionType: "CONFIRM_DELIVERY",
+          actionLabel: "Confirm Delivery",
+          statusLabel: "DELIVERED",
+          message:
+            "Your item has arrived. Please confirm receipt.",
+        };
+      }
+
+      return {
+        ...mappedOrder,
+        actionType: "VIEW_ORDER",
+        actionLabel: "View Order",
+        statusLabel: "SHIPPING",
+        message:
+          "Your item is on the way. Open the order to view shipping details.",
+      };
+    });
   /*
    * แสดง Order ล่าสุดสูงสุด 2 รายการ
    */
   const recentOrders = buyingOrders.map(mapOrderForDashboard);
 
-  /*
-   * ข้อมูลสำหรับการ์ดสรุปด้านบน
-   */
+  /* ข้อมูลสำหรับการ์ดสรุปด้านบน */
   const stats = [
     {
       id: "cart",
@@ -256,11 +286,20 @@ function Buy() {
 
         {/* Action Items และ Recent Orders */}
         <div className="mt-6 grid grid-cols-1 items-stretch gap-6 xl:grid-cols-2">
+
+          {/* ตรงนี้คือส่วนของ Pay now */}
           <PendingReceipt
             orders={actionItems}
             icon={PackageCheck}
-            onViewAll={() => navigate("/user/orders?status=shipping")}
-            onConfirm={(orderId) => navigate(`/user/orders/${orderId}`)}
+            onViewAll={() => navigate("/user/orders")}
+            onConfirm={(order) => {
+              if (order.actionType === "PAYMENT") {
+                navigate(`/user/orders/${order.id}`);
+                return;
+              }
+
+              navigate(`/user/orders/${order.id}`);
+            }}
           />
 
           <RecentOrders
