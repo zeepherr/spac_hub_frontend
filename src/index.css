@@ -662,3 +662,102 @@ body {
 .dashboard-scroll::-webkit-scrollbar-thumb:hover {
   background: #f97316;
 }
+
+/* SpecHub notifications */
+[data-sonner-toaster].spechub-toaster {
+  font-family: "Inter Variable", sans-serif;
+}
+
+[data-sonner-toaster].spechub-toaster [data-sonner-toast].spechub-toast {
+  --toast-accent: var(--hardware-orange);
+
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--hardware-border);
+  border-inline-start: 3px solid var(--toast-accent);
+  border-radius: 12px;
+  background: var(--hardware-surface);
+  color: var(--hardware-black);
+  box-shadow: var(--hardware-shadow);
+}
+
+/* Semantic colors */
+[data-sonner-toaster].spechub-toaster .spechub-toast[data-type="success"] {
+  --toast-accent: #3f7d5a;
+}
+
+[data-sonner-toaster].spechub-toaster .spechub-toast[data-type="error"] {
+  --toast-accent: #dc2626;
+}
+
+[data-sonner-toaster].spechub-toaster .spechub-toast[data-type="info"] {
+  --toast-accent: var(--hardware-gray);
+}
+
+[data-sonner-toaster].spechub-toaster .spechub-toast [data-icon] {
+  color: var(--toast-accent);
+  flex-shrink: 0;
+}
+
+[data-sonner-toaster].spechub-toaster .spechub-toast [data-content] {
+  min-width: 0;
+  gap: 4px;
+}
+
+[data-sonner-toaster].spechub-toaster .spechub-toast [data-title] {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+[data-sonner-toaster].spechub-toaster .spechub-toast [data-description] {
+  color: var(--hardware-gray);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* Compact charcoal action */
+[data-sonner-toaster].spechub-toaster .spechub-toast [data-button] {
+  height: 30px;
+  padding-inline: 12px;
+  border-radius: 8px;
+  background: var(--hardware-black);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 160ms var(--hardware-ease);
+}
+
+[data-sonner-toaster].spechub-toaster .spechub-toast [data-button]:hover {
+  background: #404040;
+}
+
+[data-sonner-toaster].spechub-toaster .spechub-toast [data-cancel] {
+  background: var(--hardware-surface-2);
+  color: var(--hardware-gray);
+}
+
+[data-sonner-toaster].spechub-toaster .spechub-toast [data-cancel]:hover {
+  background: var(--hardware-border);
+}
+
+/* Dismiss button */
+[data-sonner-toaster].spechub-toaster .spechub-toast [data-close-button] {
+  background: var(--hardware-surface);
+  border-color: var(--hardware-border);
+  color: var(--hardware-gray);
+}
+
+[data-sonner-toaster].spechub-toaster .spechub-toast [data-close-button]:hover {
+  background: var(--hardware-surface-2);
+  color: var(--hardware-black);
+}
+
+/* Keyboard focus only */
+[data-sonner-toaster].spechub-toaster .spechub-toast button:focus-visible {
+  outline: 2px solid var(--hardware-orange);
+  outline-offset: 3px;
+}

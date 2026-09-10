@@ -1,37 +1,24 @@
-import {
-  LoaderCircle,
-  Package,
-} from "lucide-react";
+import { LoaderCircle, Package } from "lucide-react";
 
 function getSellerShipment(order) {
   return order.shipments?.find(
-    (shipment) =>
-      shipment.shipmentType ===
-      "SELLER_TO_ADMIN",
+    (shipment) => shipment.shipmentType === "SELLER_TO_ADMIN",
   );
 }
 
 function getSellerName(order) {
-  const firstName =
-    order.seller?.firstName ?? "";
+  const firstName = order.seller?.firstName ?? "";
 
-  const lastName =
-    order.seller?.lastName ?? "";
+  const lastName = order.seller?.lastName ?? "";
 
-  return (
-    `${firstName} ${lastName}`.trim() ||
-    "-"
-  );
+  return `${firstName} ${lastName}`.trim() || "-";
 }
 
 function getCoverImage(order) {
-  const images =
-    order.listing?.images ?? [];
+  const images = order.listing?.images ?? [];
 
   return (
-    images.find(
-      (image) => image.isCover,
-    )?.imageUrl ||
+    images.find((image) => image.isCover)?.imageUrl ||
     images[0]?.imageUrl ||
     null
   );
@@ -40,13 +27,10 @@ function getCoverImage(order) {
 function formatDate(date) {
   if (!date) return "-";
 
-  return new Intl.DateTimeFormat(
-    "en-GB",
-    {
-      dateStyle: "medium",
-      timeStyle: "short",
-    },
-  ).format(new Date(date));
+  return new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(date));
 }
 
 function getShipmentStatus(status) {
@@ -54,24 +38,19 @@ function getShipmentStatus(status) {
     case "DELIVERED":
       return {
         label: "Delivered",
-        className:
-          "bg-green-100 text-green-700",
+        className: "bg-green-100 text-green-700",
       };
 
     case "SHIPPED":
       return {
         label: "In Transit",
-        className:
-          "bg-blue-100 text-blue-700",
+        className: "bg-blue-100 text-blue-700",
       };
 
     default:
       return {
-        label:
-          status ||
-          "Pending Shipment",
-        className:
-          "bg-neutral-100 text-neutral-600",
+        label: status || "Pending Shipment",
+        className: "bg-neutral-100 text-neutral-600",
       };
   }
 }
@@ -87,10 +66,7 @@ function AwaitingReceiptTable({
     <div className="w-full overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
       {isPending ? (
         <div className="flex min-h-[500px] items-center justify-center">
-          <LoaderCircle
-            size={28}
-            className="animate-spin text-orange-500"
-          />
+          <LoaderCircle size={28} className="animate-spin text-orange-500" />
 
           <span className="ml-3 text-sm text-neutral-500">
             Loading items...
@@ -113,19 +89,15 @@ function AwaitingReceiptTable({
       ) : orders.length === 0 ? (
         <div className="flex min-h-[500px] flex-col items-center justify-center">
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50">
-            <Package
-              size={25}
-              className="text-orange-400"
-            />
+            <Package size={25} className="text-orange-400" />
           </div>
 
           <p className="font-medium text-neutral-700">
-            No parcels awaiting receipt
+            No parcels awaiting receive
           </p>
 
           <p className="mt-1 text-sm text-neutral-400">
-            Parcels currently being shipped
-            by sellers will appear here.
+            Parcels currently being shipped by sellers will appear here.
           </p>
         </div>
       ) : (
@@ -161,16 +133,11 @@ function AwaitingReceiptTable({
 
             <tbody className="divide-y divide-neutral-100">
               {orders.map((order) => {
-                const shipment =
-                  getSellerShipment(order);
+                const shipment = getSellerShipment(order);
 
-                const coverImage =
-                  getCoverImage(order);
+                const coverImage = getCoverImage(order);
 
-                const shipmentStatus =
-                  getShipmentStatus(
-                    shipment?.status,
-                  );
+                const shipmentStatus = getShipmentStatus(shipment?.status);
 
                 return (
                   <tr
@@ -180,15 +147,11 @@ function AwaitingReceiptTable({
                     {/* Order */}
                     <td className="px-6 py-4">
                       <p className="truncate text-sm font-semibold text-neutral-900">
-                        {
-                          order.orderNumber
-                        }
+                        {order.orderNumber}
                       </p>
 
                       <p className="mt-1 text-xs text-neutral-400">
-                        {formatDate(
-                          order.createdAt,
-                        )}
+                        {formatDate(order.createdAt)}
                       </p>
                     </td>
 
@@ -198,43 +161,26 @@ function AwaitingReceiptTable({
                         <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
                           {coverImage ? (
                             <img
-                              src={
-                                coverImage
-                              }
-                              alt={
-                                order
-                                  .listing
-                                  ?.title
-                              }
+                              src={coverImage}
+                              alt={order.listing?.title}
                               className="h-full w-full object-cover"
                             />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center">
-                              <Package
-                                size={20}
-                                className="text-neutral-300"
-                              />
+                              <Package size={20} className="text-neutral-300" />
                             </div>
                           )}
                         </div>
 
                         <div className="min-w-0">
                           <p className="truncate text-sm font-semibold text-neutral-900">
-                            {order
-                              .listing
-                              ?.title ||
-                              "-"}
+                            {order.listing?.title || "-"}
                           </p>
 
                           <p className="mt-1 truncate text-xs text-neutral-500">
-                            {order
-                              .listing
-                              ?.brand ||
-                              "-"}
+                            {order.listing?.brand || "-"}
 
-                            {order
-                              .listing
-                              ?.model
+                            {order.listing?.model
                               ? ` • ${order.listing.model}`
                               : ""}
                           </p>
@@ -245,23 +191,18 @@ function AwaitingReceiptTable({
                     {/* Seller */}
                     <td className="px-6 py-4">
                       <p className="truncate text-sm font-medium text-neutral-800">
-                        {getSellerName(
-                          order,
-                        )}
+                        {getSellerName(order)}
                       </p>
                     </td>
 
                     {/* Shipping */}
                     <td className="px-6 py-4">
                       <p className="text-sm font-medium text-neutral-800">
-                        {shipment?.carrier ||
-                          "-"}
+                        {shipment?.carrier || "-"}
                       </p>
 
                       <p className="mt-1 text-xs text-neutral-500">
-                        {shipment
-                          ?.trackingNumber ||
-                          "-"}
+                        {shipment?.trackingNumber || "-"}
                       </p>
                     </td>
 
@@ -270,9 +211,7 @@ function AwaitingReceiptTable({
                       <span
                         className={`mt-1.5 inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium ${shipmentStatus.className}`}
                       >
-                        {
-                          shipmentStatus.label
-                        }
+                        {shipmentStatus.label}
                       </span>
                     </td>
 
@@ -280,9 +219,7 @@ function AwaitingReceiptTable({
                     <td className="px-6 py-4 text-right">
                       <button
                         type="button"
-                        onClick={() =>
-                          onManage(order)
-                        }
+                        onClick={() => onManage(order)}
                         className="whitespace-nowrap rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-600 active:bg-orange-700"
                       >
                         Manage Product

@@ -1,32 +1,31 @@
-import React, { useState, useRef, useMemo } from "react";
-import { CheckCircle2, Edit3, AlertCircle, Info, X } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
-
 // Components
-import SellerStepProgress from "@/components/userseller/SellerStepProgress";
-import ProductBasicForm from "@/components/userseller/ProductBasicForm";
-import ConditionFormSection from "@/components/userseller/ConditionFormSection";
-import ImageUploadPreview from "@/components/userseller/ImageUploadPreview";
 import AiConditionAnalysisSection from "@/components/userseller/AiConditionAnalysisSection";
+import ConditionFormSection from "@/components/userseller/ConditionFormSection";
+import ConfirmUploadModal from "@/components/userseller/ConfirmUploadModal";
 import EscrowInfoSidebar from "@/components/userseller/EscrowInfoSidebar";
-import { useIdentifyProduct } from "@/hook/listing/useIdentifyProduct";
-import { useCreateListing } from "@/hook/listing/useCreateListing";
-import { useUpdateListing } from "@/hook/listing/useUpdateListing";
-import { useSaveListingConditionAnswers } from "@/hook/listing/useSavListingCondidionAnswer";
-import { useUploadListingImages } from "@/hook/listing/useUploadListingImages";
-import { useAnalyzeListingCondition } from "@/hook/listing/useAnalyzeListingCondition";
-import { usePublishListing } from "@/hook/listing/usePublishListing";
-import { useListingConditionQuestions } from "@/hook/listing/useListingConditionQuestions";
+import ImageUploadPreview from "@/components/userseller/ImageUploadPreview";
+import ProductBasicForm from "@/components/userseller/ProductBasicForm";
 import ProductSummaryModal from "@/components/userseller/ProductSummaryModal";
 import PublishStepSection from "@/components/userseller/PublishStepSection";
+import SellerStepProgress from "@/components/userseller/SellerStepProgress";
+import { useAnalyzeListingCondition } from "@/hook/listing/useAnalyzeListingCondition";
+import { useCreateListing } from "@/hook/listing/useCreateListing";
+import { useIdentifyProduct } from "@/hook/listing/useIdentifyProduct";
 import { useListingsByCategory } from "@/hook/listing/useListingByCategory";
-import ConfirmUploadModal from "@/components/userseller/ConfirmUploadModal";
+import { useListingConditionQuestions } from "@/hook/listing/useListingConditionQuestions";
+import { usePublishListing } from "@/hook/listing/usePublishListing";
+import { useSaveListingConditionAnswers } from "@/hook/listing/useSavListingCondidionAnswer";
+import { useUpdateListing } from "@/hook/listing/useUpdateListing";
+import { useUploadListingImages } from "@/hook/listing/useUploadListingImages";
+import { useNavigate } from "react-router";
 
 export default function CreateProductPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [listingId, setListingId] = useState(null);
-
+  const navitage = useNavigate();
   // Form States
   const [formData, setFormData] = useState({
     title: "",
@@ -41,7 +40,7 @@ export default function CreateProductPage() {
   const [answers, setAnswers] = useState({});
   const [imageFiles, setImageFiles] = useState([]);
   const [aiResult, setAiResult] = useState(null);
-  
+
   // Modal States
   const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
   const [isConfirmUploadOpen, setIsConfirmUploadOpen] = useState(false);
@@ -67,15 +66,13 @@ export default function CreateProductPage() {
   const currentCategoryName = useMemo(() => {
     if (!formData.categoryId) return "";
     const found = categories.find(
-      (c) => String(c.id) === String(formData.categoryId)
+      (c) => String(c.id) === String(formData.categoryId),
     );
     return found?.name || found?.title || "";
   }, [formData.categoryId, categories]);
 
-  const {
-    data: questionsData,
-    isPending: isQuestionsLoading,
-  } = useListingConditionQuestions(listingId);
+  const { data: questionsData, isPending: isQuestionsLoading } =
+    useListingConditionQuestions(listingId);
 
   const questions = Array.isArray(questionsData)
     ? questionsData
@@ -180,7 +177,7 @@ export default function CreateProductPage() {
             setCurrentStep(2);
             scrollToSection(step2Ref);
           },
-        }
+        },
       );
     }
   };
@@ -201,7 +198,7 @@ export default function CreateProductPage() {
           setCurrentStep(3);
           scrollToSection(step3Ref);
         },
-      }
+      },
     );
   };
 
@@ -224,7 +221,7 @@ export default function CreateProductPage() {
           setCurrentStep(4);
           scrollToSection(step4Ref);
         },
-      }
+      },
     );
   };
 
@@ -276,9 +273,7 @@ export default function CreateProductPage() {
 
       setIsSummaryModalOpen(false);
 
-      setTimeout(() => {
-        window.location.href = "/user/sell";
-      }, 1000);
+      navitage("/user/sell", { replace: true });
     } catch (err) {
       console.error("Publish listing error:", err);
     }
@@ -297,9 +292,7 @@ export default function CreateProductPage() {
       <div className="w-full px-4 sm:px-6 md:px-8">
         {/* 🟢 ปรับเป็น grid-cols-4 ให้ฝั่ง Form กินพื้นที่ 3 ส่วน และ Sidebar กิน 1 ส่วน */}
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 items-start">
-          
           <div className="xl:col-span-3 space-y-8">
-            
             {/* Step 1: Basic Info */}
             <div ref={step1Ref} className="relative">
               <ProductBasicForm
@@ -383,7 +376,6 @@ export default function CreateProductPage() {
           <div className="xl:col-span-1 sticky top-20">
             <EscrowInfoSidebar />
           </div>
-
         </div>
       </div>
 

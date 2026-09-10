@@ -1,48 +1,57 @@
-import { useTheme } from "next-themes"
+import {
+  CircleCheckIcon,
+  InfoIcon,
+  Loader2Icon,
+  OctagonXIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
 import { Toaster as Sonner } from "sonner";
-import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
 
-const Toaster = ({
+function Toaster({
+  className = "",
+  toastOptions = {},
+  style,
+  icons,
   ...props
-}) => {
-  const { theme = "system" } = useTheme()
-
+}) {
   return (
     <Sonner
-      theme={theme}
-      className="toaster group"
+      theme="light"
+      position="top-right"
+      duration={4000}
+      visibleToasts={3}
+      gap={10}
+      closeButton={false}
+      offset={24}
+      mobileOffset={16}
+      {...props}
+      className={`spechub-toaster ${className}`}
       icons={{
-        success: (
-          <CircleCheckIcon className="size-4" />
-        ),
-        info: (
-          <InfoIcon className="size-4" />
-        ),
-        warning: (
-          <TriangleAlertIcon className="size-4" />
-        ),
-        error: (
-          <OctagonXIcon className="size-4" />
-        ),
-        loading: (
-          <Loader2Icon className="size-4 animate-spin" />
-        ),
+        success: <CircleCheckIcon size={19} />,
+        info: <InfoIcon size={19} />,
+        warning: <TriangleAlertIcon size={19} />,
+        error: <OctagonXIcon size={19} />,
+        loading: <Loader2Icon size={19} className="animate-spin" />,
+        ...icons,
       }}
-      style={
-        {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
-          "--border-radius": "var(--radius)"
-        }
-      }
+      style={{
+        "--normal-bg": "var(--hardware-surface)",
+        "--normal-text": "var(--hardware-black)",
+        "--normal-border": "var(--hardware-border)",
+        "--border-radius": "12px",
+        ...style,
+      }}
       toastOptions={{
+        ...toastOptions,
         classNames: {
-          toast: "cn-toast",
+          ...toastOptions.classNames,
+          toast: ["spechub-toast", toastOptions.classNames?.toast]
+            .filter(Boolean)
+            .join(" "),
         },
       }}
-      {...props} />
+    />
   );
 }
 
-export { Toaster }
+export { Toaster };

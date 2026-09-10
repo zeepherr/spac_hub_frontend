@@ -31,7 +31,7 @@ const menuItems = [
     icon: MessageSquareText,
   },
   {
-    name: "Awaiting Receipt",
+    name: "Awaiting Receive",
     path: "/admin/orders/awaiting-receipt",
     icon: ScanLine,
   },
@@ -66,14 +66,10 @@ function AdminSidebar() {
       <div className="mb-10">
         <h1 className="text-xl font-bold text-white">
           SPEC
-          <span className="text-orange-500">
-            HUB
-          </span>
+          <span className="text-orange-500">HUB</span>
         </h1>
 
-        <p className="text-xs text-gray-500">
-          ADMIN PANEL
-        </p>
+        <p className="text-xs text-gray-500">ADMIN PANEL</p>
       </div>
 
       {/* MENU */}
