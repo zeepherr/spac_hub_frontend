@@ -1,9 +1,11 @@
 import { useCartFlyAnimation } from "@/components/animation/CartFlyAnimationProvider";
 import { useAddCartItem } from "@/hook/cart/useCreateItem";
 import useAuthStore from "@/stores/auth.store";
+import { isListingOwnedBy } from "@/utils/listing/listingOwnership";
 import { Cpu, ShoppingCart, Star } from "lucide-react";
 import { useRef } from "react";
 import { Link, useNavigate } from "react-router";
+import { toast } from "sonner";
 
 // แก้สแลชซ้อน (เช่น "r2.dev//listings/...") ที่เกิดจากฝั่ง backend ต่อ URL พลาด
 
@@ -72,6 +74,7 @@ function ProductCard({ product }) {
   const conditionInfo = getConditionInfo(product.estimatedCondition);
   const estimatedScore =
     product.estimatedScore != null ? Number(product.estimatedScore) : null;
+  const isOwner = isListingOwnedBy(product, user?.id);
 
   const handleAddToCart = (e) => {
     // กันไม่ให้ <Link> ที่ครอบการ์ดอยู่ทำการ navigate ไปหน้า detail ตอนกดปุ่มนี้
@@ -84,11 +87,18 @@ function ProductCard({ product }) {
       return;
     }
 
-    flyToCart(productImageRef.current, imageUrl);
+    if (isOwner) return;
 
-    // TODO: ปรับ payload ให้ตรงกับที่ addCartItem ต้องการจริงๆ
-    // ตอนนี้เดาว่าส่งแค่ listingId เฉยๆ ถ้า backend ต้องการ shape อื่น (เช่น { listingId, qty }) ปรับตรงนี้
-    addCartItem.mutate(product.id);
+    addCartItem.mutate(product.id, {
+      onSuccess: () => {
+        flyToCart(productImageRef.current, imageUrl);
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.message || "Failed to add to cart", {
+          position: "top-right",
+        });
+      },
+    });
   };
 
   return (
@@ -164,8 +174,8 @@ function ProductCard({ product }) {
           type="button"
           aria-label="Add to Cart"
           onClick={handleAddToCart}
-          disabled={user ? addCartItem.isPending : false}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] transition hover:bg-orange-600 disabled:opacity-50"
+          disabled={isOwner || (user ? addCartItem.isPending : false)}
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f97316] text-white transition hover:bg-orange-600 disabled:opacity-50"
         >
           <ShoppingCart size={15} />
         </button>

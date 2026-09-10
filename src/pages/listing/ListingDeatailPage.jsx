@@ -2,6 +2,7 @@ import { useCartFlyAnimation } from "@/components/animation/CartFlyAnimationProv
 import { useAddCartItem } from "@/hook/cart/useCreateItem";
 import { usePublicListingDetail } from "@/hook/listing/usePublicListingDetail";
 import useAuthStore from "@/stores/auth.store"; // ปรับ path ให้ตรงกับที่คุณเก็บไฟล์จริง
+import { isListingOwnedBy } from "@/utils/listing/listingOwnership";
 import {
   ChevronRight,
   Cpu,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 const GLASS_PANEL =
   "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
@@ -116,6 +118,7 @@ export default function ListingDetailPage() {
   const conditionInfo = getConditionInfo(listing.estimatedCondition);
   const estimatedScore =
     listing.estimatedScore != null ? Number(listing.estimatedScore) : null;
+  const isOwner = isListingOwnedBy(listing, user?.id);
 
   const handleAddToCart = () => {
     if (!user) {
@@ -123,8 +126,18 @@ export default function ListingDetailPage() {
       return;
     }
 
-    flyToCart(productImageRef.current, activeImage);
-    addCartItem.mutate(listing.id);
+    if (isOwner) return;
+
+    addCartItem.mutate(listing.id, {
+      onSuccess: () => {
+        flyToCart(productImageRef.current, activeImage);
+      },
+      onError: (error) => {
+        toast.error(error.response?.data?.message || "Failed to add to cart", {
+          position: "top-right",
+        });
+      },
+    });
   };
 
   const handleBuyNow = () => {
@@ -132,6 +145,8 @@ export default function ListingDetailPage() {
       navigate("/login");
       return;
     }
+
+    if (isOwner) return;
 
     navigate("/checkoutstep1", {
       state: {
@@ -255,7 +270,7 @@ export default function ListingDetailPage() {
             <button
               type="button"
               onClick={handleAddToCart}
-              disabled={user ? addCartItem.isPending : false}
+              disabled={isOwner || (user ? addCartItem.isPending : false)}
               className={`mt-4 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition disabled:opacity-50 ${CTA_GLASS}`}
             >
               <ShoppingCart size={18} />
@@ -264,7 +279,8 @@ export default function ListingDetailPage() {
             <button
               type="button"
               onClick={handleBuyNow}
-              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-900 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-800"
+              disabled={isOwner}
+              className="btn mt-2 w-full gap-2 border-none bg-neutral-900 text-white hover:bg-neutral-800 disabled:opacity-50"
             >
               Buy Now
             </button>

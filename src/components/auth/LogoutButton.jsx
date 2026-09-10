@@ -1,6 +1,6 @@
+import { LoaderCircle, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { LoaderCircle, LogOut } from "lucide-react";
 import { toast } from "sonner";
 
 import { logout } from "@/api/auth/auth.api";
@@ -19,18 +19,15 @@ export function LogoutButton() {
 
       const data = await logout();
 
-      toast.success(data?.message || "ออกจากระบบสำเร็จ", {
+      toast.success(data?.message || "Logout Successfully.", {
         position: "top-center",
       });
     } catch (error) {
       console.error("Logout error:", error);
 
-      toast.warning(
-        "ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ แต่ออกจากระบบบนอุปกรณ์นี้แล้ว",
-        {
-          position: "top-center",
-        },
-      );
+      toast.warning("The server does not response, please try again.", {
+        position: "top-center",
+      });
     } finally {
       await clearClientSession({
         explicit: true,
@@ -76,8 +73,8 @@ export function LogoutButton() {
         />
       )}
 
-      <span>
-        {isLoggingOut ? "กำลังออกจากระบบ..." : "ออกจากระบบ"}
+      <span className="text-destructive">
+        {isLoggingOut ? "Signing Out..." : "Logout"}
       </span>
     </Button>
   );

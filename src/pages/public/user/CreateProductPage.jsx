@@ -341,7 +341,7 @@ export default function CreateProductPage() {
                       disabled={isGlobalLoading}
                       className={`w-full rounded-xl py-3 text-sm font-bold transition disabled:opacity-50 ${CTA_GLASS}`}
                     >
-                      บันทึกรูปภาพและไปขั้นตอนถัดไป
+                      Save and Continue
                     </button>
                   )}
                 </div>
