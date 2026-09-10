@@ -1,3 +1,4 @@
+// Toaster.jsx
 import {
   CircleCheckIcon,
   InfoIcon,
@@ -35,10 +36,10 @@ function Toaster({
         ...icons,
       }}
       style={{
-        "--normal-bg": "var(--hardware-surface)",
-        "--normal-text": "var(--hardware-black)",
-        "--normal-border": "var(--hardware-border)",
-        "--border-radius": "12px",
+        "--normal-bg": "rgba(255,255,255,0.42)",
+        "--normal-text": "#171717",
+        "--normal-border": "rgba(229,229,229,0.7)",
+        "--border-radius": "14px",
         ...style,
       }}
       toastOptions={{

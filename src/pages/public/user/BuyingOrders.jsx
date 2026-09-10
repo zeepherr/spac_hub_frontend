@@ -1,3 +1,4 @@
+// BuyingOrders.jsx
 import { hasUnreadSupportMessage } from "@/components/support/support.constants";
 import { useBuyingOrders } from "@/hook/order/useBuyingOrders";
 import { useMySupportCases } from "@/hook/support/useMySupportCases";
@@ -14,6 +15,12 @@ import {
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import BackButton from "./BackButton";
+
+const PAGE_BG =
+  "bg-[linear-gradient(180deg,rgba(100,201,207,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(100,201,207,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 const FINISHED_STATUSES = new Set([
   "COMPLETED",
   "CANCELLED",
@@ -21,10 +28,8 @@ const FINISHED_STATUSES = new Set([
   "REFUNDED",
 ]);
 
-/* สถานะที่ถือว่ายกเลิกหรือไม่สำเร็จ */
 const CANCELLED_STATUSES = new Set(["CANCELLED", "REJECTED", "REFUNDED"]);
 
-/* ข้อความและสีที่ใช้แสดงสถานะ */
 const ORDER_STATUS_CONFIG = {
   AWAITING_PAYMENT: {
     label: "Awaiting Payment",
@@ -87,7 +92,6 @@ const ORDER_STATUS_CONFIG = {
   },
 };
 
-/* ตรวจสอบว่า Order อยู่ในหมวดที่เลือกหรือไม่ */
 function isOrderInCategory(order, category) {
   const status = order.status;
 
@@ -115,7 +119,6 @@ function isOrderInCategory(order, category) {
     );
   }
 
-  // category === "all"
   return true;
 }
 
@@ -136,16 +139,13 @@ function BuyingOrders() {
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  /* อ่านหมวดจาก URL ตัวอย่าง: /user/orders?status=shipping*/
   const selectedStatus = searchParams.get("status") || "all";
 
-  /* State สำหรับช่องค้นหาและการเรียงลำดับ */
   const [searchText, setSearchText] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
 
   const { data: orders = [], isPending, isError, refetch } = useBuyingOrders();
 
-  /*จำนวนรายการในแต่ละหมวด*/
   const categoryCounts = useMemo(
     () => ({
       all: orders.length,
@@ -170,37 +170,15 @@ function BuyingOrders() {
     [orders],
   );
 
-  /*
-   * ข้อมูลของแต่ละ Tab
-   */
   const categories = [
-    {
-      value: "all",
-      label: "All",
-    },
-    {
-      value: "awaiting-payment",
-      label: "Awaiting Payment",
-    },
-    {
-      value: "processing",
-      label: "Processing",
-    },
-    {
-      value: "shipping",
-      label: "Shipping",
-    },
-    {
-      value: "completed",
-      label: "Completed",
-    },
-    {
-      value: "cancelled",
-      label: "Cancelled",
-    },
+    { value: "all", label: "All" },
+    { value: "awaiting-payment", label: "Awaiting Payment" },
+    { value: "processing", label: "Processing" },
+    { value: "shipping", label: "Shipping" },
+    { value: "completed", label: "Completed" },
+    { value: "cancelled", label: "Cancelled" },
   ];
 
-  /* กรอง + ค้นหา + เรียงลำดับ */
   const filteredOrders = useMemo(() => {
     const normalizedSearch = searchText.trim().toLowerCase();
 
@@ -273,43 +251,39 @@ function BuyingOrders() {
   }
 
   return (
-    <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
+    <section className={`min-h-full px-5 py-8 lg:px-10 ${PAGE_BG}`}>
       <div className="mx-auto max-w-7xl">
         <BackButton />
-        {/* หัวข้อของหน้า */}
-        <header className="relative mb-7 overflow-hidden rounded-2xl border border-orange-100 bg-gradient-to-r from-orange-50 via-white to-white px-6 py-6 shadow-sm">
-  {/* ลายตกแต่งด้านขวา */}
-  <div className="pointer-events-none absolute -right-10 -top-14 size-40 rounded-full border-[24px] border-orange-100/60" />
-  <div className="pointer-events-none absolute right-24 top-5 size-3 rounded-full bg-orange-300/70" />
+        <header
+          className={`relative mb-7 overflow-hidden rounded-2xl bg-gradient-to-r from-orange-50/70 via-white/50 to-white/40 px-6 py-6 ${GLASS_PANEL}`}
+        >
+          <div className="pointer-events-none absolute -right-10 -top-14 size-40 rounded-full border-[24px] border-orange-100/60" />
+          <div className="pointer-events-none absolute right-24 top-5 size-3 rounded-full bg-orange-300/70" />
 
-  <div className="relative flex items-center gap-4">
-    {/* Icon */}
-    <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-lg shadow-orange-200">
-      <ShoppingBag size={26} strokeWidth={2.2} />
-    </span>
+          <div className="relative flex items-center gap-4">
+            <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-orange-500 text-white shadow-lg shadow-orange-200">
+              <ShoppingBag size={26} strokeWidth={2.2} />
+            </span>
 
-    {/* Title */}
-    <div className="min-w-0">
-      <p className="mb-1 text-xs font-black uppercase tracking-[0.18em] text-orange-500">
-        Purchase Center
-      </p>
+            <div className="min-w-0">
+              <p className="mb-1 text-xs font-black uppercase tracking-[0.18em] text-orange-500">
+                Purchase Center
+              </p>
 
-      <h1 className="text-2xl font-black tracking-tight text-neutral-900 md:text-3xl">
-        My Orders
-      </h1>
+              <h1 className="text-2xl font-black tracking-tight text-neutral-900 md:text-3xl">
+                My Orders
+              </h1>
 
-      <p className="mt-1 text-sm text-neutral-500">
-        View, manage and track all your purchases
-      </p>
-    </div>
-  </div>
+              <p className="mt-1 text-sm text-neutral-500">
+                View, manage and track all your purchases
+              </p>
+            </div>
+          </div>
 
-  {/* เส้นสีด้านล่าง */}
-  <div className="absolute bottom-0 left-0 h-1 w-28 rounded-r-full bg-orange-500" />
-</header>
+          <div className="absolute bottom-0 left-0 h-1 w-28 rounded-r-full bg-orange-500" />
+        </header>
 
-        {/* แถบเลือกหมวดหมู่ */}
-        <div className="overflow-x-auto rounded-2xl border border-neutral-200 bg-white p-2 shadow-sm">
+        <div className={`overflow-x-auto rounded-2xl p-2 ${GLASS_PANEL}`}>
           <div className="flex min-w-max items-center justify-between gap-2 lg:min-w-full">
             {categories.map((category) => {
               const isActive = selectedStatus === category.value;
@@ -322,7 +296,7 @@ function BuyingOrders() {
                   className={`flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-semibold transition lg:flex-1 ${
                     isActive
                       ? "bg-orange-500 text-white shadow-sm"
-                      : "text-neutral-600 hover:bg-orange-50 hover:text-orange-600"
+                      : "text-neutral-600 hover:bg-orange-50/70 hover:text-orange-600"
                   }`}
                 >
                   {category.label}
@@ -341,9 +315,10 @@ function BuyingOrders() {
             })}
           </div>
         </div>
-        {/* ช่องค้นหาและเรียงลำดับ */}
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_220px]">
-          <label className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-5 shadow-sm transition focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100">
+          <label
+            className={`flex items-center gap-3 rounded-2xl px-5 transition focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100 ${GLASS_PANEL}`}
+          >
             <Search size={20} className="shrink-0 text-neutral-400" />
 
             <input
@@ -355,7 +330,7 @@ function BuyingOrders() {
             />
           </label>
 
-          <label className="relative rounded-2xl border border-neutral-200 bg-white px-5 shadow-sm">
+          <label className={`relative rounded-2xl px-5 ${GLASS_PANEL}`}>
             <span className="absolute left-5 top-2 text-xs text-neutral-400">
               Sort by
             </span>
@@ -376,7 +351,6 @@ function BuyingOrders() {
           </label>
         </div>
 
-        {/* รายการคำสั่งซื้อ */}
         <div className="mt-5">
           {filteredOrders.length === 0 ? (
             <EmptyOrders hasSearchText={Boolean(searchText.trim())} />
@@ -408,20 +382,17 @@ function BuyingOrders() {
 }
 
 function OrderRow({ order, onClick, hasUnreadSupport = false }) {
-  /* หารูปปก ถ้าไม่มีให้ใช้รูปแรก */
   const images = order.listing?.images ?? [];
 
   const coverImage = images.find((image) => image.isCover) ?? images[0];
 
   const imageUrl = coverImage?.imageUrl || coverImage?.url || "";
 
-  /* หาชื่อสินค้า */
   const productName =
     order.listing?.title ||
     [order.listing?.brand, order.listing?.model].filter(Boolean).join(" ") ||
     "Untitled Item";
 
-  /* แปลงวันที่เป็นรูปแบบภาษาอังกฤษ */
   const createdAt = order.createdAt
     ? new Intl.DateTimeFormat("en-GB", {
         day: "numeric",
@@ -430,7 +401,6 @@ function OrderRow({ order, onClick, hasUnreadSupport = false }) {
       }).format(new Date(order.createdAt))
     : "-";
 
-  /* เลือกข้อความและสีของสถานะ */
   const status = ORDER_STATUS_CONFIG[order.status] ?? {
     label: order.status || "Unknown",
     className: "bg-neutral-100 text-neutral-600 ring-neutral-200",
@@ -440,9 +410,8 @@ function OrderRow({ order, onClick, hasUnreadSupport = false }) {
     <button
       type="button"
       onClick={onClick}
-      className="grid w-full cursor-pointer grid-cols-[76px_minmax(0,1fr)_20px] items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md sm:grid-cols-[84px_minmax(0,1fr)_140px_180px_24px] sm:p-5"
+      className={`grid w-full cursor-pointer grid-cols-[76px_minmax(0,1fr)_20px] items-center gap-4 rounded-2xl p-4 text-left transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md sm:grid-cols-[84px_minmax(0,1fr)_140px_180px_24px] sm:p-5 ${GLASS_PANEL}`}
     >
-      {/* รูปสินค้า */}
       <div className="flex size-19 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-neutral-100 sm:size-20">
         {imageUrl ? (
           <img
@@ -455,7 +424,6 @@ function OrderRow({ order, onClick, hasUnreadSupport = false }) {
         )}
       </div>
 
-      {/* เลขคำสั่งซื้อ ชื่อสินค้า และวันที่ */}
       <div className="min-w-0">
         <div className="flex min-w-0 items-center gap-2">
           <p className="min-w-0 truncate text-xs font-medium text-neutral-400">
@@ -482,7 +450,6 @@ function OrderRow({ order, onClick, hasUnreadSupport = false }) {
           Ordered on {createdAt}
         </p>
 
-        {/* ราคาและสถานะสำหรับหน้าจอมือถือ */}
         <div className="mt-3 flex flex-wrap items-center gap-2 sm:hidden">
           <p className="font-bold text-neutral-900">
             ฿{Number(order.agreedPrice ?? 0).toLocaleString("th-TH")}
@@ -496,12 +463,10 @@ function OrderRow({ order, onClick, hasUnreadSupport = false }) {
         </div>
       </div>
 
-      {/* ราคาสำหรับหน้าจอใหญ่ */}
       <p className="hidden font-bold text-neutral-900 sm:block sm:text-right">
         ฿{Number(order.agreedPrice ?? 0).toLocaleString("th-TH")}
       </p>
 
-      {/* สถานะสำหรับหน้าจอใหญ่ */}
       <div className="hidden sm:text-right md:block">
         <span
           className={`inline-flex rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset ${status.className}`}
@@ -517,7 +482,9 @@ function OrderRow({ order, onClick, hasUnreadSupport = false }) {
 
 function EmptyOrders({ hasSearchText }) {
   return (
-    <div className="flex min-h-80 flex-col items-center justify-center rounded-2xl border border-neutral-200 bg-white p-8 text-center shadow-sm">
+    <div
+      className={`flex min-h-80 flex-col items-center justify-center rounded-2xl p-8 text-center ${GLASS_PANEL}`}
+    >
       <span className="flex size-16 items-center justify-center rounded-full bg-orange-50 text-orange-500">
         <PackageOpen size={30} />
       </span>

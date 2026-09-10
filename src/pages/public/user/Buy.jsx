@@ -21,6 +21,14 @@ const FINISHED_ORDER_STATUSES = new Set([
   "REFUNDED",
 ]);
 
+const CTA_GLASS =
+  "bg-orange-500 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
+
+const STAT_CARD_HIGHLIGHT =
+  "border-orange-200/70 bg-gradient-to-br from-orange-50/70 to-white/40 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(249,115,22,0.08)]";
+const STAT_CARD_NEUTRAL =
+  "border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 function mapOrderForDashboard(order) {
   const images = order.listing?.images ?? [];
 
@@ -57,17 +65,8 @@ function Buy() {
 
   const displayName = user?.firstName || user?.email || "User";
 
-  /*
-   * จำนวน Order ทั้งหมด
-   */
   const totalOrders = buyingOrders.length;
 
-  /*
-   * Order ที่กำลังดำเนินการ
-   * ไม่นับ Awaiting Payment
-   * ไม่นับ Shipping to Buyer
-   * ไม่นับ Order ที่จบแล้ว
-   */
   const processingOrders = buyingOrders.filter(
     (order) =>
       !FINISHED_ORDER_STATUSES.has(order.status) &&
@@ -75,19 +74,10 @@ function Buy() {
       order.status !== "SHIPPING_TO_BUYER",
   ).length;
 
-  /*
-   * Order ที่กำลังส่งให้ผู้ซื้อ
-   */
   const shippingOrders = buyingOrders.filter(
     (order) => order.status === "SHIPPING_TO_BUYER",
   ).length;
 
-  /*
-   * สร้างรายการสำหรับ Action Items
-   *
-   * ใช้ filter เพราะต้องการหลายรายการ
-   * แสดงสูงสุด 2 รายการบน Dashboard
-   */
   const actionItems = buyingOrders
     .filter((order) => order.status === "SHIPPING_TO_BUYER")
     .map((order) => ({
@@ -106,14 +96,8 @@ function Buy() {
         "Your item is on the way. Open the order to view shipping details.",
     }));
 
-  /*
-   * แสดง Order ล่าสุดสูงสุด 2 รายการ
-   */
   const recentOrders = buyingOrders.map(mapOrderForDashboard);
 
-  /*
-   * ข้อมูลสำหรับการ์ดสรุปด้านบน
-   */
   const stats = [
     {
       id: "cart",
@@ -122,10 +106,9 @@ function Buy() {
       unit: "Items",
       icon: ShoppingCart,
 
-      cardClassName:
-        "border-orange-200 bg-gradient-to-br from-orange-50 to-white",
+      cardClassName: STAT_CARD_HIGHLIGHT,
 
-      iconClassName: "bg-orange-100 text-orange-500",
+      iconClassName: "bg-orange-100/80 text-orange-500",
 
       watermarkClassName: "text-orange-500",
 
@@ -141,9 +124,9 @@ function Buy() {
       unit: "Items",
       icon: PackageOpen,
 
-      cardClassName: "border-neutral-200 bg-white",
+      cardClassName: STAT_CARD_NEUTRAL,
 
-      iconClassName: "bg-neutral-100 text-neutral-900",
+      iconClassName: "bg-neutral-100/80 text-neutral-900",
 
       watermarkClassName: "text-neutral-500",
 
@@ -159,10 +142,9 @@ function Buy() {
       unit: "Items",
       icon: Clock3,
 
-      cardClassName:
-        "border-orange-200 bg-gradient-to-br from-orange-50 to-white",
+      cardClassName: STAT_CARD_HIGHLIGHT,
 
-      iconClassName: "bg-orange-100 text-orange-500",
+      iconClassName: "bg-orange-100/80 text-orange-500",
 
       watermarkClassName: "text-orange-500",
 
@@ -178,9 +160,9 @@ function Buy() {
       unit: "Items",
       icon: Truck,
 
-      cardClassName: "border-neutral-200 bg-white",
+      cardClassName: STAT_CARD_NEUTRAL,
 
-      iconClassName: "bg-neutral-100 text-neutral-900",
+      iconClassName: "bg-neutral-100/80 text-neutral-900",
 
       watermarkClassName: "text-neutral-500",
 
@@ -190,9 +172,6 @@ function Buy() {
     },
   ];
 
-  /*
-   * Loading
-   */
   if (isPending) {
     return (
       <div className="flex min-h-96 items-center justify-center gap-3">
@@ -203,9 +182,6 @@ function Buy() {
     );
   }
 
-  /*
-   * Error
-   */
   if (isError) {
     return (
       <div className="flex min-h-96 flex-col items-center justify-center gap-4">
@@ -223,9 +199,8 @@ function Buy() {
   }
 
   return (
-    <section className="min-h-full bg-neutral-50 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 xl:px-10">
+    <section className="min-h-full bg-[linear-gradient(180deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)] px-4 py-5 sm:px-6 sm:py-6 lg:px-8 xl:px-10">
       <div className="mx-auto w-full max-w-[1440px]">
-        {/* Header */}
         <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <h1 className="break-words text-2xl font-bold text-neutral-900 sm:text-3xl">
@@ -240,21 +215,19 @@ function Buy() {
           <button
             type="button"
             onClick={() => navigate("/")}
-            className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white transition hover:bg-orange-600 sm:w-auto"
+            className={`inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-5 py-3 font-semibold transition sm:w-auto ${CTA_GLASS}`}
           >
             <ShoppingBag size={20} />
             Shop Now
           </button>
         </header>
 
-        {/* การ์ดสรุป */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-6">
           {stats.map((stat) => (
             <DashboardStatCard key={stat.id} {...stat} />
           ))}
         </div>
 
-        {/* Action Items และ Recent Orders */}
         <div className="mt-6 grid grid-cols-1 items-stretch gap-6 xl:grid-cols-2">
           <PendingReceipt
             orders={actionItems}

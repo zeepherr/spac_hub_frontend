@@ -12,13 +12,13 @@ import { useNavigate } from "react-router";
 
 import { hasUnreadSupportMessage } from "@/components/support/support.constants";
 import useAuthStore from "../../stores/auth.store.js";
-// 1. นำเข้า Card ตัวเดิมที่มีอยู่แล้ว
-// import { OrderItemCard } from "@/components/sell/OrderItemCard";
-// import ShipOrderModal from "@/components/sell/ShipOrderModal";
 
-// 2. นำเข้า Components ย่อยที่เราเพิ่งแยก
-// import SellingOrderFilter, { FILTER_TABS } from "@/components/sell/SellingOrderFilter";
-// import SellingOrderDetailModal from "@/components/sell/SellingOrderDetailModal";
+// bg หลักมาตรฐานของทั้งเว็บ (เดียวกับที่ตั้งไว้ใน PublicLayout.jsx) - ใช้กับพื้นหลังหลักของหน้าเท่านั้น
+const PAGE_BG =
+  "bg-[linear-gradient(180deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
+// เดียวกับ GLASS_PANEL ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
 
 export default function SellingOrdersPage() {
   const navigate = useNavigate();
@@ -122,7 +122,7 @@ export default function SellingOrdersPage() {
   );
 
   return (
-    <div className="min-h-screen w-full bg-neutral-50 p-4 sm:p-6 md:p-8">
+    <div className={`min-h-screen w-full p-4 sm:p-6 md:p-8 ${PAGE_BG}`}>
       {/* 🟢 เปลี่ยนจาก mx-auto max-w-6xl เป็น w-full เพื่อขยายให้เต็มจอ */}
       <div className="w-full space-y-6">
         {/* Header */}
@@ -158,7 +158,9 @@ export default function SellingOrdersPage() {
           {isLoading ? (
             <SellingOrdersSkeleton />
           ) : isError ? (
-            <div className="rounded-2xl border border-neutral-200 bg-white p-8 text-center text-red-500 shadow-sm space-y-2">
+            <div
+              className={`space-y-2 rounded-2xl p-8 text-center text-red-500 ${GLASS_PANEL}`}
+            >
               <p className="font-bold">Unable to load order data.</p>
               <button
                 type="button"
@@ -169,7 +171,9 @@ export default function SellingOrdersPage() {
               </button>
             </div>
           ) : filteredOrders.length === 0 ? (
-            <div className="rounded-2xl border border-neutral-200 bg-white p-12 text-center text-neutral-400 shadow-sm space-y-3">
+            <div
+              className={`space-y-3 rounded-2xl p-12 text-center text-neutral-400 ${GLASS_PANEL}`}
+            >
               <PackageX className="mx-auto h-16 w-16 stroke-1" />
               <p className="text-lg font-bold text-neutral-700">
                 No orders found
@@ -234,7 +238,7 @@ function SellingOrdersSkeleton() {
       {[1, 2, 3, 4].map((i) => (
         <div
           key={i}
-          className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm space-y-4"
+          className="rounded-2xl border border-neutral-200/70 bg-white/60 backdrop-blur-sm p-5 shadow-sm space-y-4"
         >
           <div className="flex justify-between items-center">
             <div className="h-5 w-28 animate-pulse rounded bg-neutral-200" />

@@ -1,3 +1,4 @@
+// RegisterPage.jsx
 import { registerUser } from "@/api/auth/auth.api.js";
 import GlobalLoading from "@/components/loading/GlobalLoading.jsx";
 import { getRoleHome } from "@/routes/Role.route.jsx";
@@ -11,15 +12,16 @@ import { Link, Navigate, useNavigate } from "react-router";
 import { toast } from "sonner";
 import { registerSchema } from "../../validations/auth.schema.js";
 
+const GLASS_PANEL =
+  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 function RegisterPage() {
   const user = useAuthStore((store) => store.user);
   const navigate = useNavigate();
 
-  // Password visibility states
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // React Hook Form
   const {
     register,
     handleSubmit,
@@ -37,7 +39,6 @@ function RegisterPage() {
     },
   });
 
-  // Handle submit when Zod validation passes
   const onSubmit = async (values) => {
     const { confirmPassword, ...restData } = values;
     try {
@@ -63,8 +64,9 @@ function RegisterPage() {
   if (isSubmitting) return <GlobalLoading label="Sending OTP..." />;
 
   return (
-    <section className="w-full hardware-surface max-w-xl rounded-2xl border border-neutral-200 bg-white px-6 py-6 shadow-xl sm:px-10 sm:py-7">
-      {/* Header */}
+    <section
+      className={`w-full max-w-xl rounded-2xl px-6 py-6 sm:px-10 sm:py-7 hardware-surface ${GLASS_PANEL}`}
+    >
       <header className="mb-4 text-center">
         <Link
           to="/"
@@ -293,9 +295,9 @@ function RegisterPage() {
       </form>
 
       <div className="mt-4 flex items-center gap-4">
-        <div className="h-px flex-1 bg-neutral-200" />
+        <div className="h-px flex-1 bg-neutral-200/70" />
         <span className="text-xs text-neutral-400">OR</span>
-        <div className="h-px flex-1 bg-neutral-200" />
+        <div className="h-px flex-1 bg-neutral-200/70" />
       </div>
 
       <p className="mt-4 text-center text-sm text-neutral-500">

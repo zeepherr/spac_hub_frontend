@@ -1,3 +1,4 @@
+// VerifyPage.jsx
 import { Navigate, useNavigate } from "react-router";
 
 import { VerifyEmailForm } from "@/components/auth/VerifyEmailFrom";
@@ -5,6 +6,9 @@ import {
   clearPendingRegistration,
   getPendingRegistration,
 } from "@/utils/auth/pending-registration";
+
+const GLASS_PANEL =
+  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
 
 export default function VerifyPage() {
   const navigate = useNavigate();
@@ -33,14 +37,17 @@ export default function VerifyPage() {
   }
 
   return (
-    <div className="min-h-full flex items-center justify-center text-base-content">
-      <div className="hardware-surface w-full max-w-md bg-white p-8 md:p-10 text-center flex flex-col items-center">
-        {/* Icon */}
-        <div className="w-20 h-20 mb-6 rounded-2xl bg-neutral text-neutral-content border border-neutral-focus flex items-center justify-center relative">
-          <div className="hardware-indicator absolute top-2 right-2" />
+    <div className="min-h-full flex items-center justify-center text-neutral-900">
+      <div
+        className={`w-full max-w-md p-8 md:p-10 text-center flex flex-col items-center rounded-2xl hardware-surface ${GLASS_PANEL}`}
+      >
+        <div
+          className={`w-20 h-20 mb-6 rounded-2xl flex items-center justify-center relative ${GLASS_PANEL}`}
+        >
+          <div className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-[#f97316]" />
 
           <svg
-            className="w-10 h-10 text-secondary"
+            className="w-10 h-10 text-neutral-500"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -64,17 +71,17 @@ export default function VerifyPage() {
 
             <path
               d="M13.5 7.5l1.5 1.5 2.5-2.5"
-              stroke="var(--hardware-orange, #f97316)"
+              stroke="#f97316"
               strokeWidth="2"
             />
           </svg>
         </div>
 
-        <h1 className="text-2xl md:text-3xl text-[#171717] font-black tracking-tight mb-2">
+        <h1 className="text-2xl md:text-3xl text-neutral-900 font-black tracking-tight mb-2">
           Verification Code
         </h1>
 
-        <p className="text-xs md:text-sm text-[#171717] max-w-xs mb-6 leading-relaxed">
+        <p className="text-xs md:text-sm text-neutral-700 max-w-xs mb-6 leading-relaxed">
           Please enter the 6-digit verification code we sent to your email:{" "}
           <span className="font-bold text-[#f97316]">{pending.email}</span>
         </p>

@@ -1,42 +1,46 @@
 import { useMyCart } from "@/hook/cart/useMyCart";
 import { useDebounce } from "@/hook/listing/useBounce";
 import { useListingSearch } from "@/hook/listing/useListingSearch";
-import { useWebAssets } from "@/hook/webAsset/useWebAssets";
 import useAuthStore from "@/stores/auth.store";
 import { Cpu, Search, ShoppingCart, User, X } from "lucide-react";
-import { animate } from "motion";
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import { useCartFlyAnimation } from "../animation/CartFlyAnimationProvider";
-import GlobalLoading from "../loading/GlobalLoading";
+import { animate } from "motion";
+import { useWebAssets } from "@/hook/webAsset/useWebAssets";
 
-// เงาชุดเดียวกับ MainNav.jsx - เวอร์ชันปรับให้อ่านออกชัดบนพื้นหลังขาว (ของเดิม bg-white/25 จะจางมาก
-// ถ้าไม่มีคอนเทนต์สีสันข้างหลังให้ blur) ขึ้น opacity ของ bg-white ให้พอเห็นเป็นแผ่นแก้วได้เองแม้พื้น
-// เป็นขาวล้วน เพิ่ม border สีเทา/ส้มจางๆ ให้มีขอบชัดขึ้น แต่ยังคง backdrop-blur ไว้เผื่อมีคอนเทนต์
-// เลื่อนผ่านข้างหลังตอน scroll (ดู PublicLayout.jsx ที่ทำ header เป็น fixed ไว้แล้ว)
 const GLASS_IDLE =
   "bg-white/60 backdrop-blur-md text-neutral-700 border border-neutral-200/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_8px_rgba(0,0,0,0.06)]";
 const GLASS_ACTIVE =
   "bg-[#f97316]/90 backdrop-blur-md text-white border border-orange-300/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.45),0_4px_14px_rgba(249,115,22,0.35)]";
-// panel (dropdown ผลค้นหา) ต้องทึบกว่าปุ่มพอสมควร เพราะต้องมีตัวหนังสือ/รูปสินค้าอ่านง่ายอยู่ข้างใน
 const GLASS_PANEL =
   "bg-white/95 backdrop-blur-xl border border-neutral-200 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_20px_40px_rgba(0,0,0,0.10)]";
-// พื้นหลังของตัว header เองก็เป็นแผ่นแก้ว liquid glass ด้วย (เดิมโปร่งใสล้วน) - บางกว่าตัว element ย่อย
-// ข้างใน (search/cart/avatar) มีเส้นขีดล่างจางๆ (border-b) คั่นจากเนื้อหาข้างล่างให้ดูเป็นแถบลอย
 const GLASS_BAR =
-  "bg-white/50 backdrop-blur-xl border-b border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.05)]";
+  "bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.05)]";
+
+const GLASS_TRACK =
+  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const ITEM_IDLE = "text-neutral-600 hover:text-[#f97316]";
+const ITEM_ACTIVE =
+  "bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(249,115,22,0.35)]";
 
 function Logo() {
-  const { data: webassents, isLoading } = useWebAssets();
-  const logoUrl = webassents?.homeImageUrl;
-  if (logoUrl && isLoading) return <GlobalLoading />;
+  const logoUrl = useWebAssets().data?.homeImageUrl;
+
   return (
     <Link to="/" className="flex shrink-0 flex-col items-start">
-      <img
-        src={logoUrl ? logoUrl : "/spechub-logo.png"}
-        alt="SpecHub"
-        className="h-13 w-auto object-contain "
-      />
+      {logoUrl ? (
+        <img
+          src={logoUrl}
+          alt="SpecHub"
+          className="h-10 w-auto object-contain"
+        />
+      ) : (
+        <span className="flex items-center gap-2 text-xl font-bold tracking-tight text-neutral-900">
+          <Cpu className="h-5 w-5 text-[#f97316]" strokeWidth={2} />
+          SPEC<span className="text-[#f97316]">HUB</span>
+        </span>
+      )}
     </Link>
   );
 }
@@ -111,7 +115,6 @@ function SearchForm() {
 
   return (
     <div ref={searchContainerRef} className="relative w-full max-w-2xl">
-      {/* ช่องค้นหาเป็นแผ่นแก้ว liquid glass ลอยอยู่บนพื้นหลังโปร่งใสของ header */}
       <form
         onSubmit={handleSubmit}
         className={`flex w-full items-center overflow-hidden rounded-2xl transition-colors ${GLASS_IDLE}`}
@@ -220,21 +223,22 @@ function SearchForm() {
   );
 }
 
-const navLinkClass = ({ isActive }) =>
-  `hover:text-[#f97316] ${isActive ? "text-[#f97316]" : "text-neutral-600"}`;
+const trackItemClass = ({ isActive }) =>
+  `flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition-colors duration-150 ${
+    isActive ? ITEM_ACTIVE : ITEM_IDLE
+  }`;
 
 function AuthLinks() {
   return (
-    <div className="flex items-center gap-1.5 text-sm font-medium text-neutral-600">
-      <User size={17} strokeWidth={1.75} />
-      <NavLink to="/login" className={navLinkClass}>
+    <>
+      <NavLink to="/login" className={trackItemClass}>
+        <User size={15} strokeWidth={1.75} />
         Login
       </NavLink>
-      <span className="text-neutral-400">/</span>
-      <NavLink to="/register" className={navLinkClass}>
+      <NavLink to="/register" className={trackItemClass}>
         Register
       </NavLink>
-    </div>
+    </>
   );
 }
 
@@ -242,24 +246,16 @@ function ProfileLink({ user }) {
   return (
     <NavLink
       to="/user" // TODO: แก้ path ให้ตรงกับ route หน้าโปรไฟล์จริงของคุณ เช่น `/users/${user.id}`
-      className="flex items-center gap-2 text-sm font-medium text-neutral-700 hover:text-[#f97316]"
+      className={trackItemClass}
     >
       {user.profileImageUrl ? (
-        <span
-          className={`flex h-8 w-8 items-center justify-center rounded-full ${GLASS_IDLE}`}
-        >
-          <img
-            src={user.profileImageUrl}
-            alt={user.firstName ?? "My Profile "}
-            className="h-7 w-7 rounded-full object-cover"
-          />
-        </span>
+        <img
+          src={user.profileImageUrl}
+          alt={user.firstName ?? "My Profile"}
+          className="h-6 w-6 rounded-full object-cover"
+        />
       ) : (
-        <span
-          className={`flex h-8 w-8 items-center justify-center rounded-full ${GLASS_IDLE}`}
-        >
-          <User size={14} className="text-[#f97316]" />
-        </span>
+        <User size={16} />
       )}
       <span className="max-w-[100px] truncate">{user.firstName}</span>
     </NavLink>
@@ -291,13 +287,14 @@ function MainNav() {
   }, [cartCount]);
 
   return (
-    <nav className="flex shrink-0 items-center gap-4 whitespace-nowrap text-sm font-medium">
-      {/* ปุ่มตะกร้าเป็นแผ่นแก้วเดียวกับปุ่มเมนูใน MainNav.jsx - ใส (idle) / ส้มโปร่งพร้อมเรืองแสงตอน active */}
+    <nav className="flex shrink-0 items-center gap-3 whitespace-nowrap text-sm font-medium">
+      {/* ตะกร้าแยกออกมาเป็นปุ่มวงกลมของตัวเอง ไม่รวมอยู่ใน track เดียวกับโปรไฟล์แล้ว */}
       <NavLink
         to={user ? "/cart" : "/login"}
+        aria-label="Cart"
         className={() =>
-          `flex items-center gap-2 rounded-2xl px-3 py-2 transition-colors ${
-            isCartActive ? GLASS_ACTIVE : `${GLASS_IDLE} hover:text-[#f97316]`
+          `relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors duration-150 ${
+            isCartActive ? GLASS_ACTIVE : GLASS_IDLE
           }`
         }
       >
@@ -307,19 +304,23 @@ function MainNav() {
             className="pointer-events-none absolute -inset-1.5 rounded-full border border-[#f97316] opacity-0"
           />
           <ShoppingCart size={18} strokeWidth={1.75} />
-          {cartCount > 0 && (
-            <span
-              ref={cartBadgeRef}
-              className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#f97316] text-[10px] text-white"
-            >
-              {cartCount > 99 ? "99+" : cartCount}
-            </span>
-          )}
         </span>
-        Cart
+        {cartCount > 0 && (
+          <span
+            ref={cartBadgeRef}
+            className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#f97316] text-[10px] text-white"
+          >
+            {cartCount > 99 ? "99+" : cartCount}
+          </span>
+        )}
       </NavLink>
 
-      {user ? <ProfileLink user={user} /> : <AuthLinks />}
+      {/* โปรไฟล์/login-register ยังเป็น track แก้วเหมือนเดิม แค่ไม่มีตะกร้าปนอยู่ในนี้แล้ว */}
+      <div
+        className={`inline-flex items-center gap-1 rounded-2xl p-1.5 ${GLASS_TRACK}`}
+      >
+        {user ? <ProfileLink user={user} /> : <AuthLinks />}
+      </div>
     </nav>
   );
 }

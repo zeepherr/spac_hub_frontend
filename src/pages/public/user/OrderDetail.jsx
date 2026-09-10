@@ -25,6 +25,19 @@ import { useMySupportCases } from "@/hook/support/useMySupportCases";
 import useAuthStore from "@/stores/auth.store";
 import BackButton from "./BackButton";
 
+// bg หลักมาตรฐานของทั้งเว็บ (เดียวกับที่ตั้งไว้ใน PublicLayout.jsx) - ใช้กับพื้นหลังหลักของหน้าเท่านั้น
+const PAGE_BG =
+  "bg-[linear-gradient(180deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
+// เดียวกับ GLASS_PANEL ที่ใช้ทั้งเว็บ - การ์ด/แผงทุกอันในหน้านี้เป็น liquid card หมดแล้ว
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const CTA_GLASS =
+  "bg-orange-500 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
+// Modal ต้องทึบกว่าการ์ดปกติหน่อย เพราะลอยทับเนื้อหาเยอะ ต้องอ่านง่ายชัดเจน (เดียวกับ dropdown ผลค้นหา
+// ใน SiteHeader.jsx ที่ใช้ bg-white/95)
+const GLASS_MODAL =
+  "border border-neutral-200/80 bg-white/92 backdrop-blur-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_20px_40px_rgba(0,0,0,0.14)]";
+
 const ORDER_STATUS = {
   AWAITING_PAYMENT: {
     label: "Awaiting Payment",
@@ -228,7 +241,7 @@ function OrderDetail() {
 
   return (
     <section
-      className={`bg-neutral-50 px-5 py-8 lg:px-10 ${
+      className={`px-5 py-8 lg:px-10 ${PAGE_BG} ${
         activeTab === "support"
           ? "h-full min-h-0 overflow-hidden"
           : "min-h-full"
@@ -244,7 +257,7 @@ function OrderDetail() {
         </div>
         <nav
           aria-label="Order detail sections"
-          className="mb-6 flex shrink-0 gap-1 rounded-xl border border-neutral-200 bg-white p-1 shadow-sm"
+          className={`mb-6 flex shrink-0 gap-1 rounded-xl p-1 ${GLASS_PANEL}`}
         >
           <button
             type="button"
@@ -252,7 +265,7 @@ function OrderDetail() {
             className={`inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition ${
               activeTab === "details"
                 ? "bg-neutral-900 text-white shadow-sm"
-                : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
+                : "text-neutral-500 hover:bg-neutral-100/70 hover:text-neutral-900"
             }`}
           >
             <PackageSearch size={18} />
@@ -265,7 +278,7 @@ function OrderDetail() {
             className={`relative inline-flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold transition ${
               activeTab === "support"
                 ? "bg-orange-500 text-white shadow-sm"
-                : "text-neutral-500 hover:bg-orange-50 hover:text-orange-600"
+                : "text-neutral-500 hover:bg-orange-50/70 hover:text-orange-600"
             }`}
           >
             <MessageSquareText size={18} />
@@ -307,14 +320,14 @@ function OrderDetail() {
             {/* คอลัมน์ด้านซ้าย */}
             <div className="space-y-6">
               {/* ข้อมูลสินค้า */}
-              <article className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+              <article className={`rounded-2xl p-6 ${GLASS_PANEL}`}>
                 <h2 className="mb-5 text-lg font-bold text-neutral-900">
                   Item Information
                 </h2>
 
                 <div className="flex flex-col gap-5 sm:flex-row">
                   {/* รูปสินค้า */}
-                  <div className="flex size-36 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100">
+                  <div className="flex size-36 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-neutral-200/70 bg-neutral-100">
                     {imageUrl ? (
                       <img
                         src={imageUrl}
@@ -380,7 +393,7 @@ function OrderDetail() {
                     type="button"
                     onClick={handleOpenConfirmModal}
                     disabled={confirmDeliveryMutation.isPending}
-                    className="mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                    className={`mt-2 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${CTA_GLASS}`}
                   >
                     <PackageCheck size={18} />
                     Confirm Delivery
@@ -455,7 +468,7 @@ function OrderDetail() {
                       value={address.phone}
                     />
 
-                    <div className="rounded-xl bg-neutral-50 p-4 text-sm leading-7 text-neutral-600">
+                    <div className="rounded-xl border border-neutral-200/50 bg-white/40 p-4 text-sm leading-7 text-neutral-600 backdrop-blur-sm">
                       {address.address}
                     </div>
                   </>
@@ -506,7 +519,7 @@ function ConfirmDeliveryModal({ isOpen, isPending, onClose, onConfirm }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-delivery-title"
-        className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl"
+        className={`w-full max-w-md rounded-2xl p-6 ${GLASS_MODAL}`}
       >
         {/* ไอคอนและปุ่มปิด */}
         <div className="flex items-start justify-between gap-4">
@@ -556,7 +569,7 @@ function ConfirmDeliveryModal({ isOpen, isPending, onClose, onConfirm }) {
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="cursor-pointer rounded-xl border border-neutral-300 bg-white px-5 py-2.5 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="cursor-pointer rounded-xl border border-neutral-300 bg-white/70 px-5 py-2.5 text-sm font-semibold text-neutral-700 backdrop-blur-sm transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Cancel
           </button>
@@ -565,7 +578,7 @@ function ConfirmDeliveryModal({ isOpen, isPending, onClose, onConfirm }) {
             type="button"
             onClick={onConfirm}
             disabled={isPending}
-            className="inline-flex min-w-36 cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+            className={`inline-flex min-w-36 cursor-pointer items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${CTA_GLASS}`}
           >
             {isPending ? (
               <>
@@ -588,7 +601,7 @@ function ConfirmDeliveryModal({ isOpen, isPending, onClose, onConfirm }) {
 /* กล่อง Card ที่ใช้ซ้ำในหน้า */
 function Card({ title, children }) {
   return (
-    <article className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+    <article className={`rounded-2xl p-6 ${GLASS_PANEL}`}>
       <h2 className="mb-5 text-lg font-bold text-neutral-900">{title}</h2>
       <div className="space-y-4">{children}</div>
     </article>

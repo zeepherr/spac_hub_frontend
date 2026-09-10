@@ -1,3 +1,4 @@
+// CheckoutStep1Page.jsx
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AlertTriangle,
@@ -20,6 +21,13 @@ import CheckoutStep3 from "@/components/cart/CheckoutStep3";
 import CheckoutStepIndicator from "@/components/cart/CheckoutStepLine";
 
 const ASSEMBLY_SERVICE_FEE = 400;
+
+const GLASS_PANEL =
+  "bg-white/50 backdrop-blur-xl border border-neutral-200/70 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const GLASS_DARK =
+  "bg-neutral-900/85 backdrop-blur-xl border border-neutral-800/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_20px_40px_rgba(0,0,0,0.25)]";
+const CTA_GLASS =
+  "bg-[#f97316] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
 
 function formatPrice(amount) {
   return `฿${amount.toLocaleString()}`;
@@ -55,7 +63,7 @@ function OrderSummary({
   const grandTotal = hasItems ? (quote?.grandTotal ?? 0) : 0;
 
   return (
-    <div className="matte sticky top-24 p-6 text-white">
+    <div className={`sticky top-24 rounded-2xl p-6 text-white ${GLASS_DARK}`}>
       <h2 className="mb-4 text-lg font-bold">Order Summary</h2>
 
       <div className="mb-4 flex flex-col gap-3 border-b border-white/10 pb-4 text-sm">
@@ -126,7 +134,7 @@ function OrderSummary({
         type="button"
         onClick={onContinue}
         disabled={submitting}
-        className="btn btn-accent w-full gap-2 text-white disabled:opacity-50"
+        className={`flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold transition disabled:opacity-50 ${CTA_GLASS}`}
       >
         Proceed to Checkout
         <ArrowRight size={18} />
@@ -259,7 +267,9 @@ export default function CheckoutStep1Page() {
       <div className="mx-auto max-w-6xl px-4 py-8">
         <CheckoutStepIndicator currentStep={1} />
         <div className="mx-auto flex min-h-[70vh] w-full max-w-xl flex-col justify-center">
-          <div className="hardware-surface flex flex-col items-center gap-3 p-10 text-center">
+          <div
+            className={`flex flex-col items-center gap-3 rounded-2xl p-10 text-center ${GLASS_PANEL}`}
+          >
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
               <AlertTriangle className="h-7 w-7 text-red-500" />
             </span>
@@ -272,7 +282,7 @@ export default function CheckoutStep1Page() {
             <button
               type="button"
               onClick={retryPayment}
-              className="btn btn-accent mt-2 gap-2 text-white"
+              className={`mt-2 flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${CTA_GLASS}`}
             >
               <ArrowLeft size={16} />
               Try Again
@@ -291,7 +301,7 @@ export default function CheckoutStep1Page() {
         type="button"
         onClick={() => navigate("/cart")}
         disabled={updateUserProfile.isPending}
-        className="mb-4 flex items-center gap-1.5 rounded-field border border-neutral-200 bg-white px-3 py-1.5 text-sm font-semibold text-neutral-700 hardware-shadow hover:border-[#f97316] hover:text-[#f97316] disabled:cursor-not-allowed disabled:opacity-50"
+        className="mb-4 flex items-center gap-1.5 rounded-lg border border-neutral-200/70 bg-white/60 px-3 py-1.5 text-sm font-semibold text-neutral-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_2px_8px_rgba(0,0,0,0.06)] backdrop-blur-md transition hover:border-[#f97316] hover:text-[#f97316] disabled:cursor-not-allowed disabled:opacity-50"
       >
         <ArrowLeft size={16} />
         Back

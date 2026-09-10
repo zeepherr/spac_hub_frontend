@@ -1,68 +1,65 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
-import {
-  ArrowLeft,
-  PackageX,
-  Plus,
-  Search,
-} from "lucide-react";
+import { ArrowLeft, PackageX, Plus, Search } from "lucide-react";
 import { useDeleteListing } from "@/hook/listing/useDeleteListing";
 import { useMyListings } from "@/hook/listing/useMyListings";
 import MyListingItemCard from "@/components/userSellerDashboard/MyListingItemCard";
 import EditListingModal from "@/components/userSellerDashboard/EditListingModal";
 import DeleteConfirmModal from "@/components/userSellerDashboard/DeleteConfirmModal";
 import ListingDetailModal from "@/components/userSellerDashboard/ListingDetailModal";
-// import { useDeleteListing } from "@/hook/listing/useDeleteListing";
-// // เปลี่ยน path hook ให้ตรงกับโปรเจกต์ของคุณ (เช่น useMyListings)
-// import { useMyListings } from "@/hook/listing/useMyListings"; 
 
-// import EditListingModal from "@/components/sell/EditListingModal";
-// import DeleteConfirmModal from "@/components/sell/DeleteConfirmModal";
-// import ListingDetailModal from "@/components/sell/ListingDetailModal";
-// import MyListingItemCard from "@/components/sell/MyListingItemCard";
+// bg หลักมาตรฐานของทั้งเว็บ (เดียวกับที่ตั้งไว้ใน PublicLayout.jsx) - ใช้กับพื้นหลังหลักของหน้าเท่านั้น
+const PAGE_BG =
+  "bg-[linear-gradient(180deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
+// เดียวกับ GLASS_PANEL/CTA_GLASS ที่ใช้ทั้งเว็บ
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const CTA_GLASS =
+  "bg-orange-500 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
+
 // 🟢 ตัวแปร FILTER_TABS พร้อมการแยกสีแต่ละสถานะ
 const FILTER_TABS = [
-  { 
-    id: "ALL", 
+  {
+    id: "ALL",
     label: "All Items",
     activeClass: "bg-slate-800 text-white shadow-slate-800/20",
     badgeActive: "bg-white/20 text-white",
-    badgeInactive: "bg-slate-100 text-slate-600"
+    badgeInactive: "bg-slate-100 text-slate-600",
   },
-  { 
-    id: "ACTIVE", 
+  {
+    id: "ACTIVE",
     label: "Active",
     activeClass: "bg-emerald-500 text-white shadow-emerald-500/20",
     badgeActive: "bg-white/20 text-white",
-    badgeInactive: "bg-emerald-50 text-emerald-700"
+    badgeInactive: "bg-emerald-50 text-emerald-700",
   },
-  { 
-    id: "RESERVED", 
+  {
+    id: "RESERVED",
     label: "Reserved",
     activeClass: "bg-amber-500 text-white shadow-amber-500/20",
     badgeActive: "bg-white/20 text-white",
-    badgeInactive: "bg-amber-50 text-amber-700"
+    badgeInactive: "bg-amber-50 text-amber-700",
   },
-  { 
-    id: "DRAFT", 
+  {
+    id: "DRAFT",
     label: "Draft",
     activeClass: "bg-sky-500 text-white shadow-sky-500/20",
     badgeActive: "bg-white/20 text-white",
-    badgeInactive: "bg-sky-50 text-sky-700"
+    badgeInactive: "bg-sky-50 text-sky-700",
   },
-  { 
-    id: "SOLD", 
+  {
+    id: "SOLD",
     label: "Sold",
     activeClass: "bg-neutral-600 text-white shadow-neutral-600/20",
     badgeActive: "bg-white/20 text-white",
-    badgeInactive: "bg-neutral-100 text-neutral-600"
+    badgeInactive: "bg-neutral-100 text-neutral-600",
   },
-  { 
-    id: "ARCHIVED", 
+  {
+    id: "ARCHIVED",
     label: "Archived",
     activeClass: "bg-rose-500 text-white shadow-rose-500/20",
     badgeActive: "bg-white/20 text-white",
-    badgeInactive: "bg-rose-50 text-rose-700"
+    badgeInactive: "bg-rose-50 text-rose-700",
   },
 ];
 
@@ -79,10 +76,12 @@ export default function MyListingsPage() {
   const [selectedListingForEdit, setSelectedListingForEdit] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const [selectedListingForDelete, setSelectedListingForDelete] = useState(null);
+  const [selectedListingForDelete, setSelectedListingForDelete] =
+    useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const [selectedListingIdForDetail, setSelectedListingIdForDetail] = useState(null);
+  const [selectedListingIdForDetail, setSelectedListingIdForDetail] =
+    useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   // Filter listings base on Status and Search Query
@@ -129,7 +128,7 @@ export default function MyListingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-base-200/50 p-4 lg:p-6 w-full">
+    <div className={`min-h-screen w-full p-4 lg:p-6 ${PAGE_BG}`}>
       {/* 🟢 เปลี่ยนจาก max-w-7xl เป็น w-full เพื่อขยายกว้างเต็มจอ */}
       <div className="w-full space-y-6">
         {/* Header */}
@@ -138,14 +137,14 @@ export default function MyListingsPage() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-2 text-sm text-base-content/70 hover:text-primary transition-colors mb-1 font-semibold"
+              className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-orange-600 transition-colors mb-1 font-semibold cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
-            <h1 className="text-3xl font-extrabold text-base-content">
+            <h1 className="text-3xl font-extrabold text-neutral-900">
               My Listings
             </h1>
-            <p className="text-sm text-base-content/60">
+            <p className="text-sm text-neutral-500">
               Manage all your listed products, drafts, and sold items
             </p>
           </div>
@@ -153,16 +152,16 @@ export default function MyListingsPage() {
           <button
             type="button"
             onClick={() => navigate("/user/sell/create")}
-            className="btn btn-primary text-white font-bold rounded-xl gap-2 shadow-lg shadow-primary/20"
+            className={`inline-flex cursor-pointer items-center gap-2 rounded-xl px-5 py-2.5 font-bold transition ${CTA_GLASS}`}
           >
             <Plus className="w-5 h-5" /> Create Listing
           </button>
         </div>
 
         {/* Filter Controls Card */}
-        <div className="card hardware-surface p-4 space-y-4 w-full">
+        <div className={`space-y-4 rounded-2xl p-4 w-full ${GLASS_PANEL}`}>
           {/* Status Tabs แบบแยกสี */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-base-200">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-neutral-200/70">
             {FILTER_TABS.map((tab) => {
               const count =
                 tab.id === "ALL"
@@ -176,15 +175,15 @@ export default function MyListingsPage() {
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`btn btn-sm rounded-xl font-bold transition-all shrink-0 border-none ${
+                  className={`inline-flex shrink-0 cursor-pointer items-center rounded-xl px-4 py-2 text-sm font-bold transition-all ${
                     isActive
                       ? `${tab.activeClass} shadow-md`
-                      : "bg-base-200/60 text-base-content/70 hover:bg-base-200"
+                      : "bg-white/40 text-neutral-600 backdrop-blur-sm hover:bg-white/60"
                   }`}
                 >
                   {tab.label}
                   <span
-                    className={`badge badge-sm border-none ml-1 font-extrabold ${
+                    className={`ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-extrabold ${
                       isActive ? tab.badgeActive : tab.badgeInactive
                     }`}
                   >
@@ -197,13 +196,13 @@ export default function MyListingsPage() {
 
           {/* Search Box */}
           <div className="relative">
-            <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-base-content/40" />
+            <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by title, brand, or model..."
-              className="input input-bordered w-full pl-11 rounded-xl bg-base-100 text-sm focus:border-primary focus:outline-none"
+              className="w-full rounded-xl border border-neutral-300 bg-white/70 backdrop-blur-sm pl-11 pr-4 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-100"
             />
           </div>
         </div>
@@ -213,22 +212,28 @@ export default function MyListingsPage() {
           {isLoading ? (
             <ListingsGridSkeleton />
           ) : isError ? (
-            <div className="card hardware-surface p-8 text-center text-error space-y-2 w-full">
+            <div
+              className={`space-y-2 rounded-2xl p-8 text-center text-red-500 w-full ${GLASS_PANEL}`}
+            >
               <p className="font-bold">Failed to load listings data.</p>
               <button
                 type="button"
                 onClick={() => refetch && refetch()}
-                className="btn btn-sm btn-outline btn-error mt-2"
+                className="mt-2 cursor-pointer rounded-lg border border-red-500 px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-50"
               >
                 Try Again
               </button>
             </div>
           ) : filteredListings.length === 0 ? (
-            <div className="card hardware-surface p-12 text-center text-base-content/50 space-y-3 w-full">
+            <div
+              className={`space-y-3 rounded-2xl p-12 text-center text-neutral-400 w-full ${GLASS_PANEL}`}
+            >
               <PackageX className="w-16 h-16 mx-auto stroke-1" />
-              <p className="text-lg font-bold">No listings found</p>
+              <p className="text-lg font-bold text-neutral-500">
+                No listings found
+              </p>
 
-              <p className="text-sm text-base-content/40 max-w-sm mx-auto">
+              <p className="text-sm text-neutral-400 max-w-sm mx-auto">
                 {searchQuery
                   ? `No items match "${searchQuery}"`
                   : `There are no listings under "${
@@ -295,7 +300,7 @@ function ListingsGridSkeleton() {
       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
         <div
           key={i}
-          className="flex flex-col justify-between bg-white border border-neutral-200/80 rounded-2xl p-3.5 min-h-[310px] space-y-3"
+          className="flex flex-col justify-between bg-white/70 backdrop-blur-sm border border-neutral-200/70 rounded-2xl p-3.5 min-h-[310px] space-y-3"
         >
           <div className="space-y-2">
             <div className="flex items-center justify-between">

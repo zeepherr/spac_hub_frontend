@@ -83,17 +83,6 @@ function SelectedPartRow({
           >
             Details
           </Link>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onIncreaseQty?.(part.id);
-            }}
-            className="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-700"
-          >
-            Qty x {part.qty}
-            <Pencil size={12} />
-          </button>
         </div>
       </div>
     </div>
