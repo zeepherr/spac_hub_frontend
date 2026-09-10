@@ -13,16 +13,6 @@ import SummarySection from "@/components/admin/order/summary/SummarySection";
 function OrderSummary() {
   const [search, setSearch] = useState("");
 
-  /*
-   * SHIPPING_TO_BUYER
-   * = Admin has shipped the product to the Buyer
-   *
-   * COMPLETED
-   * = Buyer has received the product
-   *
-   * REJECTED
-   * = Used to find ADMIN_TO_SELLER shipments
-   */
   const ordersQuery = useAdminOrders({
     statuses: [
       "SHIPPING_TO_BUYER",

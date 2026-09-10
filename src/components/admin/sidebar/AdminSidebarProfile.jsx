@@ -1,4 +1,9 @@
-import { ChevronUp, LoaderCircle, LogOut, UserRound } from "lucide-react";
+import {
+  ChevronUp,
+  LoaderCircle,
+  LogOut,
+  UserRound,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 function AdminSidebarProfile({
@@ -37,43 +42,75 @@ function AdminSidebarProfile({
               ease: "easeOut",
             }}
             className={[
-              "absolute z-[70] rounded-xl border border-neutral-700",
-              "bg-[#292929] p-1.5 shadow-2xl",
+              "absolute z-[70] rounded-xl",
+              "border border-neutral-200",
+              "bg-white p-1.5 shadow-xl",
               collapsed
                 ? "bottom-0 left-[calc(100%+12px)] w-56"
                 : "bottom-[calc(100%+8px)] left-0 right-0",
             ].join(" ")}
           >
+            {/* ADMIN PROFILE */}
             <button
               type="button"
               onClick={onProfile}
               disabled={isLoggingOut}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-neutral-200 transition-colors hover:bg-neutral-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="
+                flex w-full items-center gap-3
+                rounded-lg px-3 py-2.5
+                text-left text-sm text-neutral-700
+                transition-colors
+                hover:bg-neutral-100
+                hover:text-neutral-900
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+              "
             >
               <UserRound size={17} className="shrink-0" />
+
               <span>Admin Profile</span>
             </button>
 
-            <div className="my-1 border-t border-neutral-700" />
+            <div className="my-1 border-t border-neutral-200" />
 
+            {/* LOGOUT */}
             <button
               type="button"
               onClick={onLogout}
               disabled={isLoggingOut}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-red-400 transition-colors hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+              className="
+                flex w-full items-center gap-3
+                rounded-lg px-3 py-2.5
+                text-left text-sm text-red-500
+                transition-colors
+                hover:bg-red-50
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+              "
             >
               {isLoggingOut ? (
-                <LoaderCircle size={17} className="shrink-0 animate-spin" />
+                <LoaderCircle
+                  size={17}
+                  className="shrink-0 animate-spin"
+                />
               ) : (
-                <LogOut size={17} className="shrink-0" />
+                <LogOut
+                  size={17}
+                  className="shrink-0"
+                />
               )}
 
-              <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+              <span>
+                {isLoggingOut
+                  ? "Logging out..."
+                  : "Logout"}
+              </span>
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* PROFILE BUTTON */}
       <motion.button
         type="button"
         onClick={onToggleProfileMenu}
@@ -83,12 +120,15 @@ function AdminSidebarProfile({
         whileTap={{ scale: 0.97 }}
         className={[
           "flex h-14 w-full min-w-0 items-center rounded-xl",
-          "border border-neutral-700 bg-[#292929] text-left",
-          "transition-colors hover:bg-[#333333]",
+          "border border-neutral-200 bg-white text-left",
+          "transition-colors hover:bg-neutral-100",
           "focus:outline-none focus:ring-2 focus:ring-orange-400",
-          collapsed ? "justify-center px-0" : "gap-3 px-2.5",
+          collapsed
+            ? "justify-center px-0"
+            : "gap-3 px-2.5",
         ].join(" ")}
       >
+        {/* AVATAR */}
         <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-orange-500">
           {user?.profileImageUrl ? (
             <img
@@ -97,7 +137,10 @@ function AdminSidebarProfile({
               className="size-full object-cover"
             />
           ) : (
-            <UserRound size={19} className="text-white" />
+            <UserRound
+              size={19}
+              className="text-white"
+            />
           )}
         </div>
 
@@ -111,11 +154,13 @@ function AdminSidebarProfile({
               transition={{ duration: 0.13 }}
               className="min-w-0 flex-1 overflow-hidden whitespace-nowrap"
             >
-              <p className="truncate text-sm font-medium text-white">
-                {isProfileLoading ? "Loading..." : fullName}
+              <p className="truncate text-sm font-medium text-neutral-900">
+                {isProfileLoading
+                  ? "Loading..."
+                  : fullName}
               </p>
 
-              <p className="truncate text-[11px] text-neutral-400">
+              <p className="truncate text-[11px] text-neutral-500">
                 {user?.email || "Administrator"}
               </p>
             </motion.div>
@@ -126,8 +171,11 @@ function AdminSidebarProfile({
           <ChevronUp
             size={16}
             className={[
-              "shrink-0 text-neutral-500 transition-transform duration-200",
-              isProfileMenuOpen ? "rotate-180" : "",
+              "shrink-0 text-neutral-400",
+              "transition-transform duration-200",
+              isProfileMenuOpen
+                ? "rotate-180"
+                : "",
             ].join(" ")}
           />
         )}

@@ -30,9 +30,10 @@ function AdminSidebarNavigation({ collapsed, onNavigate }) {
                   "flex h-11 min-w-0 items-center rounded-xl",
                   "text-sm font-medium transition-colors duration-150",
                   collapsed ? "justify-center px-0" : "gap-3 px-4",
+
                   isActive
                     ? "bg-[#D96A26] text-white shadow-sm"
-                    : "text-zinc-400 hover:bg-zinc-800 hover:text-white",
+                    : "text-neutral-600 hover:bg-neutral-200 hover:text-neutral-900",
                 ].join(" ")
               }
             >

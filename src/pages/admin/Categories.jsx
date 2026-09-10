@@ -23,31 +23,70 @@ function Categories() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [statusCategory, setStatusCategory] = useState(null);
+  const [isStatusModalOpen, setIsStatusModalOpen] =
+    useState(false);
 
-  // GET
-  const { data: categoriesResponse, isPending: isLoading } = useCategories({
+  const [statusCategory, setStatusCategory] =
+    useState(null);
+
+  /*
+   * ================================
+   * GET CATEGORIES
+   * ================================
+   */
+  const {
+    data: categoriesResponse,
+    isPending: isLoading,
+  } = useCategories({
     includeInactive: true,
   });
 
-  // CREATE
-  const { mutate: createCategory, isPending: isCreating } = useCreateCategory();
+  /*
+   * ================================
+   * CREATE CATEGORY
+   * ================================
+   */
+  const {
+    mutate: createCategory,
+    isPending: isCreating,
+  } = useCreateCategory();
 
-  // UPDATE
-  const { mutate: updateCategoryStatus, isPending: isUpdatingStatus } =
-    useUpdateCategory();
+  /*
+   * ================================
+   * UPDATE CATEGORY
+   * ================================
+   */
+  const {
+    mutate: updateCategoryStatus,
+    isPending: isUpdatingStatus,
+  } = useUpdateCategory();
 
   const categories = categoriesResponse || [];
 
+  /*
+   * ================================
+   * STATS
+   * ================================
+   */
   const stats = useMemo(() => {
     return {
       total: categories.length,
-      active: categories.filter((category) => category.isActive).length,
-      disabled: categories.filter((category) => !category.isActive).length,
+
+      active: categories.filter(
+        (category) => category.isActive,
+      ).length,
+
+      disabled: categories.filter(
+        (category) => !category.isActive,
+      ).length,
     };
   }, [categories]);
 
+  /*
+   * ================================
+   * FILTER
+   * ================================
+   */
   const filteredCategories = useMemo(() => {
     return categories.filter((category) => {
       const matchSearch = category.name
@@ -62,8 +101,12 @@ function Categories() {
       return matchSearch && matchStatus;
     });
   }, [categories, search, status]);
-  // console.log(filteredCategories);
 
+  /*
+   * ================================
+   * ADD CATEGORY
+   * ================================
+   */
   const handleAddCategory = (event) => {
     event.preventDefault();
 
@@ -85,6 +128,11 @@ function Categories() {
     setCategoryName("");
   };
 
+  /*
+   * ================================
+   * EDIT CATEGORY
+   * ================================
+   */
   const handleEdit = (category) => {
     setSelectedCategory(category);
     setIsEditOpen(true);
@@ -95,6 +143,11 @@ function Categories() {
     setSelectedCategory(null);
   };
 
+  /*
+   * ================================
+   * STATUS CATEGORY
+   * ================================
+   */
   const handleStatusChange = (category) => {
     setStatusCategory(category);
     setIsStatusModalOpen(true);
@@ -106,48 +159,59 @@ function Categories() {
   };
 
   return (
-    <div className="mx-auto max-w-300 px-4 py-6 h-full">
-      <CategoryHeader onAdd={() => setIsAddOpen(true)} />
+    <div className="min-h-screen bg-[#F5F5F4] px-6 py-6">
+      <div className="mx-auto w-full max-w-[1500px]">
+        {/* HEADER */}
+        <CategoryHeader
+          onAdd={() => setIsAddOpen(true)}
+        />
 
-      <CategoryStats stats={stats} />
+        {/* STATS */}
+        <CategoryStats stats={stats} />
 
-      <CategoryFilters
-        search={search}
-        setSearch={setSearch}
-        status={status}
-        setStatus={setStatus}
-      />
+        {/* FILTER */}
+        <CategoryFilters
+          search={search}
+          setSearch={setSearch}
+          status={status}
+          setStatus={setStatus}
+        />
 
-      <CategoryTable
-        categories={filteredCategories}
-        isLoading={isLoading}
-        isUpdatingStatus={isUpdatingStatus}
-        onEdit={handleEdit}
-        onStatusChange={handleStatusChange}
-      />
+        {/* TABLE */}
+        <CategoryTable
+          categories={filteredCategories}
+          isLoading={isLoading}
+          isUpdatingStatus={isUpdatingStatus}
+          onEdit={handleEdit}
+          onStatusChange={handleStatusChange}
+        />
 
-      <AddCategoryModal
-        isOpen={isAddOpen}
-        categoryName={categoryName}
-        setCategoryName={setCategoryName}
-        onSubmit={handleAddCategory}
-        onClose={handleCloseAdd}
-        isCreating={isCreating}
-      />
+        {/* ADD CATEGORY */}
+        <AddCategoryModal
+          isOpen={isAddOpen}
+          categoryName={categoryName}
+          setCategoryName={setCategoryName}
+          onSubmit={handleAddCategory}
+          onClose={handleCloseAdd}
+          isCreating={isCreating}
+        />
 
-      <CategoryStatusModal
-        isOpen={isStatusModalOpen}
-        category={statusCategory}
-        updateCategoryStatus={updateCategoryStatus}
-        isUpdatingStatus={isUpdatingStatus}
-        onClose={handleCloseStatus}
-      />
+        {/* STATUS CATEGORY */}
+        <CategoryStatusModal
+          isOpen={isStatusModalOpen}
+          category={statusCategory}
+          updateCategoryStatus={updateCategoryStatus}
+          isUpdatingStatus={isUpdatingStatus}
+          onClose={handleCloseStatus}
+        />
 
-      <EditCategoryModal
-        isOpen={isEditOpen}
-        category={selectedCategory}
-        onClose={handleCloseEdit}
-      />
+        {/* EDIT CATEGORY */}
+        <EditCategoryModal
+          isOpen={isEditOpen}
+          category={selectedCategory}
+          onClose={handleCloseEdit}
+        />
+      </div>
     </div>
   );
 }

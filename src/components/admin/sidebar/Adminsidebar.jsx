@@ -78,9 +78,7 @@ function AdminSidebar({
   }
 
   async function handleLogout() {
-    if (isLoggingOut) {
-      return;
-    }
+    if (isLoggingOut) return;
 
     setIsProfileMenuOpen(false);
 
@@ -136,7 +134,12 @@ function AdminSidebar({
           width: collapsed ? 72 : 240,
         }}
         transition={desktopSidebarTransition}
-        className="relative z-30 hidden h-dvh shrink-0 flex-col bg-[#1F1F1F] shadow-sm xl:flex"
+        className="
+          relative z-30 hidden h-dvh shrink-0 flex-col
+          border-r border-neutral-200
+          bg-[#F5F5F4] shadow-sm
+          xl:flex
+        "
       >
         <SidebarContent
           collapsed={collapsed}
@@ -156,7 +159,13 @@ function AdminSidebar({
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={mobileDrawerTransition}
-            className="fixed bottom-0 left-0 top-14 z-50 flex w-[min(20rem,calc(100vw-3rem))] flex-col bg-[#1F1F1F] shadow-2xl xl:hidden"
+            className="
+              fixed bottom-0 left-0 top-14 z-50
+              flex w-[min(20rem,calc(100vw-3rem))]
+              flex-col border-r border-neutral-200
+              bg-[#F5F5F4] shadow-2xl
+              xl:hidden
+            "
           >
             <SidebarContent
               collapsed={false}

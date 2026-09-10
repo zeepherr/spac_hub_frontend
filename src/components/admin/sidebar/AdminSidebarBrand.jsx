@@ -18,12 +18,7 @@ function AdminSidebarBrand({
 }) {
   const webAssetsQuery = useWebAssets();
 
-  const logoUrl =
-    webAssetsQuery.data?.homeImageUrl;
-
-  if (isMobile) {
-    return null;
-  }
+  const logoUrl = webAssetsQuery.data?.homeImageUrl;
 
   return (
     <div
@@ -60,7 +55,7 @@ function AdminSidebarBrand({
                 className="h-15 w-auto object-contain object-left"
               />
             ) : (
-              <p className="text-xl font-bold leading-none text-white">
+              <p className="text-xl font-bold leading-none text-neutral-900">
                 SPEC
                 <span className="text-orange-500">
                   HUB
@@ -68,7 +63,7 @@ function AdminSidebarBrand({
               </p>
             )}
 
-            <p className="mt-1 text-[10px] font-medium tracking-wide text-zinc-500">
+            <p className="mt-1 text-[10px] font-medium tracking-wide text-neutral-400">
               ADMIN PANEL
             </p>
           </motion.div>
@@ -80,7 +75,15 @@ function AdminSidebarBrand({
           type="button"
           onClick={onClose}
           aria-label="Close admin navigation"
-          className="inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
+          className="
+            inline-flex size-10 shrink-0 cursor-pointer
+            items-center justify-center rounded-xl
+            text-neutral-500 transition-colors
+            hover:bg-neutral-200 hover:text-neutral-900
+            focus:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-orange-400
+          "
         >
           <X size={21} />
         </button>
@@ -105,7 +108,18 @@ function AdminSidebarBrand({
           whileTap={{
             scale: 0.94,
           }}
-          className="inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-orange-700 text-zinc-400 transition-colors hover:bg-orange-500/10 hover:text-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-400"
+          className="
+            inline-flex size-10 shrink-0 cursor-pointer
+            items-center justify-center rounded-xl
+            border border-orange-300
+            text-neutral-500
+            transition-colors
+            hover:bg-orange-50
+            hover:text-orange-600
+            focus:outline-none
+            focus:ring-2
+            focus:ring-orange-400
+          "
         >
           {collapsed ? (
             <PanelLeftOpen size={19} />
