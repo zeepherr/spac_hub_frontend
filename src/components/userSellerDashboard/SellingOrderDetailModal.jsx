@@ -17,6 +17,16 @@ import {
 const R2_PUBLIC_URL = import.meta.env.VITE_R2_PUBLIC_URL || "";
 const DEFAULT_IMAGE = "https://placehold.co/150x150?text=No+Image";
 
+// Modal ต้องทึบกว่าการ์ดปกติหน่อย เพราะลอยทับเนื้อหาเยอะ (เดียวกับ GLASS_MODAL ที่ใช้ใน OrderDetail.jsx)
+const GLASS_MODAL =
+  "border border-neutral-200/80 bg-white/92 backdrop-blur-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_20px_40px_rgba(0,0,0,0.14)]";
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+const CTA_GLASS =
+  "bg-orange-500 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(249,115,22,0.3)] hover:bg-orange-600";
+const GLASS_IDLE =
+  "border border-neutral-200/70 bg-white/60 backdrop-blur-md shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_2px_8px_rgba(0,0,0,0.06)]";
+
 export default function SellingOrderDetailModal({
   isOpen,
   onClose,
@@ -97,7 +107,7 @@ export default function SellingOrderDetailModal({
       default:
         return {
           label: status,
-          color: "bg-base-200 text-base-content/70 border-base-300",
+          color: "bg-neutral-100 text-neutral-600 border-neutral-300",
           icon: Clock,
         };
     }
@@ -107,29 +117,38 @@ export default function SellingOrderDetailModal({
   const StatusIcon = statusInfo.icon;
 
   return (
-    <div className="modal modal-open bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="modal-box relative flex h-[min(680px,92vh)] w-full max-w-4xl flex-col gap-4 overflow-hidden rounded-3xl border border-base-300 bg-base-100 p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div
+        className={`relative flex h-[min(680px,92vh)] w-full max-w-4xl flex-col gap-4 overflow-hidden rounded-3xl p-6 ${GLASS_MODAL}`}
+      >
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 text-base-content/60 hover:text-base-content"
+          className="absolute right-4 top-4 cursor-pointer rounded-full p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-700"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Modal Header */}
-        <div className="border-b border-base-200 pb-4">
-          <span className="text-xs font-semibold text-base-content/50 uppercase tracking-wider block">
+        <div className="border-b border-neutral-200/70 pb-4">
+          <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider block">
             Order Details
           </span>
-          <h3 className="text-lg font-bold text-base-content mt-0.5">
+          <h3 className="text-lg font-bold text-neutral-900 mt-0.5">
             Order #{order.orderNumber || order.id}
           </h3>
         </div>
         <div
           role="tablist"
-          className="grid grid-cols-2 rounded-xl bg-base-200/70 p-1"
+          className={`grid grid-cols-2 rounded-xl p-1 ${GLASS_PANEL}`}
         >
           <button
             type="button"
@@ -138,8 +157,8 @@ export default function SellingOrderDetailModal({
             onClick={() => setActiveTab("details")}
             className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-all ${
               activeTab === "details"
-                ? "bg-base-100 text-primary shadow-sm"
-                : "text-base-content/60 hover:text-base-content"
+                ? "bg-white text-orange-600 shadow-sm"
+                : "text-neutral-500 hover:text-neutral-900"
             }`}
           >
             <PackageSearch className="h-4 w-4" />
@@ -153,8 +172,8 @@ export default function SellingOrderDetailModal({
             onClick={() => setActiveTab("support")}
             className={`relative flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-bold transition-all ${
               activeTab === "support"
-                ? "bg-base-100 text-primary shadow-sm"
-                : "text-base-content/60 hover:text-base-content"
+                ? "bg-white text-orange-600 shadow-sm"
+                : "text-neutral-500 hover:text-neutral-900"
             }`}
           >
             <MessageSquareText className="h-4 w-4" />
@@ -173,7 +192,7 @@ export default function SellingOrderDetailModal({
             <div
               className={`p-4 rounded-2xl border flex items-center gap-3.5 ${statusInfo.color}`}
             >
-              <div className="p-2.5 rounded-xl bg-white/40 dark:bg-black/20 shrink-0">
+              <div className="p-2.5 rounded-xl bg-white/40 shrink-0">
                 <StatusIcon className="w-6 h-6" />
               </div>
               <div>
@@ -187,8 +206,8 @@ export default function SellingOrderDetailModal({
             </div>
 
             {/* Product Details Card */}
-            <div className="flex gap-4 p-3 bg-base-200/50 rounded-2xl border border-base-200">
-              <div className="w-20 h-20 bg-base-300 rounded-xl overflow-hidden shrink-0 border border-base-200 flex items-center justify-center">
+            <div className="flex gap-4 p-3 bg-white/40 backdrop-blur-sm rounded-2xl border border-neutral-200/70">
+              <div className="w-20 h-20 bg-neutral-100 rounded-xl overflow-hidden shrink-0 border border-neutral-200/70 flex items-center justify-center">
                 <img
                   src={imageUrl}
                   alt={item.title || "Product"}
@@ -196,13 +215,13 @@ export default function SellingOrderDetailModal({
                 />
               </div>
               <div className="flex-1 min-w-0 space-y-1">
-                <h4 className="font-bold text-sm text-base-content truncate">
+                <h4 className="font-bold text-sm text-neutral-900 truncate">
                   {item.title || "Untitled Product"}
                 </h4>
-                <p className="text-xs text-base-content/60">
+                <p className="text-xs text-neutral-500">
                   Category: {item.category?.name || "General"}
                 </p>
-                <p className="text-sm font-black text-primary">
+                <p className="text-sm font-black text-orange-500">
                   ฿
                   {Number(
                     order.agreedPrice || order.totalPrice || item.price || 0,
@@ -212,10 +231,10 @@ export default function SellingOrderDetailModal({
             </div>
 
             {/* Order Information Grid */}
-            <div className="space-y-2 text-xs bg-base-200/30 p-4 rounded-2xl border border-base-200">
+            <div className="space-y-2 text-xs bg-white/40 backdrop-blur-sm p-4 rounded-2xl border border-neutral-200/70">
               <div className="flex justify-between">
-                <span className="text-base-content/60">Order Date:</span>
-                <span className="font-semibold text-base-content">
+                <span className="text-neutral-500">Order Date:</span>
+                <span className="font-semibold text-neutral-900">
                   {order.createdAt
                     ? new Date(order.createdAt).toLocaleString("th-TH")
                     : "-"}
@@ -223,16 +242,16 @@ export default function SellingOrderDetailModal({
               </div>
               {order.trackingNumber && (
                 <div className="flex justify-between">
-                  <span className="text-base-content/60">Tracking Number:</span>
-                  <span className="font-mono font-bold text-primary">
+                  <span className="text-neutral-500">Tracking Number:</span>
+                  <span className="font-mono font-bold text-orange-500">
                     {order.trackingNumber}
                   </span>
                 </div>
               )}
               {order.courier && (
                 <div className="flex justify-between">
-                  <span className="text-base-content/60">Courier:</span>
-                  <span className="font-semibold text-base-content">
+                  <span className="text-neutral-500">Courier:</span>
+                  <span className="font-semibold text-neutral-900">
                     {order.courier}
                   </span>
                 </div>
@@ -244,10 +263,10 @@ export default function SellingOrderDetailModal({
               <button
                 type="button"
                 onClick={onClose}
-                className={`btn rounded-xl font-bold ${
+                className={`cursor-pointer rounded-xl px-5 py-3 font-bold transition ${
                   order.status === "PAID"
-                    ? "flex-1 btn-outline"
-                    : "w-full btn-primary text-white"
+                    ? `flex-1 text-neutral-700 hover:bg-white/80 ${GLASS_IDLE}`
+                    : `w-full ${CTA_GLASS}`
                 }`}
               >
                 Close
@@ -257,7 +276,7 @@ export default function SellingOrderDetailModal({
                 <button
                   type="button"
                   onClick={onOpenShip}
-                  className="btn btn-primary flex-1 rounded-xl font-bold text-white"
+                  className={`flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl px-5 py-3 font-bold transition ${CTA_GLASS}`}
                 >
                   <Truck className="h-4 w-4" />
                   Ship to Admin

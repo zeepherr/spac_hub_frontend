@@ -10,7 +10,9 @@ export function OrderProductImage({ images, title, className = "w-12 h-12" }) {
     if (!firstImg) return null;
 
     if (typeof firstImg === "string") return firstImg;
-    return firstImg.url || firstImg.image || firstImg.path || firstImg.src || null;
+    return (
+      firstImg.url || firstImg.image || firstImg.path || firstImg.src || null
+    );
   };
 
   const imageUrl = getImageUrl(images);
@@ -18,7 +20,7 @@ export function OrderProductImage({ images, title, className = "w-12 h-12" }) {
   if (!imageUrl || imageError) {
     return (
       <div
-        className={`${className} rounded-xl bg-base-300 flex flex-col items-center justify-center text-base-content/40 shrink-0 border border-base-300`}
+        className={`${className} rounded-xl bg-neutral-100 flex flex-col items-center justify-center text-neutral-400 shrink-0 border border-neutral-200/70`}
       >
         <Package className="w-1/2 h-1/2 stroke-[1.5]" />
       </div>
@@ -27,7 +29,7 @@ export function OrderProductImage({ images, title, className = "w-12 h-12" }) {
 
   return (
     <div
-      className={`${className} rounded-xl bg-base-200 overflow-hidden shrink-0 border border-base-300 relative`}
+      className={`${className} rounded-xl bg-neutral-100 overflow-hidden shrink-0 border border-neutral-200/70 relative`}
     >
       <img
         src={imageUrl}

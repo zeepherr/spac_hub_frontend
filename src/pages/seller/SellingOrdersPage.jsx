@@ -120,6 +120,8 @@ export default function SellingOrdersPage() {
     selectedSupportCase,
     currentUser?.id,
   );
+  const GLASS_IDLE =
+    "border border-neutral-200/70 bg-white/30 backdrop-blur-md shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_2px_8px_rgba(0,0,0,0.06)]";
 
   return (
     <div className={`min-h-screen w-full p-4 sm:p-6 md:p-8 ${PAGE_BG}`}>
@@ -131,7 +133,7 @@ export default function SellingOrdersPage() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="mb-1 inline-flex items-center gap-2 text-sm font-semibold text-neutral-500 transition-colors hover:text-orange-500 cursor-pointer"
+              className={`mb-1 inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-neutral-700 transition hover:border-orange-300 hover:bg-orange-50/70 hover:text-orange-600 ${GLASS_IDLE}`}
             >
               <ArrowLeft className="h-4 w-4" /> Back
             </button>

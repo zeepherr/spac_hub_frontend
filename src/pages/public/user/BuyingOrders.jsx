@@ -16,8 +16,10 @@ import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import BackButton from "./BackButton";
 
+// bg หลักมาตรฐานของทั้งเว็บ (เดียวกับที่ตั้งไว้ใน PublicLayout.jsx) - ใช้กับพื้นหลังหลักของหน้าเท่านั้น
+// (ไฟล์นี้ที่ส่งมาใช้สีเขียวอมฟ้าอีกรอบ แก้กลับเป็นสีน้ำเงินมาตรฐานตามกฎที่ตกลงกันไว้)
 const PAGE_BG =
-  "bg-[linear-gradient(180deg,rgba(100,201,207,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(100,201,207,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
+  "bg-[linear-gradient(180deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
 const GLASS_PANEL =
   "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
 
