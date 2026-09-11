@@ -1,10 +1,12 @@
-// EditProfile.jsx
 import { Camera, LoaderCircle, Save, UserRound } from "lucide-react";
 import { useProfileForm } from "@/components/user/useProfileForm";
 import BackButton from "./BackButton";
 
+// bg หลักมาตรฐานของทั้งเว็บ (เดียวกับที่ตั้งไว้ใน PublicLayout.jsx) - ใช้กับพื้นหลังหลักของหน้าเท่านั้น
+// ไม่ใช่ bg ของปุ่มหรือ element ย่อย ส่วนการ์ด/แผงต่างๆ ในหน้ายังคงเป็น liquid card (GLASS_PANEL)
 const PAGE_BG =
-  "bg-[linear-gradient(180deg,rgba(100,201,207,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(100,201,207,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
+  "bg-[linear-gradient(180deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
+// เดียวกับ GLASS_PANEL/CTA_GLASS ที่ใช้ทั้งเว็บ
 const GLASS_PANEL =
   "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
 const CTA_GLASS =
@@ -64,6 +66,7 @@ function EditProfile() {
           className={`rounded-2xl p-6 lg:p-8 ${GLASS_PANEL}`}
           noValidate
         >
+          {/* Profile Picture */}
           <div className="mb-8 flex items-center gap-5 border-b border-neutral-200/70 pb-8">
             <div className="flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200/70 bg-neutral-100">
               {imagePreview ? (
@@ -164,7 +167,7 @@ function EditProfile() {
               id="address"
               rows={5}
               placeholder="Enter your contact address"
-              className={`w-full resize-none rounded-xl border px-4 py-3 text-sm text-neutral-900 outline-none transition focus:ring-2 ${
+              className={`w-full resize-none rounded-xl border bg-white/70 backdrop-blur-sm px-4 py-3 text-sm text-neutral-900 outline-none transition focus:ring-2 ${
                 errors.address
                   ? "border-red-500 focus:ring-red-100"
                   : "border-neutral-300 focus:border-orange-500 focus:ring-orange-100"
@@ -232,7 +235,7 @@ function FormInput({
         type={type}
         placeholder={placeholder}
         disabled={disabled}
-        className={`w-full rounded-xl border px-4 py-3 text-sm outline-none transition ${
+        className={`w-full rounded-xl border bg-white/70 backdrop-blur-sm px-4 py-3 text-sm outline-none transition disabled:cursor-not-allowed disabled:bg-neutral-100/60 disabled:text-neutral-500 ${
           error
             ? "border-red-500"
             : "border-neutral-300 focus:border-orange-500"

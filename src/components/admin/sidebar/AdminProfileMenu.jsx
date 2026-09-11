@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import {
-  ChevronUp,
-  LoaderCircle,
-  LogOut,
-  UserRound,
-} from "lucide-react";
+import { ChevronUp, LoaderCircle, LogOut, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
 import { logout } from "@/api/auth/auth.api";
@@ -15,17 +10,14 @@ import { clearClientSession } from "@/lib/clear.client.session";
 function AdminProfileMenu() {
   const navigate = useNavigate();
 
-  const [isLoggingOut, setIsLoggingOut] =
-    useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const profileQuery = useUserProfile();
 
   const user = profileQuery.data?.user;
 
   const fullName =
-    [user?.firstName, user?.lastName]
-      .filter(Boolean)
-      .join(" ") || "Admin";
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "Admin";
 
   async function handleLogout() {
     if (isLoggingOut) return;
@@ -35,12 +27,9 @@ function AdminProfileMenu() {
 
       const data = await logout();
 
-      toast.success(
-        data?.message || "Logged out successfully",
-        {
-          position: "top-center",
-        },
-      );
+      toast.success(data?.message || "Logged out successfully", {
+        position: "top-center",
+      });
     } catch (error) {
       console.error("Logout error:", error);
 
@@ -81,9 +70,7 @@ function AdminProfileMenu() {
         {/* ADMIN PROFILE */}
         <button
           type="button"
-          onClick={() =>
-            navigate("/admin/profile")
-          }
+          onClick={() => navigate("/admin/profile")}
           disabled={isLoggingOut}
           className="
             flex w-full items-center gap-3
@@ -95,10 +82,7 @@ function AdminProfileMenu() {
             disabled:opacity-50
           "
         >
-          <UserRound
-            size={17}
-            className="shrink-0"
-          />
+          <UserRound size={17} className="shrink-0" />
 
           <span>Admin Profile</span>
         </button>
@@ -121,22 +105,12 @@ function AdminProfileMenu() {
           "
         >
           {isLoggingOut ? (
-            <LoaderCircle
-              size={17}
-              className="shrink-0 animate-spin"
-            />
+            <LoaderCircle size={17} className="shrink-0 animate-spin" />
           ) : (
-            <LogOut
-              size={17}
-              className="shrink-0"
-            />
+            <LogOut size={17} className="shrink-0" />
           )}
 
-          <span>
-            {isLoggingOut
-              ? "Logging out..."
-              : "Logout"}
-          </span>
+          <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
         </button>
       </div>
 
@@ -161,19 +135,14 @@ function AdminProfileMenu() {
               className="h-full w-full object-cover"
             />
           ) : (
-            <UserRound
-              size={19}
-              className="text-white"
-            />
+            <UserRound size={19} className="text-white" />
           )}
         </div>
 
         {/* USER INFO */}
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium text-white">
-            {profileQuery.isPending
-              ? "Loading..."
-              : fullName}
+            {profileQuery.isPending ? "Loading..." : fullName}
           </p>
 
           <p className="truncate text-[11px] text-neutral-400">

@@ -22,7 +22,7 @@ const PAGE_BG =
   "bg-[linear-gradient(180deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
 // popup menu ลอยทับเนื้อหา ต้องทึบกว่าการ์ดปกติหน่อยให้อ่านง่าย (เดียวกับ GLASS_MODAL ที่ใช้ใน OrderDetail.jsx)
 const GLASS_MODAL =
-  "border border-neutral-200/80 bg-white/92 backdrop-blur-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_20px_40px_rgba(0,0,0,0.14)]";
+  "border border-neutral-200/80 bg-white/70 backdrop-blur-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_20px_40px_rgba(0,0,0,0.14)]";
 // ปุ่มแบบแก้วโปร่ง (เดียวกับ GLASS_IDLE ใน BackButton.jsx/SiteHeader.jsx) - ใช้ทั้งเมนูหลักและปุ่ม Settings
 const GLASS_IDLE =
   "border border-neutral-200/70 bg-white/60 backdrop-blur-md shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_2px_8px_rgba(0,0,0,0.06)]";
