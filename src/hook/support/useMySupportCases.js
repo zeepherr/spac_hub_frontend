@@ -15,7 +15,7 @@ export const useMySupportCases = () => {
      * Backend currently does not broadcast
      * Support Case status changes.
      */
-    refetchInterval: 30 * 1000,
+    refetchInterval: 60 * 1000,
 
     retry: false,
   });

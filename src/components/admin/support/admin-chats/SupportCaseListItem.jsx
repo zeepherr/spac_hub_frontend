@@ -35,11 +35,14 @@ function SupportCaseListItem({
     [listing?.brand, listing?.model].filter(Boolean).join(" ") ||
     "Unknown product";
 
-  const openedByName =
-    [supportCase.openedBy?.firstName, supportCase.openedBy?.lastName]
+  const participantName =
+    [
+      supportCase.participantUser?.firstName,
+      supportCase.participantUser?.lastName,
+    ]
       .filter(Boolean)
       .join(" ") || "Unknown user";
-
+  const participantRole = supportCase.participantRole || "USER";
   const openedByRole = getSupportCaseOpenerRole(supportCase);
 
   const issueLabel = formatEnumLabel(supportCase.issueType);
@@ -103,12 +106,16 @@ function SupportCaseListItem({
           {/* User + role */}
           <div className="mt-1 flex min-w-0 items-center gap-1.5">
             <p className="truncate text-xs font-medium text-neutral-700">
-              {openedByName}
+              {participantName}
             </p>
 
             <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-500">
               <UserRound size={10} />
-              {openedByRole}
+              {participantRole === "BUYER"
+                ? "Buyer"
+                : participantRole === "SELLER"
+                  ? "Seller"
+                  : "User"}
             </span>
           </div>
 

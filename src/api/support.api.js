@@ -17,6 +17,12 @@ import { authApi } from "./axios";
  *   message: string
  * }
  */
+
+export const createAdminSupportCases = async (payload) => {
+  const response = await authApi.post("/admin/support-cases", payload);
+
+  return response.data;
+};
 export const createSupportCase = async (payload) => {
   const response = await authApi.post("/support-cases", payload);
 

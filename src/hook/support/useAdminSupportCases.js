@@ -15,7 +15,7 @@ export const useAdminSupportCases = () => {
      * New Support Cases are created through REST.
      * There is no global Admin Socket event for new cases yet.
      */
-    refetchInterval: 30 * 1000,
+    refetchInterval: 60 * 1000,
 
     retry: false,
   });

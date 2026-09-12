@@ -8,8 +8,9 @@ import { useEffect } from "react";
 
 import { supportKeys } from "./supportKeys";
 
-export function useAdminSupportRealtime() {
+export function useUserSupportRealtime() {
   const queryClient = useQueryClient();
+
   const accessToken = useAuthStore((state) => state.accessToken);
 
   useEffect(() => {
@@ -24,37 +25,34 @@ export function useAdminSupportRealtime() {
     }
 
     const handleCaseCreated = (response) => {
-      const newSupportCase = response?.data;
+      const supportCase = response?.data;
 
-      if (!response?.success || !newSupportCase) {
+      if (!response?.success || !supportCase?.id) {
         return;
       }
 
-      queryClient.setQueryData(supportKeys.adminList(), (oldSupportCases) => {
-        const currentCases = Array.isArray(oldSupportCases)
-          ? oldSupportCases
-          : [];
+      queryClient.setQueryData(supportKeys.myList(), (oldCases) => {
+        const currentCases = Array.isArray(oldCases) ? oldCases : [];
 
-        const alreadyExists = currentCases.some(
-          (supportCase) => String(supportCase.id) === String(newSupportCase.id),
+        const withoutDuplicate = currentCases.filter(
+          (item) => String(item.id) !== String(supportCase.id),
         );
 
-        if (alreadyExists) {
-          return currentCases;
-        }
-
-        return [newSupportCase, ...currentCases];
+        return [supportCase, ...withoutDuplicate];
       });
 
-      /*
-       * Background verification against the database.
-       */
+      queryClient.setQueryData(
+        supportKeys.myDetail(supportCase.id),
+        supportCase,
+      );
+
       void queryClient.invalidateQueries({
-        queryKey: supportKeys.adminList(),
+        queryKey: supportKeys.myList(),
         exact: true,
         refetchType: "active",
       });
     };
+
     const handleCaseUpdated = (response) => {
       const update = response?.data;
 
@@ -62,24 +60,34 @@ export function useAdminSupportRealtime() {
         return;
       }
 
+      /*
+       * Backend's case-updated event may be a partial object
+       * when it comes from a new message.
+       *
+       * Refetching keeps the cache shape correct.
+       */
       void queryClient.invalidateQueries({
-        queryKey: supportKeys.adminList(),
+        queryKey: supportKeys.myList(),
         exact: true,
         refetchType: "active",
       });
 
       void queryClient.invalidateQueries({
-        queryKey: supportKeys.adminDetail(update.id),
+        queryKey: supportKeys.myDetail(update.id),
         exact: true,
         refetchType: "active",
       });
     };
 
     socket.on("support:case-created", handleCaseCreated);
+
     socket.on("support:case-updated", handleCaseUpdated);
+
     return () => {
       socket.off("support:case-created", handleCaseCreated);
-      socket.off("support:case-created", handleCaseUpdated);
+
+      socket.off("support:case-updated", handleCaseUpdated);
+
       disconnectSupportSocket();
     };
   }, [accessToken, queryClient]);
