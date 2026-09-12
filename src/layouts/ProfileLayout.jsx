@@ -3,8 +3,8 @@ import { useState } from "react";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { hasUnreadSupportMessage } from "@/components/support/support.constants";
 import { useMySupportCases } from "@/hook/support/useMySupportCases";
+import { useUserSupportRealtime } from "@/hook/support/useUserSupportRealtime";
 import useAuthStore from "@/stores/auth.store";
-
 import {
   ChevronUp,
   LayoutDashboard,
@@ -50,6 +50,7 @@ const menus = [
 ];
 
 function ProfileLayout() {
+  useUserSupportRealtime();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const user = useAuthStore((state) => state.user);

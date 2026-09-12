@@ -1,16 +1,13 @@
 import { useEffect } from "react";
 
 import { refreshAccessToken } from "@/api/auth/auth.session";
-import {
-  disconnectSupportSocket,
-  getSupportSocket,
-} from "@/lib/support.socket";
+import { getSupportSocket } from "@/lib/support.socket";
 import { supportKeys } from "../supportKeys";
+import { emitWithAcknowledgement } from "./supportSocket.utils";
 import {
   updateMessagesWithNewMessage,
   updateMessagesWithReadReceipt,
 } from "./supportSocketCache.utils";
-import { emitWithAcknowledgement } from "./supportSocket.utils";
 
 function useSupportSocketLifecycle({
   accessToken,
@@ -132,8 +129,14 @@ function useSupportSocketLifecycle({
         exact: true,
         refetchType: "active",
       });
-      void queryClient.invalidateQueries({ queryKey: listQueryKey, exact: true });
-      void queryClient.invalidateQueries({ queryKey: detailQueryKey, exact: true });
+      void queryClient.invalidateQueries({
+        queryKey: listQueryKey,
+        exact: true,
+      });
+      void queryClient.invalidateQueries({
+        queryKey: detailQueryKey,
+        exact: true,
+      });
     };
 
     const handleMessageRead = (response) => {
@@ -148,8 +151,14 @@ function useSupportSocketLifecycle({
       queryClient.setQueryData(messagesQueryKey, (oldData) =>
         updateMessagesWithReadReceipt(oldData, readData),
       );
-      void queryClient.invalidateQueries({ queryKey: listQueryKey, exact: true });
-      void queryClient.invalidateQueries({ queryKey: detailQueryKey, exact: true });
+      void queryClient.invalidateQueries({
+        queryKey: listQueryKey,
+        exact: true,
+      });
+      void queryClient.invalidateQueries({
+        queryKey: detailQueryKey,
+        exact: true,
+      });
     };
 
     socket.on("connect", handleConnect);
@@ -176,9 +185,6 @@ function useSupportSocketLifecycle({
         socket.emit("conversation:leave", {
           conversationId: parsedConversationId,
         });
-      }
-      if (!isAdmin) {
-        disconnectSupportSocket();
       }
       socketRef.current = null;
     };
