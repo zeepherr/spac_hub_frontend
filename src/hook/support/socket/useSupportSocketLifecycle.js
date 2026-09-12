@@ -186,11 +186,6 @@ function useSupportSocketLifecycle({
           conversationId: parsedConversationId,
         });
       }
-      if (socket.connected) {
-        socket.emit("conversation:leave", {
-          conversationId: parsedConversationId,
-        });
-      }
       socketRef.current = null;
     };
   }, [

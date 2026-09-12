@@ -79,7 +79,7 @@ export function useAdminSupportRealtime() {
     socket.on("support:case-updated", handleCaseUpdated);
     return () => {
       socket.off("support:case-created", handleCaseCreated);
-      socket.off("support:case-created", handleCaseUpdated);
+      socket.off("support:case-updated", handleCaseUpdated);
       disconnectSupportSocket();
     };
   }, [accessToken, queryClient]);

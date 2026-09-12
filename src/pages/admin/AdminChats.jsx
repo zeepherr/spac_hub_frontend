@@ -98,11 +98,12 @@ function AdminChats() {
 
     if (nextCaseId) {
       setSelectedSupportCaseId(nextCaseId);
+      setIsOrderDetailOpen(false);
     }
   }, [searchParams]);
   /* Close the active conversation if filtering removes it from the queue. */
   useEffect(() => {
-    if (!selectedSupportCaseId) {
+    if (isCasesPending || !selectedSupportCaseId) {
       return;
     }
 
@@ -114,7 +115,7 @@ function AdminChats() {
       setSelectedSupportCaseId(null);
       setIsOrderDetailOpen(false);
     }
-  }, [filteredSupportCases, selectedSupportCaseId]);
+  }, [isCasesPending, filteredSupportCases, selectedSupportCaseId]);
 
   const {
     data: supportCaseDetail,

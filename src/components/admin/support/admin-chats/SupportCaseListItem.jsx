@@ -5,11 +5,7 @@ import {
   SUPPORT_STATUS_META,
 } from "@/components/support/support.constants";
 
-import {
-  formatCaseDate,
-  formatEnumLabel,
-  getSupportCaseOpenerRole,
-} from "./adminChats.utils";
+import { formatCaseDate, formatEnumLabel } from "./adminChats.utils";
 
 function SupportCaseListItem({
   supportCase,
@@ -43,7 +39,6 @@ function SupportCaseListItem({
       .filter(Boolean)
       .join(" ") || "Unknown user";
   const participantRole = supportCase.participantRole || "USER";
-  const openedByRole = getSupportCaseOpenerRole(supportCase);
 
   const issueLabel = formatEnumLabel(supportCase.issueType);
 
