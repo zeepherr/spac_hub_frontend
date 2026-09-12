@@ -17,8 +17,7 @@ function AdminChats() {
 
   const currentUser = useAuthStore((state) => state.user);
   const [selectedSupportCaseId, setSelectedSupportCaseId] = useState(
-    caseFromUrl,
-    null,
+    caseFromUrl || null,
   );
   const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -27,6 +26,7 @@ function AdminChats() {
   const {
     data: supportCases = [],
     isPending: isCasesPending,
+    isFetching: isCasesFetching,
     isError: isCasesError,
     refetch: refetchCases,
   } = useAdminSupportCases();
@@ -103,7 +103,7 @@ function AdminChats() {
   }, [searchParams]);
   /* Close the active conversation if filtering removes it from the queue. */
   useEffect(() => {
-    if (isCasesPending || !selectedSupportCaseId) {
+    if (isCasesPending || isCasesFetching || !selectedSupportCaseId) {
       return;
     }
 
@@ -115,7 +115,12 @@ function AdminChats() {
       setSelectedSupportCaseId(null);
       setIsOrderDetailOpen(false);
     }
-  }, [isCasesPending, filteredSupportCases, selectedSupportCaseId]);
+  }, [
+    isCasesPending,
+    isCasesFetching,
+    filteredSupportCases,
+    selectedSupportCaseId,
+  ]);
 
   const {
     data: supportCaseDetail,
