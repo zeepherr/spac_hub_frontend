@@ -46,7 +46,7 @@ export default function StatCardsGroup() {
   // ลด opacity ของสีพื้นหลัง + เพิ่ม backdrop-blur ให้ทุกการ์ดดูเป็นกระจกโปร่งแสง (liquid glass) แทนสีทึบเดิม
   const stats = [
     {
-      label: "Buying",
+      label: "Sold",
       value: buyingCount,
       icon: ShoppingBag,
       actionText: "View completed →",
