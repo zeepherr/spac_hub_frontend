@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
+import { useCategories } from "@/hook/category/useCategory";
+import { createListingSchema } from "@/validations/listing.schema";
+import { AnimatePresence, motion } from "framer-motion";
 import {
+  CheckCircle2,
   ChevronRight,
+  Image as ImageIcon,
   Layers,
+  Loader2,
+  MapPin,
   Sparkles,
   Upload,
   X,
-  Loader2,
-  Image as ImageIcon,
-  CheckCircle2,
-  MapPin,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import AiProcessingCard from "./AiProcessingCard";
 import CategorySelectModal from "./CategorySelectModal";
 import ProvinceSelectModal from "./ProvinceSelectModal";
-import AiProcessingCard from "./AiProcessingCard";
-import { createListingSchema } from "@/validations/listing.schema";
-import { useCategories } from "@/hook/category/useCategory";
 
 // เดียวกับ GLASS_PANEL/CTA_GLASS ที่ใช้ทั้งเว็บ
 const GLASS_PANEL =
@@ -75,7 +75,15 @@ const typeEffect = (text, callback, speed = 25) => {
     }, speed);
   });
 };
+const formatThb = (value) => {
+  const amount = Number(value);
 
+  if (!Number.isFinite(amount)) {
+    return "-";
+  }
+
+  return `฿${amount.toLocaleString("th-TH")}`;
+};
 export default function ProductBasicForm({
   formData,
   setFormData,
@@ -93,6 +101,7 @@ export default function ProductBasicForm({
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false); // สถานะขณะกำลัง Typing ลง Input
   const [isAiSuccess, setIsAiSuccess] = useState(false);
+  const [marketPrice, setMarketPrice] = useState(null);
   const [errors, setErrors] = useState({});
 
   const { data: categoriesData } = useCategories({ includeInactive: false });
@@ -148,6 +157,7 @@ export default function ProductBasicForm({
     setSelectedFile(file);
     setAiImagePreview(URL.createObjectURL(file));
     setIsAiSuccess(false);
+    setMarketPrice(null);
   };
 
   // ----------------------------------------------------
@@ -158,6 +168,7 @@ export default function ProductBasicForm({
     try {
       setIsAiLoading(true);
       setIsAiSuccess(false);
+      setMarketPrice(null);
 
       // เรียก API ถอดข้อมูลจากรูป
       const aiResult = await onAiAutofill(selectedFile);
@@ -172,7 +183,6 @@ export default function ProductBasicForm({
         title: "",
         brand: "",
         model: "",
-        price: "",
         description: "",
       }));
 
@@ -198,13 +208,7 @@ export default function ProductBasicForm({
           25,
         );
       }
-      if (data.price) {
-        await typeEffect(
-          String(data.price),
-          (val) => setFormData((prev) => ({ ...prev, price: val })),
-          40,
-        );
-      }
+
       if (data.description) {
         await typeEffect(
           data.description,
@@ -212,7 +216,7 @@ export default function ProductBasicForm({
           10,
         );
       }
-
+      setMarketPrice(data.marketPrice ?? null);
       setIsAiSuccess(true);
     } catch (error) {
       console.error("AI Autofill Failed:", error);
@@ -227,6 +231,7 @@ export default function ProductBasicForm({
     setSelectedFile(null);
     setAiImagePreview(null);
     setIsAiSuccess(false);
+    setMarketPrice(null);
   };
 
   const handleFormSubmit = (e) => {
@@ -263,33 +268,38 @@ export default function ProductBasicForm({
         </div>
 
         {/* AI AUTOFILL BANNER */}
-        <div className="relative overflow-hidden rounded-2xl p-5 md:p-6 transition-all duration-300 bg-linear-to-br from-amber-500/10 via-white/50 to-orange-500/5 border border-amber-500/30 shadow-md hover:shadow-lg hover:border-amber-500/50 group">
+        {/* AI AUTOFILL BANNER */}
+        <div className="group relative overflow-hidden rounded-2xl border border-amber-500/30 bg-linear-to-br from-amber-500/10 via-white/50 to-orange-500/5 p-5 shadow-md transition-all duration-300 hover:border-amber-500/50 hover:shadow-lg md:p-6">
           <div className="relative z-10 space-y-4">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
               <div className="flex items-start gap-3.5">
-                <div className="p-3 rounded-xl bg-linear-to-tr from-[#ea580c] to-[#f97316] text-white shrink-0">
-                  <Sparkles className="w-6 h-6 animate-pulse" />
+                <div className="shrink-0 rounded-xl bg-linear-to-tr from-[#ea580c] to-[#f97316] p-3 text-white">
+                  <Sparkles className="h-6 w-6" />
                 </div>
+
                 <div>
-                  <h4 className="text-base font-extrabold text-neutral-900 flex items-center gap-2">
+                  <h4 className="flex flex-wrap items-center gap-2 text-base font-extrabold text-neutral-900">
                     Auto-fill Product Details with AI
-                    <span className="px-2 py-0.5 text-[11px] font-bold rounded-full bg-linear-to-r from-amber-500 to-orange-500 text-white">
+                    <span className="rounded-full bg-linear-to-r from-amber-500 to-orange-500 px-2 py-0.5 text-[11px] font-bold text-white">
                       Recommended
                     </span>
                   </h4>
-                  <p className="text-xs md:text-sm text-neutral-500 mt-1">
-                    Select a product image to preview, then click confirm for AI
-                    to scan and fill in the details automatically.
+
+                  <p className="mt-1 text-xs text-neutral-500 md:text-sm">
+                    Select a product image to preview, then confirm for AI to
+                    identify the product and research its market price.
                   </p>
                 </div>
               </div>
 
               {!aiImagePreview && (
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border-none bg-linear-to-r from-[#f97316] to-[#ea580c] hover:from-[#ea580c] hover:to-[#c2410c] text-white font-bold shadow-md px-4 py-2.5">
-                  <Upload className="w-4 h-4" />
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border-none bg-linear-to-r from-[#f97316] to-[#ea580c] px-4 py-2.5 font-bold text-white shadow-md transition hover:from-[#ea580c] hover:to-[#c2410c]">
+                  <Upload className="h-4 w-4" />
+
                   <span className="text-xs md:text-sm">
                     Select Product Image
                   </span>
+
                   <input
                     type="file"
                     accept="image/*"
@@ -301,56 +311,63 @@ export default function ProductBasicForm({
             </div>
 
             {aiImagePreview && (
-              <div className="pt-4 border-t border-amber-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
+              <div className="flex flex-col items-start justify-between gap-4 border-t border-amber-500/20 pt-4 sm:flex-row sm:items-center">
+                <div className="flex min-w-0 items-center gap-4">
                   <div className="relative shrink-0">
                     <img
                       src={aiImagePreview}
-                      alt="AI Scan Preview"
-                      className="w-20 h-20 rounded-xl border-2 border-amber-500/60 object-cover"
+                      alt="Selected product for AI analysis"
+                      className="h-20 w-20 rounded-xl border-2 border-amber-500/60 object-cover"
                     />
+
                     <button
                       type="button"
                       onClick={handleClearAiImage}
                       disabled={isFormDisabled}
-                      className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full p-1.5 hover:bg-rose-700 transition-colors cursor-pointer"
+                      aria-label="Remove selected product image"
+                      className="absolute -right-2 -top-2 cursor-pointer rounded-full bg-rose-600 p-1.5 text-white transition-colors hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <X className="h-3.5 w-3.5" />
                     </button>
                   </div>
-                  <div>
-                    <span className="text-xs font-bold text-amber-600 flex items-center gap-1.5">
-                      <ImageIcon className="w-4 h-4" /> Selected Image
+
+                  <div className="min-w-0">
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-amber-600">
+                      <ImageIcon className="h-4 w-4 shrink-0" />
+                      Selected Image
                     </span>
-                    <p className="text-xs md:text-sm text-neutral-500 mt-0.5">
+
+                    <p className="mt-0.5 text-xs leading-5 text-neutral-500 md:text-sm">
                       {isAiSuccess
-                        ? "✨ AI successfully filled in the details!"
-                        : "Please verify accuracy and confirm to scan data."}
+                        ? "AI analysis completed. Please review the generated details."
+                        : "Confirm to identify the product and research its market price."}
                     </p>
                   </div>
                 </div>
 
                 {isAiSuccess ? (
-                  <div className="flex items-center gap-2 text-emerald-600 font-bold text-xs bg-emerald-500/10 px-4 py-2.5 rounded-xl border border-emerald-500/30">
-                    <CheckCircle2 className="w-4.5 h-4.5" /> Analysis Complete
+                  <div className="flex shrink-0 items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-xs font-bold text-emerald-600">
+                    <CheckCircle2 className="h-4.5 w-4.5" />
+                    Analysis Complete
                   </div>
                 ) : (
                   <button
                     type="button"
                     onClick={handleConfirmAiAutofill}
                     disabled={isFormDisabled}
-                    className="inline-flex cursor-pointer items-center gap-2 rounded-xl border-none bg-linear-to-r from-[#f97316] to-[#d97706] text-white font-extrabold px-4 py-2.5"
+                    className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl border-none bg-linear-to-r from-[#f97316] to-[#d97706] px-4 py-2.5 font-extrabold text-white transition hover:from-[#ea580c] hover:to-[#c2410c] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isAiLoading || isTyping ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <Sparkles className="w-4 h-4" />
+                      <Sparkles className="h-4 w-4" />
                     )}
+
                     <span>
                       {isAiLoading
-                        ? "Analyzing Image..."
+                        ? "Analyzing..."
                         : isTyping
-                          ? "Typing..."
+                          ? "Applying Results..."
                           : "Confirm AI Scan"}
                     </span>
                   </button>
@@ -358,13 +375,29 @@ export default function ProductBasicForm({
               </div>
             )}
           </div>
+
+          {/* Fixed overlay: does not increase the banner or form height */}
+          <AnimatePresence>
+            {(isAiLoading || isTyping) && (
+              <motion.div
+                key="ai-processing-overlay"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0 z-30 flex items-center justify-center bg-white/70 px-2 backdrop-blur-md"
+              >
+                <AiProcessingCard
+                  isAiLoading={isAiLoading}
+                  isTyping={isTyping}
+                  isSaving={false}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* AI PROCESSING / SAVING INDICATOR CARD */}
-        <AiProcessingCard
-          isAiLoading={isAiLoading || isTyping}
-          isSaving={loading}
-        />
 
         {/* INPUT: TITLE */}
         <div className="form-control w-full">
@@ -520,24 +553,25 @@ export default function ProductBasicForm({
           </div>
 
           <div className="form-control w-full">
-            <label className="label py-1 flex items-center justify-between">
+            <label className="label py-1">
               <span className="label-text font-bold text-neutral-900">
                 Price (THB) <span className="text-red-500">*</span>
               </span>
-              {(isAiLoading || isTyping) && (
-                <SkeletonLoadingText
-                  text={isTyping ? "AI typing price" : "Estimating price"}
-                />
-              )}
             </label>
+
             <motion.div
               animate={isTyping || isAiLoading ? { scale: [1, 1.005, 1] } : {}}
-              transition={{ repeat: Infinity, duration: 1.2, delay: 0.3 }}
+              transition={{
+                repeat: Infinity,
+                duration: 1.2,
+                delay: 0.3,
+              }}
               className="relative"
             >
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-neutral-400">
                 ฿
               </span>
+
               <input
                 type="number"
                 name="price"
@@ -546,14 +580,98 @@ export default function ProductBasicForm({
                 disabled={isFormDisabled}
                 value={formData.price ?? ""}
                 onChange={handleChange}
-                placeholder={isAiLoading ? "Estimating..." : "55000"}
+                placeholder="55000"
                 className={`${INPUT_BASE} pl-8 transition-all duration-300 ${
                   isTyping || isAiLoading ? AI_TYPING_RING : ""
                 } ${errors.price ? ERROR_RING : ""}`}
               />
             </motion.div>
+
+            {/* Fixed-height price guidance slot */}
+            <div
+              className="min-h-12 pt-2"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {isAiLoading || isTyping ? (
+                  <motion.p
+                    key="researching-price"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center gap-1.5 text-xs font-medium text-amber-600"
+                  >
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Researching current market prices…
+                  </motion.p>
+                ) : marketPrice?.recommendedPrice != null ? (
+                  <motion.div
+                    key="market-price"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <p className="flex flex-wrap items-center gap-1.5 text-xs text-neutral-500">
+                      <Sparkles className="h-3.5 w-3.5 shrink-0 text-orange-500" />
+
+                      <span className="font-medium">Suggested</span>
+
+                      <span className="font-extrabold text-orange-600">
+                        {formatThb(marketPrice.recommendedPrice)}
+                      </span>
+                    </p>
+
+                    <p className="mt-0.5 text-[11px] leading-4 text-neutral-400">
+                      Range{" "}
+                      <span className="font-semibold text-neutral-600">
+                        {formatThb(marketPrice.minimumPrice)}
+                      </span>
+                      {" – "}
+                      <span className="font-semibold text-neutral-600">
+                        {formatThb(marketPrice.maximumPrice)}
+                      </span>
+                      <>
+                        <span className="mx-1.5 text-neutral-300">·</span>
+
+                        <span>
+                          {marketPrice.basis === "RETAIL_DEPRECIATION"
+                            ? "Estimated from current retail pricing"
+                            : "Based on current second-hand market data"}
+                        </span>
+                      </>
+                    </p>
+                  </motion.div>
+                ) : isAiSuccess ? (
+                  <motion.p
+                    key="price-unavailable"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-xs text-neutral-400"
+                  >
+                    No reliable market estimate was found. Enter your own price.
+                  </motion.p>
+                ) : (
+                  <motion.p
+                    key="price-idle"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-xs text-neutral-400"
+                  >
+                    AI market guidance appears after image analysis.
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
+
             {errors.price && (
-              <span className="text-xs text-red-500 mt-1 font-medium">
+              <span className="mt-1 text-xs font-medium text-red-500">
                 {errors.price}
               </span>
             )}
