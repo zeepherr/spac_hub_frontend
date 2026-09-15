@@ -54,13 +54,13 @@ const FILTER_TABS = [
     badgeActive: "bg-white/20 text-white",
     badgeInactive: "bg-neutral-100 text-neutral-600",
   },
-  {
-    id: "ARCHIVED",
-    label: "Archived",
-    activeClass: "bg-rose-500 text-white shadow-rose-500/20",
-    badgeActive: "bg-white/20 text-white",
-    badgeInactive: "bg-rose-50 text-rose-700",
-  },
+  // {
+  //   id: "ARCHIVED",
+  //   label: "Archived",
+  //   activeClass: "bg-rose-500 text-white shadow-rose-500/20",
+  //   badgeActive: "bg-white/20 text-white",
+  //   badgeInactive: "bg-rose-50 text-rose-700",
+  // },
 ];
 
 export default function MyListingsPage() {
