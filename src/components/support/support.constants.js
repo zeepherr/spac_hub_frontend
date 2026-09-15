@@ -43,6 +43,36 @@ export const SELLER_SUPPORT_ISSUES = [
     label: "Inspection or other issue",
   },
 ];
+export const ADMIN_SUPPORT_ISSUES = [
+  {
+    value: "PRODUCT_NOT_AS_DESCRIBED",
+    label: "Product not as described",
+  },
+  {
+    value: "PAYMENT",
+    label: "Payment issue",
+  },
+  {
+    value: "SHIPPING",
+    label: "Shipping issue",
+  },
+  {
+    value: "DAMAGED_PRODUCT",
+    label: "Damaged product",
+  },
+  {
+    value: "SELLER_NOT_RESPONDING",
+    label: "Seller not responding",
+  },
+  {
+    value: "BUYER_NOT_RESPONDING",
+    label: "Buyer not responding",
+  },
+  {
+    value: "OTHER",
+    label: "Other issue",
+  },
+];
 
 export const SUPPORT_STATUS_META = {
   OPEN: {

@@ -46,17 +46,22 @@ function SupportChatPanel({
     label: supportCase?.status || "Unknown",
     className: "bg-neutral-100 text-neutral-600",
   };
-  const openedBy = supportCase?.openedBy;
-  const openerName = [openedBy?.firstName, openedBy?.lastName]
+  const participantUser = supportCase?.participantUser;
+
+  const participantName = [
+    participantUser?.firstName,
+    participantUser?.lastName,
+  ]
     .filter(Boolean)
     .join(" ");
-  const openerParticipant = supportCase?.conversation?.participants?.find(
-    (participant) => participant.userId === supportCase.openedById,
-  );
+
   const recipientLabel = isAdmin
-    ? openerName || openerParticipant?.roleInChat || "Customer"
+    ? participantName || "Customer"
     : "SpecHub Admin";
-  const recipientRole = isAdmin ? openerParticipant?.roleInChat : "ADMIN";
+
+  const recipientRole = isAdmin
+    ? supportCase?.participantRole || "USER"
+    : "ADMIN";
 
   if (!supportCase) {
     return null;

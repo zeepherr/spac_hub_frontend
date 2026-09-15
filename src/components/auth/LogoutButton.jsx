@@ -50,8 +50,8 @@ export function LogoutButton() {
       className={[
         "h-auto w-full cursor-pointer",
         "justify-start gap-3 rounded-md",
-        "bg-white px-4 py-3",
-        "text-sm font-medium text-black",
+        "bg-white/60 backdrop-blur-sm px-4 py-3",
+        "text-sm font-medium text-neutral-900",
         "transition-colors",
         // "hover:bg-red-500/10 hover:text-red-400",
         "disabled:cursor-not-allowed",

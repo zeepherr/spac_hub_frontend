@@ -1,5 +1,3 @@
-import { useEffect, useMemo, useState } from "react";
-
 import { AdminOrderDetailsModal } from "@/components/admin/support/AdminOrderContext";
 import AdminChatsHeader from "@/components/admin/support/admin-chats/AdminChatsHeader";
 import AdminSupportCaseQueue from "@/components/admin/support/admin-chats/AdminSupportCaseQueue";
@@ -9,10 +7,18 @@ import { useAdminOrderById } from "@/hook/order/useAdminOrderById";
 import { useAdminSupportCaseById } from "@/hook/support/useAdminSupportCaseById";
 import { useAdminSupportCases } from "@/hook/support/useAdminSupportCases";
 import useAuthStore from "@/stores/auth.store";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 
 function AdminChats() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const caseFromUrl = searchParams.get("case");
+
   const currentUser = useAuthStore((state) => state.user);
-  const [selectedSupportCaseId, setSelectedSupportCaseId] = useState(null);
+  const [selectedSupportCaseId, setSelectedSupportCaseId] = useState(
+    caseFromUrl || null,
+  );
   const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -20,6 +26,7 @@ function AdminChats() {
   const {
     data: supportCases = [],
     isPending: isCasesPending,
+    isFetching: isCasesFetching,
     isError: isCasesError,
     refetch: refetchCases,
   } = useAdminSupportCases();
@@ -45,9 +52,9 @@ function AdminChats() {
           return true;
         }
 
-        const openedByName = [
-          supportCase.openedBy?.firstName,
-          supportCase.openedBy?.lastName,
+        const participantName = [
+          supportCase.participantUser?.firstName,
+          supportCase.participantUser?.lastName,
         ]
           .filter(Boolean)
           .join(" ");
@@ -59,7 +66,8 @@ function AdminChats() {
           supportCase.order?.listing?.title,
           supportCase.issueType,
           supportCase.status,
-          openedByName,
+          participantName,
+          supportCase.participantRole,
         ]
           .filter(Boolean)
           .join(" ")
@@ -85,10 +93,17 @@ function AdminChats() {
         );
       });
   }, [supportCases, statusFilter, searchText, currentUser?.id]);
+  useEffect(() => {
+    const nextCaseId = searchParams.get("case");
 
+    if (nextCaseId) {
+      setSelectedSupportCaseId(nextCaseId);
+      setIsOrderDetailOpen(false);
+    }
+  }, [searchParams]);
   /* Close the active conversation if filtering removes it from the queue. */
   useEffect(() => {
-    if (!selectedSupportCaseId) {
+    if (isCasesPending || isCasesFetching || !selectedSupportCaseId) {
       return;
     }
 
@@ -100,7 +115,12 @@ function AdminChats() {
       setSelectedSupportCaseId(null);
       setIsOrderDetailOpen(false);
     }
-  }, [filteredSupportCases, selectedSupportCaseId]);
+  }, [
+    isCasesPending,
+    isCasesFetching,
+    filteredSupportCases,
+    selectedSupportCaseId,
+  ]);
 
   const {
     data: supportCaseDetail,
@@ -123,6 +143,11 @@ function AdminChats() {
 
   function handleSelectSupportCase(supportCaseId) {
     setSelectedSupportCaseId(supportCaseId);
+
+    setSearchParams({
+      case: String(supportCaseId),
+    });
+
     setIsOrderDetailOpen(false);
   }
 

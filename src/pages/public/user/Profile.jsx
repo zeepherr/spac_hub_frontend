@@ -14,6 +14,12 @@ import { useNavigate } from "react-router";
 import { useUserProfile } from "@/hook/user/useUserProfile";
 import BackButton from "./BackButton";
 
+// เดียวกับ PAGE_BG/GLASS_PANEL ที่ใช้ทั้งเว็บ
+const PAGE_BG =
+  "bg-[linear-gradient(180deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(0deg,rgba(59,130,246,0.12)_0%,transparent_35%),linear-gradient(180deg,#fafafa_0%,#f0f0f0_100%)]";
+const GLASS_PANEL =
+  "border border-neutral-200/70 bg-white/50 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.7),0_8px_24px_rgba(0,0,0,0.06)]";
+
 function Profile() {
   const navigate = useNavigate();
   const profileQuery = useUserProfile();
@@ -68,9 +74,8 @@ function Profile() {
     : "No data";
 
   return (
-    <section className="min-h-full bg-neutral-50 px-5 py-8 lg:px-10">
+    <section className={`min-h-full px-5 py-8 lg:px-10 ${PAGE_BG}`}>
       <div className="mx-auto max-w-6xl">
-       
         {/* Header */}
         <header className="mb-7">
           <h1 className="text-3xl font-bold text-neutral-900">My Profile</h1>
@@ -81,9 +86,9 @@ function Profile() {
         </header>
 
         {/* Profile Card */}
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm lg:p-8">
+        <div className={`rounded-2xl p-6 lg:p-8 ${GLASS_PANEL}`}>
           {/* Header Info */}
-          <div className="flex flex-col gap-6 border-b border-neutral-200 pb-7 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-6 border-b border-neutral-200/70 pb-7 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-5">
               <ProfileImage
                 imageUrl={user.profileImageUrl}
@@ -125,11 +130,7 @@ function Profile() {
 
           {/* Details */}
           <div className="mt-7 space-y-4">
-            <ProfileRow
-              icon={UserRound}
-              label="Full Name"
-              value={fullName}
-            />
+            <ProfileRow icon={UserRound} label="Full Name" value={fullName} />
 
             <ProfileRow icon={Mail} label="Email Address" value={user.email} />
 
@@ -163,7 +164,7 @@ function Profile() {
 
 function ProfileImage({ imageUrl, fullName }) {
   return (
-    <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200 bg-neutral-100">
+    <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-neutral-200/70 bg-neutral-100">
       {imageUrl ? (
         <img
           src={imageUrl}
@@ -177,12 +178,17 @@ function ProfileImage({ imageUrl, fullName }) {
   );
 }
 
-function ProfileRow({ icon: Icon, label, value, emptyText = "No information" }) {
+function ProfileRow({
+  icon: Icon,
+  label,
+  value,
+  emptyText = "No information",
+}) {
   const hasValue =
     value !== null && value !== undefined && String(value).trim() !== "";
 
   return (
-    <div className="grid gap-3 rounded-2xl border border-neutral-200 px-5 py-4 sm:grid-cols-[260px_1fr] sm:items-center">
+    <div className="grid gap-3 rounded-2xl border border-neutral-200/70 bg-white/40 backdrop-blur-sm px-5 py-4 sm:grid-cols-[260px_1fr] sm:items-center">
       <div className="flex items-center gap-4">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-orange-50 text-orange-600">
           <Icon size={21} />
