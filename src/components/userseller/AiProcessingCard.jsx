@@ -1,32 +1,45 @@
-import React from "react";
-import { Sparkles, Loader2, Bot, Save } from "lucide-react";
+import { Bot, Loader2, Save } from "lucide-react";
 
-export default function AiProcessingCard({ isAiLoading, isSaving }) {
-  // If not processing AI and not saving, hide the card automatically
-  if (!isAiLoading && !isSaving) return null;
+export default function AiProcessingCard({
+  isAiLoading = false,
+  isTyping = false,
+  isSaving = false,
+}) {
+  if (!isAiLoading && !isTyping && !isSaving) {
+    return null;
+  }
+
+  const title = isSaving
+    ? "Saving Product Details..."
+    : isTyping
+      ? "Applying AI Results..."
+      : "Analyzing Product Image...";
+
+  const description = isSaving
+    ? "Saving your product information. Please wait."
+    : isTyping
+      ? "Adding the detected product details to the form."
+      : "Identifying the product and researching current market prices.";
 
   return (
-    <div className="w-full bg-amber-500/10 backdrop-blur-sm border-2 border-amber-500/40 rounded-2xl p-4 flex items-center gap-4 animate-pulse shadow-md mb-6">
-      <div className="p-3 rounded-xl bg-amber-500 text-white shrink-0">
-        {isSaving ? (
-          <Save className="w-6 h-6 animate-bounce" />
-        ) : (
-          <Bot className="w-6 h-6 animate-bounce" />
-        )}
+    <div
+      role="status"
+      aria-live="polite"
+      className="mx-4 flex w-full max-w-md items-center gap-3 rounded-2xl border border-amber-300/70 bg-white/85 p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_12px_32px_rgba(249,115,22,0.14)] backdrop-blur-xl"
+    >
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-orange-500 to-amber-500 text-white shadow-md shadow-orange-500/20">
+        {isSaving ? <Save className="h-5 w-5" /> : <Bot className="h-5 w-5" />}
       </div>
-      <div className="space-y-0.5">
+
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <h4 className="font-extrabold text-sm text-amber-600">
-            {isSaving
-              ? "Saving Product Details..."
-              : "AI Auto-filling Details..."}
-          </h4>
-          <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-500" />
+          <h4 className="text-sm font-extrabold text-neutral-900">{title}</h4>
+
+          <Loader2 className="h-4 w-4 shrink-0 animate-spin text-orange-500" />
         </div>
-        <p className="text-xs text-neutral-500">
-          {isSaving
-            ? "Saving product information to the database, please wait..."
-            : "Extracting text from images and automatically populating product fields..."}
+
+        <p className="mt-0.5 text-xs leading-5 text-neutral-500">
+          {description}
         </p>
       </div>
     </div>
