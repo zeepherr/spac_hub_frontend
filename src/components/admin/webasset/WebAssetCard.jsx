@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import {
   ImageIcon,
   LoaderCircle,
@@ -7,6 +6,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { useDeleteWebAssetImage } from "@/hook/webAsset/useDeleteWebAssetImage";
@@ -14,43 +14,26 @@ import { useReplaceWebAssetImage } from "@/hook/webAsset/useReplaceWebAssetImage
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-const ALLOWED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-];
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-function WebAssetCard({
-  slot,
-  title,
-  description,
-  imageUrl,
-}) {
+function WebAssetCard({ slot, title, description, imageUrl }) {
   const fileInputRef = useRef(null);
 
-  const [selectedFile, setSelectedFile] =
-    useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
-  const [previewUrl, setPreviewUrl] =
-    useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
-  const [showDeleteConfirm, setShowDeleteConfirm] =
-    useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const replaceImageMutation =
-    useReplaceWebAssetImage();
+  const replaceImageMutation = useReplaceWebAssetImage();
 
-  const deleteImageMutation =
-    useDeleteWebAssetImage();
+  const deleteImageMutation = useDeleteWebAssetImage();
 
-  const isReplacing =
-    replaceImageMutation.isPending;
+  const isReplacing = replaceImageMutation.isPending;
 
-  const isDeleting =
-    deleteImageMutation.isPending;
+  const isDeleting = deleteImageMutation.isPending;
 
-  const isPending =
-    isReplacing || isDeleting;
+  const isPending = isReplacing || isDeleting;
 
   useEffect(() => {
     return () => {
@@ -65,27 +48,19 @@ function WebAssetCard({
 
     if (!file) return;
 
-    if (
-      !ALLOWED_IMAGE_TYPES.includes(file.type)
-    ) {
-      toast.error(
-        "Only JPEG, PNG, and WebP images are allowed.",
-        {
-          position: "top-right",
-        },
-      );
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      toast.error("Only JPEG, PNG, and WebP images are allowed.", {
+        position: "top-right",
+      });
 
       event.target.value = "";
       return;
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      toast.error(
-        "Image must not exceed 5 MB.",
-        {
-          position: "top-right",
-        },
-      );
+      toast.error("Image must not exceed 5 MB.", {
+        position: "top-right",
+      });
 
       event.target.value = "";
       return;
@@ -95,8 +70,7 @@ function WebAssetCard({
       URL.revokeObjectURL(previewUrl);
     }
 
-    const nextPreviewUrl =
-      URL.createObjectURL(file);
+    const nextPreviewUrl = URL.createObjectURL(file);
 
     setSelectedFile(file);
     setPreviewUrl(nextPreviewUrl);
@@ -141,21 +115,16 @@ function WebAssetCard({
     });
   };
 
-  const displayedImage =
-    previewUrl || imageUrl;
+  const displayedImage = previewUrl || imageUrl;
 
   return (
     <>
       <article className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
         {/* HEADER */}
         <div>
-          <h2 className="text-lg font-semibold text-neutral-900">
-            {title}
-          </h2>
+          <h2 className="text-lg font-semibold text-neutral-900">{title}</h2>
 
-          <p className="mt-1 text-sm text-neutral-500">
-            {description}
-          </p>
+          <p className="mt-1 text-sm text-neutral-500">{description}</p>
         </div>
 
         {/* IMAGE */}
@@ -170,10 +139,7 @@ function WebAssetCard({
             ) : (
               <div className="flex flex-col items-center justify-center px-6 text-center">
                 <div className="flex size-14 items-center justify-center rounded-full bg-neutral-100">
-                  <ImageIcon
-                    size={25}
-                    className="text-neutral-400"
-                  />
+                  <ImageIcon size={25} className="text-neutral-400" />
                 </div>
 
                 <p className="mt-3 text-sm font-medium text-neutral-600">
@@ -181,8 +147,7 @@ function WebAssetCard({
                 </p>
 
                 <p className="mt-1 text-xs text-neutral-400">
-                  Select an image to add to this
-                  website position.
+                  Select an image to add to this website position.
                 </p>
               </div>
             )}
@@ -206,9 +171,7 @@ function WebAssetCard({
                 </p>
 
                 <p className="mt-0.5 text-xs text-neutral-400">
-                  {formatFileSize(
-                    selectedFile.size,
-                  )}
+                  {formatFileSize(selectedFile.size)}
                 </p>
               </>
             ) : (
@@ -254,10 +217,7 @@ function WebAssetCard({
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isReplacing ? (
-                <LoaderCircle
-                  size={17}
-                  className="animate-spin"
-                />
+                <LoaderCircle size={17} className="animate-spin" />
               ) : (
                 <Upload size={17} />
               )}
@@ -273,29 +233,19 @@ function WebAssetCard({
           <div className="mt-5 flex gap-3">
             <button
               type="button"
-              onClick={() =>
-                fileInputRef.current?.click()
-              }
+              onClick={() => fileInputRef.current?.click()}
               disabled={isPending}
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {imageUrl ? (
-                <Pencil size={17} />
-              ) : (
-                <Upload size={17} />
-              )}
+              {imageUrl ? <Pencil size={17} /> : <Upload size={17} />}
 
-              {imageUrl
-                ? "Replace Image"
-                : "Upload Image"}
+              {imageUrl ? "Replace Image" : "Upload Image"}
             </button>
 
             {imageUrl && (
               <button
                 type="button"
-                onClick={() =>
-                  setShowDeleteConfirm(true)
-                }
+                onClick={() => setShowDeleteConfirm(true)}
                 disabled={isPending}
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-3 text-sm font-semibold text-red-500 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
@@ -313,17 +263,12 @@ function WebAssetCard({
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-red-50">
-                <Trash2
-                  size={20}
-                  className="text-red-500"
-                />
+                <Trash2 size={20} className="text-red-500" />
               </div>
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowDeleteConfirm(false)
-                }
+                onClick={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}
                 className="rounded-lg p-1.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
@@ -336,21 +281,15 @@ function WebAssetCard({
             </h3>
 
             <p className="mt-2 text-sm leading-6 text-neutral-500">
-              Are you sure you want to delete the
-              image for{" "}
-              <span className="font-semibold text-neutral-700">
-                {title}
-              </span>
-              ? This website position will return to
-              its default fallback.
+              Are you sure you want to delete the image for{" "}
+              <span className="font-semibold text-neutral-700">{title}</span>?
+              This website position will return to its default fallback.
             </p>
 
             <div className="mt-6 flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() =>
-                  setShowDeleteConfirm(false)
-                }
+                onClick={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}
                 className="rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-sm font-semibold text-neutral-600 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
@@ -364,17 +303,12 @@ function WebAssetCard({
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isDeleting ? (
-                  <LoaderCircle
-                    size={17}
-                    className="animate-spin"
-                  />
+                  <LoaderCircle size={17} className="animate-spin" />
                 ) : (
                   <Trash2 size={17} />
                 )}
 
-                {isDeleting
-                  ? "Deleting..."
-                  : "Delete Image"}
+                {isDeleting ? "Deleting..." : "Delete Image"}
               </button>
             </div>
           </div>
@@ -387,9 +321,7 @@ function WebAssetCard({
 function formatFileSize(bytes) {
   if (!bytes) return "0 MB";
 
-  return `${(bytes / 1024 / 1024).toFixed(
-    2,
-  )} MB`;
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
 
 export default WebAssetCard;

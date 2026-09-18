@@ -1,10 +1,6 @@
-import {
-  ImageIcon,
-  Images,
-  RefreshCw,
-} from "lucide-react";
+import { ImageIcon, Images, RefreshCw } from "lucide-react";
 
-import WebAssetCard from "@/components/admin/webAsset/WebAssetCard";
+import WebAssetCard from "@/components/admin/webasset/WebAssetCard";
 import GlobalLoading from "@/components/loading/GlobalLoading";
 
 import { useWebAssets } from "@/hook/webAsset/useWebAssets";
@@ -14,29 +10,25 @@ const WEB_ASSET_SLOTS = [
     slot: "home",
     field: "homeImageUrl",
     title: "Home Logo",
-    description:
-      "Logo displayed at the top-left of the homepage.",
+    description: "Logo displayed at the top-left of the homepage.",
   },
   {
     slot: "cover",
     field: "coverImageUrl",
     title: "Homepage Banner",
-    description:
-      "Main banner displayed in the center of the homepage.",
+    description: "Main banner displayed in the center of the homepage.",
   },
   {
     slot: "promotion",
     field: "promotionImageUrl",
     title: "Promotion Image",
-    description:
-      "Promotion image displayed on the homepage.",
+    description: "Promotion image displayed on the homepage.",
   },
   {
     slot: "banner",
     field: "bannerImageUrl",
     title: "Authentication Banner",
-    description:
-      "Banner displayed on the Login and Register pages.",
+    description: "Banner displayed on the Login and Register pages.",
   },
 ];
 
@@ -70,10 +62,7 @@ function WebAssets() {
           <div className="text-center">
             {/* ICON */}
             <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-red-50">
-              <ImageIcon
-                size={24}
-                className="text-red-500"
-              />
+              <ImageIcon size={24} className="text-red-500" />
             </div>
 
             {/* TITLE */}
@@ -81,16 +70,12 @@ function WebAssets() {
               Unable to load website images
             </h2>
 
-            <p className="mt-1 text-sm text-neutral-500">
-              Please try again.
-            </p>
+            <p className="mt-1 text-sm text-neutral-500">Please try again.</p>
 
             {/* RETRY */}
             <button
               type="button"
-              onClick={() =>
-                webAssetsQuery.refetch()
-              }
+              onClick={() => webAssetsQuery.refetch()}
               className="
                 mt-5
                 inline-flex
@@ -109,7 +94,6 @@ function WebAssets() {
               "
             >
               <RefreshCw size={17} />
-
               Try Again
             </button>
           </div>
@@ -121,7 +105,6 @@ function WebAssets() {
   return (
     <section className="min-h-screen bg-[#F5F5F4] px-6 py-6">
       <div className="mx-auto w-full max-w-[1500px]">
-
         {/* =========================================
             HEADER
         ========================================= */}
@@ -129,10 +112,7 @@ function WebAssets() {
           <div className="flex items-center gap-3">
             {/* ICON */}
             <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-orange-100">
-              <Images
-                size={22}
-                className="text-orange-500"
-              />
+              <Images size={22} className="text-orange-500" />
             </div>
 
             {/* TITLE */}
@@ -150,12 +130,8 @@ function WebAssets() {
           {/* REFRESH */}
           <button
             type="button"
-            onClick={() =>
-              webAssetsQuery.refetch()
-            }
-            disabled={
-              webAssetsQuery.isFetching
-            }
+            onClick={() => webAssetsQuery.refetch()}
+            disabled={webAssetsQuery.isFetching}
             className="
               inline-flex
               items-center
@@ -178,16 +154,10 @@ function WebAssets() {
           >
             <RefreshCw
               size={16}
-              className={
-                webAssetsQuery.isFetching
-                  ? "animate-spin"
-                  : ""
-              }
+              className={webAssetsQuery.isFetching ? "animate-spin" : ""}
             />
 
-            {webAssetsQuery.isFetching
-              ? "Loading..."
-              : "Refresh"}
+            {webAssetsQuery.isFetching ? "Loading..." : "Refresh"}
           </button>
         </div>
 
@@ -200,12 +170,8 @@ function WebAssets() {
               key={item.slot}
               slot={item.slot}
               title={item.title}
-              description={
-                item.description
-              }
-              imageUrl={
-                webAssets?.[item.field]
-              }
+              description={item.description}
+              imageUrl={webAssets?.[item.field]}
             />
           ))}
         </div>
